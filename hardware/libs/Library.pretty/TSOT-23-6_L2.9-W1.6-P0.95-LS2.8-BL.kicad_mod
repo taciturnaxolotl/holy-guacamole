@@ -1,0 +1,225 @@
+(footprint "TSOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL"
+	(version 20241229)
+	(generator "easyeda2kicad-ts")
+	(layer "F.Cu")
+	(attr smd)
+	(property "Reference" "REF**"
+		(at 0 -5.2 0)
+		(layer "F.SilkS")
+		(uuid "56390a17-11b9-46b6-9e72-6d4909c9ea73")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "TSOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL"
+		(at 0 5.2 0)
+		(layer "F.Fab")
+		(uuid "f1b21234-912b-41c6-aed4-9b2199e370af")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "ad90e6b8-7807-4608-94ca-aa2d95cd5c87")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "9388ab4e-df7d-4d44-a75e-43ef01b8675f")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "LCSC Part" "C2071056"
+		(at 0 7.2 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "4ee3dca9-dc82-43e9-a7f0-613e52fa9188")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Part Name" "AP63205WU-7"
+		(at 0 9.2 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "3d883c32-3ff6-4520-bddd-1d1731866d2e")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Manufacturer" "DIODES(美台)"
+		(at 0 11.2 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "3ccc6cb2-2d08-472d-87be-6edec9b00009")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(fp_text user "%R"
+		(at 0 0)
+		(layer "F.Fab")
+		(uuid "27341148-1d6a-469e-bda4-339db466a29d")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(fp_line
+		(start -1.5 0.8)
+		(end -1.5 -0.8)
+		(stroke
+			(width 0.254)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "10fd307c-4735-4b25-84e8-8ec6c266e17f")
+	)
+	(fp_line
+		(start 1.5 -0.8)
+		(end 1.5 0.8)
+		(stroke
+			(width 0.254)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "09a406f2-af53-4b07-a45b-ea2bc39acfff")
+	)
+	(fp_line
+		(start -1.9 -2.05)
+		(end 1.9 -2.05)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "d35b0ad6-9e3b-4f9a-b29b-b931850fb5aa")
+	)
+	(fp_line
+		(start 1.9 -2.05)
+		(end 1.9 2.65)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "bd157099-3edf-43e1-85d0-13d6dfbe4357")
+	)
+	(fp_line
+		(start 1.9 2.65)
+		(end -1.9 2.65)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "77350363-05d3-4d55-aa8b-cc6c608f17fb")
+	)
+	(fp_line
+		(start -1.9 -2.05)
+		(end -1.9 2.65)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "f981b66c-e36e-476d-85c9-5db3f0c5ec37")
+	)
+	(pad "6" smd rect
+		(at -0.95 -1.2 0)
+		(size 0.55 1.2)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "3094d9b2-4f18-4938-be88-4ab15fdc5cf6")
+	)
+	(pad "4" smd rect
+		(at 0.95 -1.2 0)
+		(size 0.55 1.2)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "9c6929c8-8d6e-4de8-ac70-dd964425ca7e")
+	)
+	(pad "3" smd rect
+		(at 0.95 1.2 0)
+		(size 0.55 1.2)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "4219e496-1018-4b67-b1f5-dd7891cf5100")
+	)
+	(pad "2" smd rect
+		(at 0 1.2 0)
+		(size 0.55 1.2)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "c06f0bbf-42f0-4e2e-aadf-59368e4bf68e")
+	)
+	(pad "1" smd rect
+		(at -0.95 1.2 0)
+		(size 0.55 1.2)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "4336cc37-cd52-42b4-9446-9ddb7a8e94f6")
+	)
+	(pad "5" smd rect
+		(at 0 -1.2 0)
+		(size 0.55 1.2)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "566de9ba-984a-4db1-bb22-eb551baf7db4")
+	)
+	(fp_circle
+		(center -1.45 1.4)
+		(end -1.42 1.4)
+		(stroke
+			(width 0.06)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "5dfb4a5b-3065-4ec9-aabe-c1b3021befe5")
+	)
+	(fp_circle
+		(center -0.93 1.83)
+		(end -0.73 1.83)
+		(stroke
+			(width 0.4)
+			(type solid)
+		)
+		(layer "Cmts.User")
+		(uuid "ddc35303-384a-4c21-8317-78e84110758a")
+	)
+	(fp_circle
+		(center -0.98 2.12)
+		(end -0.85 2.12)
+		(stroke
+			(width 0.25)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "558065db-fa15-4220-a2fd-cc0f08baac16")
+	)
+)

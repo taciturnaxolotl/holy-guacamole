@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+lib_pickle_dir/
+
+# KiCad generated outputs
+*.erc
+*.net
+*.svg
+*.png
+
+# Logs
+*.log
+
+# SKiDL/codex internals
+.codex/auth.json
+.codex/log/
+.codex/sessions/
+.codex/version.json
+
+subagents/
+
+.solder/
+agent-runs/
+circuit-backups/
+.history/
+*.lck

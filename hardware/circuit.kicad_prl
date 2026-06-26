@@ -1,0 +1,114 @@
+{
+  "board": {
+    "active_layer": 0,
+    "active_layer_preset": "",
+    "auto_track_width": true,
+    "hidden_netclasses": [],
+    "hidden_nets": [],
+    "high_contrast_mode": 0,
+    "net_color_mode": 1,
+    "opacity": {
+      "images": 0.6,
+      "pads": 1.0,
+      "shapes": 1.0,
+      "tracks": 1.0,
+      "vias": 1.0,
+      "zones": 0.6
+    },
+    "prototype_zone_fills": false,
+    "selection_filter": {
+      "dimensions": true,
+      "footprints": true,
+      "graphics": true,
+      "keepouts": true,
+      "lockedItems": false,
+      "otherItems": true,
+      "pads": true,
+      "text": true,
+      "tracks": true,
+      "vias": true,
+      "zones": true
+    },
+    "visible_items": [
+      "vias",
+      "footprint_text",
+      "footprint_anchors",
+      "ratsnest",
+      "grid",
+      "footprints_front",
+      "footprints_back",
+      "footprint_values",
+      "footprint_references",
+      "tracks",
+      "drc_errors",
+      "drawing_sheet",
+      "bitmaps",
+      "pads",
+      "zones",
+      "drc_warnings",
+      "drc_exclusions",
+      "locked_item_shadows",
+      "conflict_shadows",
+      "shapes",
+      "board_outline_area",
+      "ly_points"
+    ],
+    "visible_layers": "ffffffff_ffffffff_ffffffff_ffffffff",
+    "zone_display_mode": 0
+  },
+  "git": {
+    "integration_disabled": false,
+    "repo_type": "",
+    "repo_username": "",
+    "ssh_key": ""
+  },
+  "meta": {
+    "filename": "circuit.kicad_prl",
+    "version": 5
+  },
+  "net_inspector_panel": {
+    "col_hidden": [],
+    "col_order": [],
+    "col_widths": [],
+    "custom_group_rules": [],
+    "expanded_rows": [],
+    "filter_by_net_name": true,
+    "filter_by_netclass": true,
+    "filter_text": "",
+    "group_by_constraint": false,
+    "group_by_netclass": false,
+    "show_time_domain_details": false,
+    "show_unconnected_nets": false,
+    "show_zero_pad_nets": false,
+    "sort_ascending": true,
+    "sorting_column": -1
+  },
+  "open_jobsets": [],
+  "project": {
+    "files": []
+  },
+  "schematic": {
+    "ai_chat_state": "{\"activeSheetKey\":\"/5ff26309-9be7-4732-9683-b5a799424d79\",\"nextTabId\":2,\"sheets\":[{\"activeTabId\":\"tab_1\",\"nextTabNumber\":2,\"sheetKey\":\"/5ff26309-9be7-4732-9683-b5a799424d79\",\"sheetPath\":\"/5ff26309-9be7-4732-9683-b5a799424d79\",\"tabs\":[{\"displayMessages\":[],\"fixedKicadContext\":\"\",\"history\":[],\"id\":\"tab_1\",\"kicadChatId\":\"\",\"modelType\":\"medium\",\"selectionItems\":[],\"title\":\"Chat 1\"}]}]}",
+    "component_search_lib_path": "libs/Library.kicad_sym",
+    "component_search_state": "[{\"sheetPath\":\"/5ff26309-9be7-4732-9683-b5a799424d79\",\"state\":{\"hasScreenRect\":true,\"hasWorldRect\":true,\"logicalH\":696,\"logicalScaleVersion\":6,\"logicalW\":756,\"screenH\":2267,\"screenW\":2461,\"screenX\":-1492,\"screenY\":127,\"session\":{\"query\":\"\",\"results\":[]},\"visible\":false,\"worldPosX\":-418545.1022047968,\"worldPosY\":1839885.5019879837,\"worldSizeX\":1060659.3406593406,\"worldSizeY\":976923.0769230768}},{\"sheetPath\":\"/5ff26309-9be7-4732-9683-b5a799424d79\",\"state\":{\"hasScreenRect\":true,\"hasWorldRect\":true,\"logicalH\":691,\"logicalScaleVersion\":6,\"logicalW\":755,\"screenH\":2059,\"screenW\":2250,\"screenX\":-1321,\"screenY\":176,\"session\":{\"query\":\"\",\"results\":[]},\"visible\":false,\"worldPosX\":-387430.7421174236,\"worldPosY\":1833285.4862118743,\"worldSizeX\":1060716.8211604473,\"worldSizeY\":970673.7487863827}}]",
+    "create_submodule_state": "[]",
+    "datasheet_chat_state": "[]",
+    "datasheet_pdf_state": "[]",
+    "eval_jobs_state": "[]",
+    "hierarchy_collapsed": [],
+    "project_context_folder": "",
+    "project_context_password": "",
+    "selection_filter": {
+      "graphics": true,
+      "images": true,
+      "labels": true,
+      "lockedItems": false,
+      "otherItems": true,
+      "pins": true,
+      "ruleAreas": true,
+      "symbols": true,
+      "text": true,
+      "wires": true
+    }
+  }
+}
