@@ -1,6 +1,6 @@
 # Holy Guacamole — Carrier PCB Specification
 
-**Document status:** Draft v1.3 — updated to match current `circuit.py` Rev A schematic  
+**Document status:** Draft v1.3b — updated to match current `circuit.py` Rev A schematic  
 **Robot:** Holy Guacamole — 1lb meltybrain antweight, MRCA full-combat  
 
 ---
@@ -13,14 +13,14 @@ Primary carrier jobs:
 
 - Mount the XIAO RP2350 flat as an SMD/castellated module; no XIAO pin headers.
 - Generate a local regulated 5V rail from the switched 2S LiPo bus using an AP63205 fixed-5V buck regulator.
-- Use the XIAO 3.3V rail for IMUs, GPIO expander, ELRS receiver, analog protection, and control logic.
+- Use the XIAO 3.3V rail for IMUs, GPIO expander, analog protection, and control logic; power the BetaFPV ELRS Lite receiver from the carrier 5V rail per its vendor spec.
 - Route SPI to three H3LIS331DL high-G accelerometers.
 - Use a MCP23S17 SPI GPIO expander for IMU chip-selects and SK9822 LED-output enable.
 - Connect to the Repeat AM32 Dual Brushless Drive ESC using two direct bidirectional DSHOT/EDT lines.
 - Keep independent battery voltage sensing on the carrier.
 - Rely on AM32 bidirectional DSHOT / EDT for motor eRPM/current/voltage telemetry; no external Kelvin shunt in Rev A.
 - Provide a dedicated orange 2-3S TinySLED meltybrain heading output using XIAO edge pin D1/A1 and one MOSFET low-side switch; no underside XIAO GPIOs are used for runtime IO.
-- Provide protected piezo impact sensing, status LED, SWD pads, and scope/logic-analyzer test points.
+- Provide protected piezo impact sensing, retain the SK9822 RGB status LED for boot/error/mode indication, expose SWD pads, and provide scope/logic-analyzer test points.
 
 The PCB mounts near the chassis centre. Final IMU coordinates must be measured from the actual chassis rotation centre and copied into firmware calibration constants.
 
@@ -117,10 +117,10 @@ Rev A keeps an independent controller buck regulator. The Repeat AM32 dual ESC B
                   -> 5V rail
                       -> XIAO 5V/VBUS pad
                       -> SK9822 status LED + AHCT buffers
+                      -> BetaFPV ELRS Lite receiver 5V input
                   -> XIAO onboard 3.3V regulator
                       -> H3LIS331DL IMUs
                       -> MCP23S17 expander
-                      -> ELRS receiver
                       -> analog clamps / control logic
               -> J2 pin 1 TinySLED VBUS feed
                   -> external orange 2-3S TinySLED
@@ -239,6 +239,28 @@ ST guidance for H3LIS331DL supply bypassing calls for local 100nF plus bulk capa
 
 Each CS line has a 10kΩ pull-up (`R3`, `R4`, `R5`) so the IMUs remain deselected while the RP2350 and MCP23S17 boot.
 
+### IMU readout timing
+
+Rev A uses one shared `SPI_MISO` net, so firmware must select **only one H3LIS331DL at a time**. Do not assert `CS_A`, `CS_B`, and `CS_C` simultaneously on this hardware: all selected IMUs would drive the same MISO net through the 33Ω resistors, causing contention and invalid data.
+
+Timing budget at 10MHz SPI:
+
+| Operation | Approximate time |
+|---|---:|
+| H3LIS331DL X/Y burst read: 1 address byte + 4 data bytes = 40 bits | ~4us per IMU |
+| Three ideal sequential IMU reads | ~12us |
+| MCP23S17 GPIO write: opcode + register + data = 24 bits | ~2.4us each at 10MHz |
+| Practical three-IMU read set with expander CS management | ~20-35us depending on firmware gaps |
+| Angular skew at 4000RPM for 30us | ~0.72deg |
+
+Firmware requirements:
+
+- Cache the MCP23S17 GPIO state and use one GPIOA write to transition between selected IMUs, e.g. all-high -> `CS_A` low -> `CS_B` low -> `CS_C` low -> all-high.
+- Keep exactly one IMU CS low during each SPI data transaction.
+- Timestamp the read set and, if needed, compensate fixed read skew in the estimator. Expected Rev A skew is below other likely error sources such as IMU placement tolerance and accelerometer nonlinearity.
+- Parallel-MISO PIO readout is a Rev B optimization only. It would require routing `MISO_A`, `MISO_B`, and `MISO_C` to separate direct RP2350 GPIOs, while sharing SCK/MOSI/CS timing. It is not supported by the current edge-pin-only Rev A schematic.
+- Parallel MISO removes bus readout skew but does not synchronize the IMUs' internal sample clocks; data-ready timing still matters if sample simultaneity becomes a limiting error source.
+
 ### Axis orientation convention
 
 Mount each chip so:
@@ -309,21 +331,33 @@ High-current ESC battery and motor phase wiring must not pass through the carrie
 
 ## CRSF / ELRS
 
-**Connector:** `J6`
+**Connector:** `J6`  
+**Receiver:** BetaFPV ELRS Lite Receiver 2.4GHz, Flat Antenna V1.2 variant, https://betafpv.com/products/elrs-lite-receiver
+
+Vendor-listed receiver facts for the selected variant:
+
+| Parameter | Value |
+|---|---|
+| MCU | ESP8285 |
+| Serial output protocol | CRSF |
+| Input voltage | 5V |
+| Frequency band | 2.4GHz ISM |
+| Telemetry RF power | 17mW |
+| Size / mass | 11 × 10 × 3mm, 0.46g |
+| Antenna | Integrated SMD ceramic antenna |
 
 | J6 pin | Signal | Notes |
 |---:|---|---|
-| 1 | 3V3 | Receiver power from XIAO 3.3V rail; verify receiver supports 3.3V |
+| 1 | 5V | Receiver power from carrier AP63205 5V rail; BetaFPV specifies 5V input |
 | 2 | GND | Receiver ground |
-| 3 | `CRSF_TX` | XIAO D6/GPIO0 -> receiver |
-| 4 | `CRSF_RX` | receiver -> XIAO D7/GPIO1 |
+| 3 | `CRSF_TX` | XIAO D6/GPIO0 -> receiver RX pad |
+| 4 | `CRSF_RX` | receiver TX pad -> XIAO D7/GPIO1 |
 
 CRSF caveat:
 
-- CRSF is commonly described as inverted UART at 420000 baud, but receiver behavior varies.
-- Prefer an ELRS receiver or pad configuration that exposes non-inverted CRSF if available.
-- If the chosen receiver only exposes inverted CRSF, handle inversion in RP2350 PIO/firmware or add a hardware inverter in a later revision.
-- Rev A schematic has no discrete CRSF inverter.
+- CRSF is normally non-inverted UART at 420000 baud. SBUS is the common inverted-serial trap; Rev A is using CRSF, not SBUS.
+- Rev A schematic has no discrete CRSF inverter, which is appropriate for the selected BetaFPV ELRS Lite CRSF output.
+- Before soldering, verify the physical `5V`/`GND`/`TX`/`RX` pad order on the actual receiver board and cross-connect receiver TX to XIAO RX and receiver RX to XIAO TX.
 
 Receiver placement: off-PCB on chassis wall for antenna clearance, away from the buck inductor and motor phase wires.
 
@@ -381,7 +415,7 @@ Piezo elements can generate voltage spikes well beyond 3.3V during impact. The S
 **Reference:** `U10`  
 **Part:** SK9822-EC20, 2×2mm, LCSC `C2909059`
 
-This is a small top-visible status LED, not the primary meltybrain heading indicator.
+This RGB status LED is intentionally retained in Rev A. It is a small top-visible status/debug indicator, not the primary meltybrain heading indicator.
 
 | Parameter | Value |
 |---|---|
@@ -393,7 +427,7 @@ This is a small top-visible status LED, not the primary meltybrain heading indic
 | Local bypass | `C16` = 100nF |
 | Worst-case LED current budget | ~61mA full white |
 
-Because the SK9822 shares the IMU SPI SCK/MOSI nets before the AHCT buffers, firmware must keep `LED_OE_N` disabled during normal IMU/MCP23S17 SPI traffic and only enable the buffers when intentionally updating the status LED. This avoids accidental LED updates during high-rate IMU bursts.
+Keep this subsystem populated for Rev A unless board area becomes impossible. It provides multi-color boot/error/mode indication without consuming extra direct XIAO GPIOs. Because the SK9822 shares the IMU SPI SCK/MOSI nets before the AHCT buffers, firmware must keep `LED_OE_N` disabled during normal IMU/MCP23S17 SPI traffic and only enable the buffers when intentionally updating the status LED. This avoids accidental LED updates during high-rate IMU bursts.
 
 State/color mapping is firmware-defined. Suggested defaults:
 
@@ -451,7 +485,7 @@ Important notes:
 - The selected 2-3S TinySLED module is expected to include its own current limiting; do not add a series LED resistor unless the selected module variant requires it.
 - The heading LED current loop is `VBUS -> J2 pin 1 -> TinySLED -> J2 pin 2 -> Q1 -> GND`; route it away from IMU supplies, piezo, and battery ADC routing.
 - `TP_HEAD` probes `HEAD_LED` before `R16` for timing verification without loading the LED current path.
-- Keep the SK9822 status LED for mode/error colors; the TinySLED is the high-brightness heading marker only.
+- Keep the SK9822 RGB status LED for boot/error/mode colors; the TinySLED is the high-brightness heading marker only.
 
 
 ## Test points
@@ -499,8 +533,8 @@ Expose the following as 1mm solderable pads with silkscreen labels.
 | D12 | NC | — | Underside pad left unused in Rev A |
 | SWDIO | `SWDIO` | debug | Test pad |
 | SWDCLK | `SWDCK` | debug | Test pad |
-| 5V/VBUS | 5V | power in | Carrier AP63205 buck output |
-| 3V3 / 3V3_OUT | 3V3 | power out | Powers IMUs, expander, receiver, analog refs |
+| 5V/VBUS | 5V | power in | Carrier AP63205 buck output; also powers the BetaFPV ELRS Lite receiver through J6 |
+| 3V3 / 3V3_OUT | 3V3 | power out | Powers IMUs, expander, analog refs, and 3.3V logic |
 | GND | GND | power | Common ground |
 
 Runtime IO intentionally stays on XIAO edge/castellated pads. Underside GPIO/control pads are left NC unless a later revision explicitly accepts the assembly/rework tradeoff.
@@ -533,6 +567,7 @@ Removed versus older spec:
 External/not included in carrier mass:
 
 - Repeat AM32 Dual Brushless Drive ESC.
+- BetaFPV ELRS Lite Receiver 2.4GHz Flat Antenna V1.2 and its fly-leads.
 - External orange 2-3S TinySLED module and its wires.
 - Piezo disc bonded to chassis.
 
@@ -556,8 +591,8 @@ External/not included in carrier mass:
 1. **Final board outline and IMU coordinates**  
    Resolve 38mm circular outline versus desired outer IMU radius. If outer sensors cannot reach 20mm centroid radius, choose final coordinates and update firmware constants.
 
-2. **CRSF inversion for chosen ELRS receiver**  
-   Confirm whether the receiver exposes non-inverted CRSF. If not, plan RP2350 PIO inversion or add a hardware inverter in Rev B.
+2. **BetaFPV ELRS Lite receiver integration**  
+   Use the selected BetaFPV ELRS Lite Receiver 2.4GHz Flat Antenna V1.2 on 5V power with CRSF. Before soldering, verify physical pad order, firmware target/version, binding phrase, packet rate, telemetry ratio, and failsafe behavior.
 
 3. **AM32 configuration**  
    Set profile `AM32_RR_ROBOT_DUAL_ESC_F421`, bidirectional drive, bidirectional DSHOT/EDT, current limits, motor direction, and correct motor pole count.
@@ -571,8 +606,11 @@ External/not included in carrier mass:
 6. **ESC BEC characterization**  
    Optional future work only. Measure BEC voltage/current/noise under motor load before considering deletion/DNP of the AP63205 buck.
 
-7. **IMU placement measurement**  
+7. **IMU readout firmware**  
+   Implement optimized sequential IMU reads with cached MCP23S17 GPIO state and exactly one IMU selected at a time. Do not use simultaneous-CS reads unless the PCB is revised for separate MISO lines.
+
+8. **IMU placement measurement**  
    After assembly, measure actual IMU centroids and axes relative to chassis centre and store calibration constants in firmware.
 
-8. **Power integrity check**  
+9. **Power integrity check**  
    Scope 5V, 3V3, and VBUS during heading LED strobes, DSHOT traffic, and motor spin-up. Ensure TinySLED pulses do not corrupt IMU reads, piezo/VBAT ADC readings, or reset the XIAO.

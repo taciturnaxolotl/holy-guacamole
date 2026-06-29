@@ -67,9 +67,42 @@
     "version": 5
   },
   "net_inspector_panel": {
-    "col_hidden": [],
-    "col_order": [],
-    "col_widths": [],
+    "col_hidden": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ],
+    "col_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "col_widths": [
+      156,
+      141,
+      103,
+      71,
+      103,
+      103,
+      103,
+      74,
+      103,
+      103
+    ],
     "custom_group_rules": [],
     "expanded_rows": [],
     "filter_by_net_name": true,
@@ -81,16 +114,16 @@
     "show_unconnected_nets": false,
     "show_zero_pad_nets": false,
     "sort_ascending": true,
-    "sorting_column": -1
+    "sorting_column": 0
   },
   "open_jobsets": [],
   "project": {
     "files": []
   },
   "schematic": {
-    "ai_chat_state": "{\"activeSheetKey\":\"/5ff26309-9be7-4732-9683-b5a799424d79\",\"nextTabId\":2,\"sheets\":[{\"activeTabId\":\"tab_1\",\"nextTabNumber\":2,\"sheetKey\":\"/5ff26309-9be7-4732-9683-b5a799424d79\",\"sheetPath\":\"/5ff26309-9be7-4732-9683-b5a799424d79\",\"tabs\":[{\"displayMessages\":[],\"fixedKicadContext\":\"\",\"history\":[],\"id\":\"tab_1\",\"kicadChatId\":\"\",\"modelType\":\"medium\",\"selectionItems\":[],\"title\":\"Chat 1\"}]}]}",
+    "ai_chat_state": "{\"activeSheetKey\":\"/5ff26309-9be7-4732-9683-b5a799424d79\",\"nextTabId\":4,\"sheets\":[{\"activeTabId\":\"tab_3\",\"nextTabNumber\":2,\"sheetKey\":\"/3cca56f2-9145-46f5-b3f1-d61bd0633948\",\"sheetPath\":\"/3cca56f2-9145-46f5-b3f1-d61bd0633948\",\"tabs\":[{\"displayMessages\":[],\"fixedKicadContext\":\"\",\"history\":[],\"id\":\"tab_3\",\"kicadChatId\":\"\",\"modelType\":\"medium\",\"selectionItems\":[],\"title\":\"Chat 1\"}]},{\"activeTabId\":\"tab_1\",\"nextTabNumber\":2,\"sheetKey\":\"/5ff26309-9be7-4732-9683-b5a799424d79\",\"sheetPath\":\"/5ff26309-9be7-4732-9683-b5a799424d79\",\"tabs\":[{\"displayMessages\":[],\"fixedKicadContext\":\"\",\"history\":[],\"id\":\"tab_1\",\"kicadChatId\":\"\",\"modelType\":\"medium\",\"selectionItems\":[],\"title\":\"Chat 1\"}]},{\"activeTabId\":\"tab_2\",\"nextTabNumber\":2,\"sheetKey\":\"/5ff26309-9be7-4732-9683-b5a799424d79/6d3b10cd-9256-4f74-9c47-bff4173e3a51\",\"sheetPath\":\"/5ff26309-9be7-4732-9683-b5a799424d79/6d3b10cd-9256-4f74-9c47-bff4173e3a51\",\"tabs\":[{\"displayMessages\":[],\"fixedKicadContext\":\"\",\"history\":[],\"id\":\"tab_2\",\"kicadChatId\":\"\",\"modelType\":\"medium\",\"selectionItems\":[],\"title\":\"Chat 1\"}]}]}",
     "component_search_lib_path": "libs/Library.kicad_sym",
-    "component_search_state": "[{\"sheetPath\":\"/5ff26309-9be7-4732-9683-b5a799424d79\",\"state\":{\"hasScreenRect\":true,\"hasWorldRect\":true,\"logicalH\":696,\"logicalScaleVersion\":6,\"logicalW\":756,\"screenH\":2267,\"screenW\":2461,\"screenX\":-1492,\"screenY\":127,\"session\":{\"query\":\"\",\"results\":[]},\"visible\":false,\"worldPosX\":-418545.1022047968,\"worldPosY\":1839885.5019879837,\"worldSizeX\":1060659.3406593406,\"worldSizeY\":976923.0769230768}},{\"sheetPath\":\"/5ff26309-9be7-4732-9683-b5a799424d79\",\"state\":{\"hasScreenRect\":true,\"hasWorldRect\":true,\"logicalH\":691,\"logicalScaleVersion\":6,\"logicalW\":755,\"screenH\":2059,\"screenW\":2250,\"screenX\":-1321,\"screenY\":176,\"session\":{\"query\":\"\",\"results\":[]},\"visible\":false,\"worldPosX\":-387430.7421174236,\"worldPosY\":1833285.4862118743,\"worldSizeX\":1060716.8211604473,\"worldSizeY\":970673.7487863827}}]",
+    "component_search_state": "[{\"sheetPath\":\"/5ff26309-9be7-4732-9683-b5a799424d79\",\"state\":{\"hasScreenRect\":true,\"hasWorldRect\":true,\"logicalH\":670,\"logicalScaleVersion\":6,\"logicalW\":731,\"screenH\":334,\"screenW\":363,\"screenX\":251,\"screenY\":398,\"session\":{\"query\":\"\",\"results\":[]},\"visible\":false,\"worldPosX\":-418731.5998088373,\"worldPosY\":1839173.8015729054,\"worldSizeX\":1060886.9629930386,\"worldSizeY\":976587.5275498206}},{\"sheetPath\":\"/5ff26309-9be7-4732-9683-b5a799424d79\",\"state\":{\"hasScreenRect\":true,\"hasWorldRect\":true,\"logicalH\":691,\"logicalScaleVersion\":6,\"logicalW\":755,\"screenH\":2059,\"screenW\":2250,\"screenX\":-1321,\"screenY\":176,\"session\":{\"query\":\"\",\"results\":[]},\"visible\":false,\"worldPosX\":-387430.7421174236,\"worldPosY\":1833285.4862118743,\"worldSizeX\":1060716.8211604473,\"worldSizeY\":970673.7487863827}}]",
     "create_submodule_state": "[]",
     "datasheet_chat_state": "[]",
     "datasheet_pdf_state": "[]",

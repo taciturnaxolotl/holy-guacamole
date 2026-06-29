@@ -1,19 +1,19 @@
 from skidl import *
 
 
-@requirement("Carrier supplies the Seeed XIAO RP2350 5V pad from a 2S LiPo bus using a fixed 5.0V AP63205 buck regulator; AP63203 is not used because it is fixed 3.3V.")
-@requirement("XIAO A0/D0 and A2/D2 physical pads are reserved for VBAT and piezo analog sensing; current/eRPM telemetry comes from the Repeat AM32 dual ESC bidirectional DSHOT links.")
-@requirement("Three H3LIS331DL accelerometers share SPI SCK/MOSI/MISO and have independent active-low chip-selects with boot-safe pull-ups.")
-@requirement("APA102/SK9822 status LED data and clock are level-shifted from 3.3V to 5V and disabled during non-LED SPI traffic.")
-@requirement("Piezo ADC input has a 1MΩ pulldown, 10nF filter capacitor, and BAT54S Schottky clamps to GND and 3V3.")
+@requirement("Carrier supplies the Seeed XIAO RP2350 5V pad from a nominal 2S LiPo bus using a fixed 5.0V AP63205 buck regulator, with VBUS protection and VBAT sensing sized for future 3S operation; AP63203 is not used because it is fixed 3.3V.")
+@requirement("XIAO A0/D0 physical pad is reserved for VBAT analog sensing; A2/D2 directly drives the SK9822 buffer enable after removing the experimental piezo input; current/eRPM telemetry comes from the Repeat AM32 dual ESC bidirectional DSHOT links.")
+@requirement("One inner LSM6DSV320X 6-axis IMU and two outer H3LIS331DL high-G accelerometers share SPI SCK/MOSI/MISO and have independent active-low chip-selects with boot-safe pull-ups.")
+@requirement("Retain the SK9822 RGB status LED for boot/error/mode indication; its data and clock are level-shifted from 3.3V to 5V and disabled during non-LED SPI traffic.")
 @requirement("Repeat AM32 dual ESC connects through one signal connector carrying two direct RP2350 bidirectional DSHOT/EDT lines and ground; the ESC BEC is not tied to the carrier 5V rail.")
 @requirement("Dedicated orange 2-3S TinySLED meltybrain heading output uses XIAO edge pin D1/A1 and a low-side MOSFET so firmware can generate phase-locked 100-500us strobes at 4000rpm without underside GPIOs.")
-@requirement("Expose test pads for SPI, IMU chip-selects, DSHOT, CRSF, VBAT, piezo, heading strobe timing, SWD, GND, 3V3, and 5V.")
+@requirement("Harness-exposed VBUS and DSHOT nets have local TVS/ESD clamp footprints; the permanently soldered ELRS receiver pads and internal SPI/IMU nets are not ESD-clamped.")
+@requirement("Expose only essential test pads for VBAT ADC calibration, SWD debug, GND reference, 3V3, and 5V rails.")
 def build_circuit():
     gnd = Ground("GND")
     v5 = Power("5V", voltage_domain=5.0, current=2.0)
     v3v3 = Power("3V3", voltage_domain=3.3, current=0.4)
-    vbus = Net("VBUS", voltage=VoltageDomain.range(6.0, 8.4), drive=POWER)
+    vbus = Net("VBUS", voltage=VoltageDomain.range(6.0, 12.6), drive=POWER)
 
     spi_sck = Net("SPI_SCK", voltage_domain=3.3)
     spi_mosi = Net("SPI_MOSI", voltage_domain=3.3)
@@ -32,7 +32,6 @@ def build_circuit():
     crsf_tx = Net("CRSF_TX", voltage_domain=3.3)
     crsf_rx = Net("CRSF_RX", voltage_domain=3.3)
     vbat_sense = Net("VBAT_SNS", voltage_domain=3.3)
-    piezo = Net("PIEZO", voltage_domain=3.3)
     head_led = Net("HEAD_LED", voltage_domain=3.3)
     head_gate = Net("HEAD_GATE")
     head_sw = Net("HEAD_SW")
@@ -46,11 +45,11 @@ def build_circuit():
 
     xiao = Part("Library", "XIAO-RP2350-SMD", ref="U1", value="Seeed XIAO RP2350", footprint="Library:XIAO-RP2350-SMD")
     xiao.fields["LCSC"] = "NONE"
-    xiao.fields["info"] = "XIAO RP2350 module on official Seeed XIAO-RP2350-SMD land pattern from Seeed OPL KiCad library. Runtime IO uses edge/castellated pads only: A0/A2 are analog VBAT/piezo inputs, A1 drives the orange 2-3S TinySLED heading MOSFET, and D4/D5 are direct bidirectional DSHOT/EDT links to the Repeat AM32 dual ESC. A0-A3 are aliases of edge pads D0-D3, so this revision still uses MCP23S17 for IMU chip-selects and LED_OE_N rather than underside GPIOs. Official footprint also exposes D11-D18, EN, BOOT, 3V3_OUT, VBAT, SWDIO, SWDCLK, and extra GND underside pads; unused underside GPIO/control pads are left NC for now. 3V3 output limit from spec: do not load over 400mA total. RP2350 CRSF inversion can be handled in IO_BANK0 GPIO INOVER/OUTOVER firmware."
+    xiao.fields["info"] = "XIAO RP2350 module on official Seeed XIAO-RP2350-SMD land pattern from Seeed OPL KiCad library. Runtime IO uses edge/castellated pads only: A0 is the analog VBAT input, A1 drives the orange 2-3S TinySLED heading MOSFET, A2/D2 directly controls LED_OE_N for the SK9822 SPI buffer gate, and D4/D5 are direct bidirectional DSHOT/EDT links to the Repeat AM32 dual ESC. A0-A3 are aliases of edge pads D0-D3, so this revision still uses MCP23S17 for IMU chip-selects while using direct XIAO control for LED_OE_N. Official footprint also exposes D11-D18, EN, BOOT, 3V3_OUT, VBAT, SWDIO, SWDCLK, and extra GND underside pads; unused underside GPIO/control pads are left NC for now. 3V3 output limit from spec: do not load over 400mA total. RP2350 CRSF inversion can be handled in IO_BANK0 GPIO INOVER/OUTOVER firmware."
     design_intent(xiao, "SMD-mounted Seeed XIAO RP2350 compute module using the official Seeed XIAO-RP2350-SMD footprint; no headers.", group="XIAO module", placement="Mount flat near the board centre with epoxy fillets at four corners after soldering; confirm USB connector clearance against the board outline.")
     vbat_sense += xiao[1]
     head_led += xiao[2]
-    piezo += xiao[3]
+    led_oe_n += xiao[3]
     exp_cs_n += xiao[4]
     dshot1_io += xiao[5]
     dshot2_io += xiao[6]
@@ -79,9 +78,16 @@ def build_circuit():
 
     j_pwr = Part("Connector_Generic", "Conn_01x02", ref="J1", value="VBUS input fly-leads", footprint="Connector_Wire:SolderWire-0.5sqmm_1x02_P4.6mm_D0.9mm_OD2.1mm_Relief")
     j_pwr.fields["LCSC"] = "NONE"
-    design_intent(j_pwr, "Switched 2S LiPo power input from Fingertech switch: pin 1 VBUS, pin 2 GND.", group="Power entry", placement="Place near radial wire exit; use wide copper from pin 1 to buck input capacitor.")
+    design_intent(j_pwr, "Switched LiPo power input from Fingertech switch: pin 1 VBUS, pin 2 GND; nominal 2S now, 3S-ready to 12.6V.", group="Power entry", placement="Place near radial wire exit; use wide copper from pin 1 to buck input capacitor.")
     vbus += j_pwr[1]
     gnd += j_pwr[2]
+
+    d_vbus_tvs = Part("Device", "D_TVS", ref="D2", value="SMAJ15CA", footprint="Diode_SMD:D_SMA")
+    d_vbus_tvs.fields["LCSC"] = "C110044"
+    d_vbus_tvs.fields["info"] = "MDD SMAJ15CA bidirectional 15V working-voltage TVS in DO-214AC/SMA package; LCSC data lists VRWM 15V, 24.4V clamp, and 16.4A at 10/1000us. Used across switched VBUS as a surge/transient clamp. The 15V standoff gives margin over a fully charged 3S LiPo at 12.6V while still protecting the AP63205 32V-rated input better than no clamp."
+    design_intent(d_vbus_tvs, "Input TVS clamp for LiPo VBUS transients before the AP63205 buck; sized for nominal 2S use and future 3S up to 12.6V.", group="Power entry protection", placement="Place directly at J1 VBUS/GND entry with a very short, wide return to ground before the buck input capacitor loop.")
+    vbus += d_vbus_tvs[1]
+    gnd += d_vbus_tvs[2]
 
     u_buck = Part("Library", "AP63205WU-7", ref="U2", value="AP63205WU-7", footprint="Library:TSOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL")
     u_buck.fields["LCSC"] = "C2071056"
@@ -102,14 +108,14 @@ def build_circuit():
 
     c_buck_in = Part("Device", "C_Small", ref="C1", value="22uF", footprint="Capacitor_SMD:C_0805_2012Metric")
     c_buck_in.fields["LCSC"] = "NONE"
-    c_buck_in.fields["info"] = "Use X7R/X5R ceramic rated at least 25V for 2S LiPo input transients and DC-bias margin."
+    c_buck_in.fields["info"] = "Use X7R/X5R ceramic rated at least 25V for 2S/3S LiPo input transients and DC-bias margin."
     design_intent(c_buck_in, "AP63205 input bulk capacitor from VBUS to GND.", group="5V buck", placement="Place at U2 VIN/GND pins with the smallest possible loop.")
     vbus += c_buck_in[1]
     gnd += c_buck_in[2]
 
     c_buck_in_hf = Part("Device", "C_Small", ref="C2", value="100nF", footprint="Capacitor_SMD:C_0402_1005Metric")
     c_buck_in_hf.fields["LCSC"] = "NONE"
-    c_buck_in_hf.fields["info"] = "Use at least 25V rating; this is the high-frequency bypass for the 2S LiPo buck input."
+    c_buck_in_hf.fields["info"] = "Use at least 25V rating; this is the high-frequency bypass for the 2S/3S LiPo buck input."
     design_intent(c_buck_in_hf, "High-frequency bypass at AP63205 VIN.", group="5V buck", placement="Place directly beside U2 VIN/GND pins, inside the input current loop.")
     vbus += c_buck_in_hf[1]
     gnd += c_buck_in_hf[2]
@@ -138,14 +144,14 @@ def build_circuit():
     c_3v3_bulk = Part("Device", "C_Small", ref="C6", value="10uF", footprint="Capacitor_SMD:C_0603_1608Metric")
     c_3v3_bulk.fields["LCSC"] = "NONE"
     c_3v3_bulk.fields["info"] = "Use 6.3V or higher ceramic with DC-bias margin on the XIAO 3V3 output rail."
-    design_intent(c_3v3_bulk, "Local bulk capacitor for 3V3 sensors, MCP23S17, piezo clamp reference, and level-shifter control logic.", group="3V3 rail", placement="Place near the cluster of 3V3 loads, not at the buck switching node.")
+    design_intent(c_3v3_bulk, "Local bulk capacitor for 3V3 sensors, MCP23S17, and level-shifter control logic.", group="3V3 rail", placement="Place near the cluster of 3V3 loads, not at the buck switching node.")
     v3v3 += c_3v3_bulk[1]
     gnd += c_3v3_bulk[2]
 
     u_exp = Part("Library", "MCP23S17T-E_SS", ref="U3", value="MCP23S17T-E/SS", footprint="Library:SSOP-28_L10.2-W5.3-P0.65-LS7.8-BL")
     u_exp.fields["LCSC"] = "C128577"
-    u_exp.fields["info"] = "3.3V SPI GPIO expander. GPIOs default to inputs/high-Z at reset; external pull-ups on IMU CS and LED_OE_N make boot state safe. I_DD max 1mA at 1MHz SPI from datasheet; use slower expander writes than IMU data SPI if current must be bounded by this spec."
-    design_intent(u_exp, "SPI GPIO expander that creates active-low IMU chip-selects and LED buffer enable from the pin-limited XIAO RP2350.", group="SPI chip-select expander", placement="Place near XIAO/SPI fanout; keep CS_A/CS_B/CS_C routes away from the buck switch node.")
+    u_exp.fields["info"] = "3.3V SPI GPIO expander. GPIOs default to inputs/high-Z at reset; external pull-ups on IMU CS make boot state safe. I_DD max 1mA at 1MHz SPI from datasheet; use slower expander writes than IMU data SPI if current must be bounded by this spec. LED_OE_N is driven directly by XIAO A2/D2, not by the expander, so the LED SPI buffers can be disabled before any non-LED SPI transaction."
+    design_intent(u_exp, "SPI GPIO expander that creates active-low IMU chip-selects from the pin-limited XIAO RP2350.", group="SPI chip-select expander", placement="Place near XIAO/SPI fanout; keep CS_A/CS_B/CS_C routes away from the buck switch node.")
     v3v3 += u_exp[9]
     gnd += u_exp[10], u_exp[15], u_exp[16], u_exp[17]
     exp_cs_n += u_exp[11]
@@ -156,7 +162,7 @@ def build_circuit():
     cs_a += u_exp[21]
     cs_b += u_exp[22]
     cs_c += u_exp[23]
-    led_oe_n += u_exp[24]
+    u_exp[24] += NC
     u_exp[9].set_current_sink(0.001)
     u_exp[1] += NC
     u_exp[2] += NC
@@ -188,7 +194,7 @@ def build_circuit():
 
     r_led_oe = Part("Device", "R_Small", ref="R2", value="10kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
     r_led_oe.fields["LCSC"] = "NONE"
-    design_intent(r_led_oe, "Pull-up disables 5V LED level-shifter outputs until firmware enables them through U3 GPA3.", group="Status LED", placement="Place near the level-shifter OE pins.")
+    design_intent(r_led_oe, "Pull-up disables 5V LED level-shifter outputs until XIAO A2/D2 actively enables them.", group="Status LED", placement="Place near the level-shifter OE pins.")
     v3v3 += r_led_oe[1]
     led_oe_n += r_led_oe[2]
 
@@ -210,27 +216,36 @@ def build_circuit():
     v3v3 += r_cs_c[1]
     cs_c += r_cs_c[2]
 
-    imu_a = Part("Library", "H3LIS331DLTR", ref="U4", value="H3LIS331DLTR", footprint="Library:LGA-16_L3.0-W3.0-P0.50-BL")
-    imu_a.fields["LCSC"] = "C2655074"
-    imu_a.fields["info"] = "SPI mode: Vdd_IO pin 1 and Vdd pin 14 to 3V3, reserved pin 10 to GND, reserved pin 15 to Vdd, INT pins unused/NC. Datasheet gives typical 300uA normal-mode supply current but no maximum; rail budget is therefore not fully current-verified for IMUs. Axis intent: +X points toward pins 1-4 edge, +Y toward pins 5-8 edge."
-    design_intent(imu_a, "IMU-A high-G accelerometer at nominal 0°/East, inner radius target 12mm; X axis radial outward and Y axis tangential.", group="IMU array", placement="Place centroid at r=12mm, angle 0°. Orient pin 1 so +X is radial outward per datasheet axis diagram.")
-    v3v3 += imu_a[1], imu_a[14], imu_a[15]
-    gnd += imu_a[5], imu_a[10], imu_a[12], imu_a[13], imu_a[16]
-    spi_sck += imu_a[4]
-    spi_mosi += imu_a[6]
-    miso_a += imu_a[7]
-    cs_a += imu_a[8]
-    imu_a[2] += NC
-    imu_a[3] += NC
+    imu_a = Part("Library", "LSM6DSV320XTR", ref="U4", value="LSM6DSV320XTR", footprint="Library:LGA-14_L3.0-W2.5-P0.50-TL")
+    imu_a.fields["LCSC"] = "C26633007"
+    imu_a.fields["info"] = "Inner 6-axis IMU with high-g accelerometer and gyro. 4-wire SPI mode: SCL pin 13 to SPI_SCK, SDA pin 14 to SPI_MOSI, SDO/TA0 pin 1 through the IMU-A MISO isolation resistor to shared SPI_MISO, and CS pin 12 to CS_A. VDDIO pin 5 and VDD pin 8 to 3V3; GND pins 6 and 7 to GND. Unused auxiliary bus pins SDx pin 2 and SCx pin 3 are tied to GND per datasheet guidance; INT1/INT2 and OSC_AUX/SDO_AUX are unused/NC. Datasheet gives typical 0.80mA for 9-axis combo high-performance mode but no maximum active current, so IMU rail current is not fully current-verified. Axis intent from package top view: +X points from pins 1-4 side toward pins 8-11 side, +Y points from pins 5-7 side toward pins 12-14 side, +Z out of the top face."
+    design_intent(imu_a, "IMU-A inner LSM6DSV320X 6-axis/high-g sensor at nominal 0°/East, radius target 12mm; +X radial outward and +Y tangential.", group="IMU array", placement="Place centroid at r=12mm, angle 0°. Orient the pins 1-4 side inward and pins 8-11 side outward so +X is radial outward; +Y is then the CCW tangential direction.")
+    miso_a += imu_a[1]
+    gnd += imu_a[2], imu_a[3]
+    imu_a[4] += NC
+    v3v3 += imu_a[5]
+    gnd += imu_a[6], imu_a[7]
+    v3v3 += imu_a[8]
     imu_a[9] += NC
+    imu_a[10] += NC
     imu_a[11] += NC
+    cs_a += imu_a[12]
+    spi_sck += imu_a[13]
+    spi_mosi += imu_a[14]
 
     c_imu_a = Part("Device", "C_Small", ref="C8", value="100nF", footprint="Capacitor_SMD:C_0402_1005Metric")
     c_imu_a.fields["LCSC"] = "NONE"
-    c_imu_a.fields["info"] = "Use 6.3V or higher ceramic at H3LIS331DL Vdd."
-    design_intent(c_imu_a, "Local Vdd decoupling for IMU-A.", group="IMU array", placement="Place as close as possible to U4 pin 14 and nearby ground pins.")
+    c_imu_a.fields["info"] = "Use 6.3V or higher ceramic at LSM6DSV320X VDD pin 8."
+    design_intent(c_imu_a, "Local VDD decoupling for IMU-A LSM6DSV320X.", group="IMU array", placement="Place as close as possible to U4 pin 8 and nearby ground pins 6/7.")
     v3v3 += c_imu_a[1]
     gnd += c_imu_a[2]
+
+    c_imu_a_io = Part("Device", "C_Small", ref="C11", value="100nF", footprint="Capacitor_SMD:C_0402_1005Metric")
+    c_imu_a_io.fields["LCSC"] = "NONE"
+    c_imu_a_io.fields["info"] = "Use 6.3V or higher ceramic at LSM6DSV320X VDDIO pin 5."
+    design_intent(c_imu_a_io, "Local VDDIO decoupling for IMU-A LSM6DSV320X.", group="IMU array", placement="Place as close as possible to U4 pin 5 and nearby ground pins 6/7.")
+    v3v3 += c_imu_a_io[1]
+    gnd += c_imu_a_io[2]
 
     r_miso_a = Part("Device", "R_Small", ref="R6", value="33Ω", footprint="Resistor_SMD:R_0402_1005Metric")
     r_miso_a.fields["LCSC"] = "NONE"
@@ -241,7 +256,7 @@ def build_circuit():
     imu_b = Part("Library", "H3LIS331DLTR", ref="U5", value="H3LIS331DLTR", footprint="Library:LGA-16_L3.0-W3.0-P0.50-BL")
     imu_b.fields["LCSC"] = "C2655074"
     imu_b.fields["info"] = "SPI mode: Vdd_IO pin 1 and Vdd pin 14 to 3V3, reserved pin 10 to GND, reserved pin 15 to Vdd, INT pins unused/NC. Datasheet gives typical 300uA normal-mode supply current but no maximum; rail budget is therefore not fully current-verified for IMUs. Axis intent: +X points toward pins 1-4 edge, +Y toward pins 5-8 edge."
-    design_intent(imu_b, "IMU-B high-G accelerometer at nominal 90°/North, outer radius target from spec; X axis radial outward and Y axis tangential.", group="IMU array", placement="Spec target r=20mm/angle 90° exceeds a 35mm circular board radius; place per revised board outline and keep within sensor G limit. Orient pin 1 for radial +X.")
+    design_intent(imu_b, "IMU-B high-G accelerometer at nominal 90°/North, outer radius target 18mm; X axis radial outward and Y axis tangential.", group="IMU array", placement="Place centroid at r=18mm, angle 90°. Orient pin 1 for radial +X per the H3LIS331DL axis diagram.")
     v3v3 += imu_b[1], imu_b[14], imu_b[15]
     gnd += imu_b[5], imu_b[10], imu_b[12], imu_b[13], imu_b[16]
     spi_sck += imu_b[4]
@@ -269,7 +284,7 @@ def build_circuit():
     imu_c = Part("Library", "H3LIS331DLTR", ref="U6", value="H3LIS331DLTR", footprint="Library:LGA-16_L3.0-W3.0-P0.50-BL")
     imu_c.fields["LCSC"] = "C2655074"
     imu_c.fields["info"] = "SPI mode: Vdd_IO pin 1 and Vdd pin 14 to 3V3, reserved pin 10 to GND, reserved pin 15 to Vdd, INT pins unused/NC. Datasheet gives typical 300uA normal-mode supply current but no maximum; rail budget is therefore not fully current-verified for IMUs. Axis intent: +X points toward pins 1-4 edge, +Y toward pins 5-8 edge."
-    design_intent(imu_c, "IMU-C high-G accelerometer at nominal 210°, outer radius target from spec; asymmetric placement breaks heading singularities.", group="IMU array", placement="Spec target r=20mm/angle 210° exceeds a 35mm circular board radius; place per revised board outline and keep within sensor G limit. Orient pin 1 for radial +X.")
+    design_intent(imu_c, "IMU-C high-G accelerometer at nominal 210°, outer radius target 18mm; asymmetric placement breaks heading singularities.", group="IMU array", placement="Place centroid at r=18mm, angle 210°. Orient pin 1 for radial +X per the H3LIS331DL axis diagram.")
     v3v3 += imu_c[1], imu_c[14], imu_c[15]
     gnd += imu_c[5], imu_c[10], imu_c[12], imu_c[13], imu_c[16]
     spi_sck += imu_c[4]
@@ -294,51 +309,24 @@ def build_circuit():
     miso_c += r_miso_c[1]
     spi_miso += r_miso_c[2]
 
-    r_vbat_hi = Part("Device", "R_Small", ref="R9", value="100kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
+    r_vbat_hi = Part("Device", "R_Small", ref="R9", value="120kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
     r_vbat_hi.fields["LCSC"] = "NONE"
-    design_intent(r_vbat_hi, "High-side resistor for 2S LiPo voltage divider to XIAO A0; 8.4V maps to about 2.08V.", group="Battery voltage sense", placement="Place near XIAO A0 with short ADC node; high side can route from VBUS after switch.")
+    design_intent(r_vbat_hi, "High-side resistor for LiPo voltage divider to XIAO A0; 8.4V maps to about 1.81V and 12.6V maps to about 2.72V with R10=33kΩ.", group="Battery voltage sense", placement="Place near XIAO A0 with short ADC node; high side can route from VBUS after switch.")
     vbus += r_vbat_hi[1]
     vbat_sense += r_vbat_hi[2]
 
     r_vbat_lo = Part("Device", "R_Small", ref="R10", value="33kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
     r_vbat_lo.fields["LCSC"] = "NONE"
-    design_intent(r_vbat_lo, "Low-side resistor for battery voltage divider to XIAO A0.", group="Battery voltage sense", placement="Place adjacent to R9 and C12 at the ADC node.")
+    design_intent(r_vbat_lo, "Low-side resistor for 3S-ready battery voltage divider to XIAO A0.", group="Battery voltage sense", placement="Place adjacent to R9 and C12 at the ADC node.")
     vbat_sense += r_vbat_lo[1]
     gnd += r_vbat_lo[2]
 
     c_vbat = Part("Device", "C_Small", ref="C12", value="100nF", footprint="Capacitor_SMD:C_0402_1005Metric")
     c_vbat.fields["LCSC"] = "NONE"
-    c_vbat.fields["info"] = "6.3V or higher ceramic; ADC node sees about 2.08V maximum at 8.4V battery."
+    c_vbat.fields["info"] = "6.3V or higher ceramic; ADC node sees about 1.81V at 8.4V battery and about 2.72V maximum at 12.6V 3S full charge."
     design_intent(c_vbat, "Noise filter capacitor on VBAT ADC divider output.", group="Battery voltage sense", placement="Place at XIAO A0 / VBAT_SNS node.")
     vbat_sense += c_vbat[1]
     gnd += c_vbat[2]
-
-    j_piezo = Part("Connector_Generic", "Conn_01x02", ref="J3", value="Piezo fly-lead", footprint="Connector_Wire:SolderWire-0.25sqmm_1x02_P4.2mm_D0.65mm_OD1.7mm_Relief")
-    j_piezo.fields["LCSC"] = "NONE"
-    design_intent(j_piezo, "Fly-lead connector to 20mm chassis-bonded piezo contact sensor: pin 1 signal, pin 2 GND.", group="Piezo impact sensor", placement="Place near radial wire exit and keep PIEZO trace short to clamp network and XIAO A2.")
-    piezo += j_piezo[1]
-    gnd += j_piezo[2]
-
-    r_piezo = Part("Device", "R_Small", ref="R11", value="1MΩ", footprint="Resistor_SMD:R_0402_1005Metric")
-    r_piezo.fields["LCSC"] = "NONE"
-    design_intent(r_piezo, "DC pulldown for piezo ADC input so it cannot float between impacts.", group="Piezo impact sensor", placement="Place at XIAO A2 / PIEZO node, next to clamp diode.")
-    piezo += r_piezo[1]
-    gnd += r_piezo[2]
-
-    c_piezo = Part("Device", "C_Small", ref="C13", value="10nF", footprint="Capacitor_SMD:C_0402_1005Metric")
-    c_piezo.fields["LCSC"] = "NONE"
-    c_piezo.fields["info"] = "6.3V or higher ceramic; forms the specified piezo input filter with the 1MΩ pulldown."
-    design_intent(c_piezo, "Piezo impact sensor input filter capacitor.", group="Piezo impact sensor", placement="Place at XIAO A2 / PIEZO node, before long/noisy routing.")
-    piezo += c_piezo[1]
-    gnd += c_piezo[2]
-
-    d_piezo = Part("Diode", "BAT54S", ref="D1", value="BAT54S", footprint="Package_TO_SOT_SMD:SOT-23")
-    d_piezo.fields["LCSC"] = "C19726"
-    d_piezo.fields["info"] = "BAT54S series Schottky pair used as rail clamps: pin 1 anode to GND, pin 3 common to PIEZO, pin 2 cathode to 3V3. Clamps negative and positive piezo spikes before the ADC pin."
-    design_intent(d_piezo, "Schottky rail clamp protecting XIAO A2 from high-voltage piezo impact spikes.", group="Piezo impact sensor", placement="Place at the XIAO A2 / PIEZO node before the trace leaves the analog protection cluster.")
-    gnd += d_piezo[1]
-    v3v3 += d_piezo[2]
-    piezo += d_piezo[3]
 
     j_head = Part("Connector_Generic", "Conn_01x02", ref="J2", value="Orange TinySLED", footprint="Connector_Wire:SolderWire-0.25sqmm_1x02_P4.2mm_D0.65mm_OD1.7mm_Relief")
     j_head.fields["LCSC"] = "NONE"
@@ -388,18 +376,33 @@ def build_circuit():
     dshot2 += j_esc[3]
     gnd += j_esc[4]
 
-    j_elrs = Part("Connector_Generic", "Conn_01x04", ref="J6", value="ELRS receiver", footprint="Connector_Wire:SolderWire-0.25sqmm_1x04_P4.2mm_D0.65mm_OD1.7mm_Relief")
-    j_elrs.fields["LCSC"] = "NONE"
-    design_intent(j_elrs, "Fly-leads to off-board ELRS receiver: 3V3, GND, CRSF TX, CRSF RX.", group="CRSF receiver", placement="Route to chassis-wall receiver mount for antenna clearance; keep away from buck inductor and switch node.")
-    v3v3 += j_elrs[1]
-    gnd += j_elrs[2]
-    crsf_tx += j_elrs[3]
-    crsf_rx += j_elrs[4]
+    d_dshot1_esd = Part("Device", "D_TVS", ref="D3", value="PESD5V0V1BB", footprint="Diode_SMD:D_SOD-523")
+    d_dshot1_esd.fields["LCSC"] = "C477993"
+    d_dshot1_esd.fields["info"] = "Nexperia PESD5V0V1BB,115 bidirectional 5V ESD diode, SC-79/SOD-523. Relevant specs: VRWM 5V, VCL 12.5V at 4.8A 8/20us, capacitance about 11pF typical / 13pF max. Suitable for 3.3V DSHOT/EDT because normal logic high is below VRWM and capacitance is acceptable for MHz-class single-ended digital lines."
+    design_intent(d_dshot1_esd, "Connector-side ESD clamp from AM32 DSHOT1/EDT line to ground.", group="DSHOT outputs", placement="Place at J4 pin 2 with the shortest possible ground path to the adjacent connector ground pad.")
+    dshot1 += d_dshot1_esd[1]
+    gnd += d_dshot1_esd[2]
+
+    d_dshot2_esd = Part("Device", "D_TVS", ref="D4", value="PESD5V0V1BB", footprint="Diode_SMD:D_SOD-523")
+    d_dshot2_esd.fields["LCSC"] = "C477993"
+    d_dshot2_esd.fields["info"] = "Nexperia PESD5V0V1BB,115 bidirectional 5V ESD diode, SC-79/SOD-523. Relevant specs: VRWM 5V, VCL 12.5V at 4.8A 8/20us, capacitance about 11pF typical / 13pF max. Suitable for 3.3V DSHOT/EDT because normal logic high is below VRWM and capacitance is acceptable for MHz-class single-ended digital lines."
+    design_intent(d_dshot2_esd, "Connector-side ESD clamp from AM32 DSHOT2/EDT line to ground.", group="DSHOT outputs", placement="Place at J4 pin 3 with the shortest possible ground path to the adjacent connector ground pad.")
+    dshot2 += d_dshot2_esd[1]
+    gnd += d_dshot2_esd[2]
+
+    u_elrs = Part("Connector_Generic", "Conn_01x04", ref="U7", value="BetaFPV ELRS Lite", footprint="Library:BetaFPV_ELRS_Lite")
+    u_elrs.fields["LCSC"] = "NONE"
+    u_elrs.fields["info"] = "Selected receiver is BetaFPV ELRS Lite Receiver 2.4GHz Flat Antenna V1.2 soldered directly to the carrier using the Eyeliner repo landing pattern. Vendor page lists ESP8285 MCU, CRSF serial output protocol, 5V input, 2.4GHz ISM, 17mW telemetry RF power, integrated SMD ceramic antenna, 11x10x3mm, and 0.46g. Footprint pad order from Eyeliner: pad 1 receiver RX, pad 2 receiver TX, pad 3 5V, pad 4 GND. Carrier CRSF_TX drives receiver RX pad 1; receiver TX pad 2 drives carrier CRSF_RX. Verify physical receiver pad order and antenna orientation before soldering."
+    design_intent(u_elrs, "Solder-down BetaFPV ELRS Lite receiver module: RX, TX, 5V, GND pads directly on the carrier, no fly-lead connector.", group="CRSF receiver", placement="Place near the chassis wall for antenna clearance and RF exposure; keep the antenna end away from copper, carbon, battery, buck inductor, and switch node. Add foam/epoxy support after soldering so impacts do not peel the module pads.")
+    crsf_tx += u_elrs[1]
+    crsf_rx += u_elrs[2]
+    v5 += u_elrs[3]
+    gnd += u_elrs[4]
 
     u_led_mosi = Part("Library", "SN74AHCT1G125DCKR", ref="U8", value="SN74AHCT1G125", footprint="Library:SC-70-5_L2.0-W1.3-P0.65-LS2.1-BL")
     u_led_mosi.fields["LCSC"] = "C350557"
     u_led_mosi.fields["info"] = "AHCT input threshold Vih min 2.0V at 5V VCC, so 3.3V RP2350/MCP logic is valid. Static ICC max 10uA plus ΔICC up to 1.5mA with 3.3V input high; budget 1.51mA. OE is active-low and driven by LED_OE_N."
-    design_intent(u_led_mosi, "5V AHCT buffer/level shifter for APA102/SK9822 data input.", group="Status LED", placement="Place near U10 LED input pins; keep the 5V output trace short.")
+    design_intent(u_led_mosi, "5V AHCT buffer/level shifter for APA102/SK9822 data input, enabled only by direct XIAO LED_OE_N control during LED updates.", group="Status LED", placement="Place near U10 LED input pins; keep the 5V output trace short.")
     led_oe_n += u_led_mosi[1]
     spi_mosi += u_led_mosi[2]
     gnd += u_led_mosi[3]
@@ -417,7 +420,7 @@ def build_circuit():
     u_led_sck = Part("Library", "SN74AHCT1G125DCKR", ref="U9", value="SN74AHCT1G125", footprint="Library:SC-70-5_L2.0-W1.3-P0.65-LS2.1-BL")
     u_led_sck.fields["LCSC"] = "C350557"
     u_led_sck.fields["info"] = "AHCT input threshold Vih min 2.0V at 5V VCC, so 3.3V RP2350/MCP logic is valid. Static ICC max 10uA plus ΔICC up to 1.5mA with 3.3V input high; budget 1.51mA. OE is active-low and driven by LED_OE_N."
-    design_intent(u_led_sck, "5V AHCT buffer/level shifter for APA102/SK9822 clock input.", group="Status LED", placement="Place near U10 LED input pins; keep the 5V output trace short and paired with LED_DI where practical.")
+    design_intent(u_led_sck, "5V AHCT buffer/level shifter for APA102/SK9822 clock input, enabled only by direct XIAO LED_OE_N control during LED updates.", group="Status LED", placement="Place near U10 LED input pins; keep the 5V output trace short and paired with LED_DI where practical.")
     led_oe_n += u_led_sck[1]
     spi_sck += u_led_sck[2]
     gnd += u_led_sck[3]
@@ -463,65 +466,10 @@ def build_circuit():
     v5 += c_led[1]
     gnd += c_led[2]
 
-    tp_sck = Part("Connector", "TestPoint", ref="TP1", value="TP_SCK", footprint="TestPoint:TestPoint_Pad_D1.0mm")
-    tp_sck.fields["LCSC"] = "NONE"
-    design_intent(tp_sck, "Scope/logic-analyzer pad for shared SPI clock.", group="Production test", placement="Place along SPI fanout where accessible by probe.")
-    spi_sck += tp_sck[1]
-
-    tp_cs_a = Part("Connector", "TestPoint", ref="TP2", value="TP_CS_A", footprint="TestPoint:TestPoint_Pad_D1.0mm")
-    tp_cs_a.fields["LCSC"] = "NONE"
-    design_intent(tp_cs_a, "Scope pad for IMU-A active-low chip-select.", group="Production test", placement="Place near U4 or expander CS fanout.")
-    cs_a += tp_cs_a[1]
-
-    tp_cs_b = Part("Connector", "TestPoint", ref="TP3", value="TP_CS_B", footprint="TestPoint:TestPoint_Pad_D1.0mm")
-    tp_cs_b.fields["LCSC"] = "NONE"
-    design_intent(tp_cs_b, "Scope pad for IMU-B active-low chip-select.", group="Production test", placement="Place near U5 or expander CS fanout.")
-    cs_b += tp_cs_b[1]
-
-    tp_cs_c = Part("Connector", "TestPoint", ref="TP4", value="TP_CS_C", footprint="TestPoint:TestPoint_Pad_D1.0mm")
-    tp_cs_c.fields["LCSC"] = "NONE"
-    design_intent(tp_cs_c, "Scope pad for IMU-C active-low chip-select.", group="Production test", placement="Place near U6 or expander CS fanout.")
-    cs_c += tp_cs_c[1]
-
-    tp_miso = Part("Connector", "TestPoint", ref="TP5", value="TP_MISO", footprint="TestPoint:TestPoint_Pad_D1.0mm")
-    tp_miso.fields["LCSC"] = "NONE"
-    design_intent(tp_miso, "Scope/logic-analyzer pad for shared SPI MISO after IMU series resistors.", group="Production test", placement="Place along SPI bus where accessible by probe.")
-    spi_miso += tp_miso[1]
-
-    tp_ds1 = Part("Connector", "TestPoint", ref="TP6", value="TP_DS1", footprint="TestPoint:TestPoint_Pad_D1.0mm")
-    tp_ds1.fields["LCSC"] = "NONE"
-    design_intent(tp_ds1, "Scope pad for AM32 channel 1 bidirectional DSHOT/EDT signal after series resistor.", group="Production test", placement="Place near J4 wire exit.")
-    dshot1 += tp_ds1[1]
-
-    tp_ds2 = Part("Connector", "TestPoint", ref="TP7", value="TP_DS2", footprint="TestPoint:TestPoint_Pad_D1.0mm")
-    tp_ds2.fields["LCSC"] = "NONE"
-    design_intent(tp_ds2, "Scope pad for AM32 channel 2 bidirectional DSHOT/EDT signal after series resistor.", group="Production test", placement="Place near J4 wire exit.")
-    dshot2 += tp_ds2[1]
-
-    tp_crsf_rx = Part("Connector", "TestPoint", ref="TP8", value="TP_CRSF_RX", footprint="TestPoint:TestPoint_Pad_D1.0mm")
-    tp_crsf_rx.fields["LCSC"] = "NONE"
-    design_intent(tp_crsf_rx, "Scope pad for CRSF packets from ELRS receiver into XIAO RX.", group="Production test", placement="Place near J6 and away from the buck SW node.")
-    crsf_rx += tp_crsf_rx[1]
-
-    tp_crsf_tx = Part("Connector", "TestPoint", ref="TP9", value="TP_CRSF_TX", footprint="TestPoint:TestPoint_Pad_D1.0mm")
-    tp_crsf_tx.fields["LCSC"] = "NONE"
-    design_intent(tp_crsf_tx, "Scope pad for CRSF telemetry from XIAO TX to ELRS receiver.", group="Production test", placement="Place near J6 and away from the buck SW node.")
-    crsf_tx += tp_crsf_tx[1]
-
     tp_vbat = Part("Connector", "TestPoint", ref="TP10", value="TP_VBAT", footprint="TestPoint:TestPoint_Pad_D1.0mm")
     tp_vbat.fields["LCSC"] = "NONE"
     design_intent(tp_vbat, "Probe pad for scaled battery voltage ADC node.", group="Production test", placement="Place next to the divider and label clearly TP_VBAT.")
     vbat_sense += tp_vbat[1]
-
-    tp_head = Part("Connector", "TestPoint", ref="TP11", value="TP_HEAD", footprint="TestPoint:TestPoint_Pad_D1.0mm")
-    tp_head.fields["LCSC"] = "NONE"
-    design_intent(tp_head, "Scope pad for the orange TinySLED meltybrain heading strobe GPIO before the MOSFET gate resistor.", group="Production test", placement="Place near Q1/R16 so firmware strobe timing can be checked at 4000rpm without loading the LED current path.")
-    head_led += tp_head[1]
-
-    tp_piezo = Part("Connector", "TestPoint", ref="TP12", value="TP_PIEZO", footprint="TestPoint:TestPoint_Pad_D1.0mm")
-    tp_piezo.fields["LCSC"] = "NONE"
-    design_intent(tp_piezo, "Probe pad for protected piezo ADC node.", group="Production test", placement="Place near clamp network and XIAO A2.")
-    piezo += tp_piezo[1]
 
     tp_swdio = Part("Connector", "TestPoint", ref="TP13", value="TP_SWDIO", footprint="TestPoint:TestPoint_Pad_D1.0mm")
     tp_swdio.fields["LCSC"] = "NONE"
@@ -549,7 +497,8 @@ def build_circuit():
     v5 += tp_5v[1]
 
     for part, info in [
-        (j_pwr, "Two-pad solder-wire input for switched 2S LiPo VBUS and GND feeding the carrier buck regulator."),
+        (j_pwr, "Two-pad solder-wire input for switched LiPo VBUS and GND feeding the carrier buck regulator; nominal 2S now, 3S-ready to 12.6V."),
+        (d_vbus_tvs, "SMAJ15CA bidirectional 15V working-voltage TVS diode across switched VBUS and GND at the power-entry connector for 2S/3S headroom."),
         (r_exp_cs, "10kΩ pull-up that keeps the MCP23S17 SPI chip-select inactive while the XIAO RP2350 boots."),
         (r_led_oe, "10kΩ pull-up that disables the AHCT LED level shifters until firmware intentionally enables LED SPI traffic."),
         (r_cs_a, "10kΩ pull-up that keeps IMU-A chip-select inactive while the MCP23S17 GPIO defaults to high impedance."),
@@ -558,31 +507,20 @@ def build_circuit():
         (r_miso_a, "33Ω series resistor from IMU-A SDO to the shared MISO bus for ringing and bus-contention limiting."),
         (r_miso_b, "33Ω series resistor from IMU-B SDO to the shared MISO bus for ringing and bus-contention limiting."),
         (r_miso_c, "33Ω series resistor from IMU-C SDO to the shared MISO bus for ringing and bus-contention limiting."),
-        (r_vbat_hi, "100kΩ high-side resistor of the 2S battery voltage divider feeding XIAO A0."),
-        (r_vbat_lo, "33kΩ low-side resistor of the 2S battery voltage divider feeding XIAO A0."),
-        (j_piezo, "Two-pad solder-wire connector for the off-board chassis-mounted piezo disc signal and ground."),
-        (r_piezo, "1MΩ pulldown that biases the piezo ADC input to ground between impact events."),
+        (r_vbat_hi, "120kΩ high-side resistor of the 3S-ready battery voltage divider feeding XIAO A0."),
+        (r_vbat_lo, "33kΩ low-side resistor of the 3S-ready battery voltage divider feeding XIAO A0."),
         (j_head, "Two-pad solder-wire connector for the external orange 2-3S TinySLED heading marker: switched VBUS feed and MOSFET-switched return."),
         (r_head_gate, "100Ω gate stopper from XIAO edge pin D1/A1 to the orange TinySLED MOSFET gate."),
         (r_head_pd, "100kΩ pulldown keeping the orange TinySLED MOSFET off during boot/reset."),
         (r_ds1, "33Ω series damping resistor on AM32 channel 1 bidirectional DSHOT/EDT near the fly-lead exit."),
         (r_ds2, "33Ω series damping resistor on AM32 channel 2 bidirectional DSHOT/EDT near the fly-lead exit."),
         (j_esc, "Four-pad solder-wire connector for Repeat AM32 dual ESC: GND, DSHOT1, DSHOT2, GND; ESC BEC intentionally not connected."),
-        (j_elrs, "Four-pad solder-wire connector for the off-board ELRS receiver: 3V3, GND, CRSF TX, and CRSF RX."),
+        (d_dshot1_esd, "5V bidirectional SOD-523 ESD diode from DSHOT1/EDT to ground at the ESC connector."),
+        (d_dshot2_esd, "5V bidirectional SOD-523 ESD diode from DSHOT2/EDT to ground at the ESC connector."),
+        (u_elrs, "Solder-down BetaFPV ELRS Lite receiver module footprint: pad 1 RX from carrier CRSF_TX, pad 2 TX to carrier CRSF_RX, pad 3 5V, pad 4 GND."),
         (r_led_di_pd, "100kΩ pulldown that holds the 5V SK9822 data input quiet when the AHCT buffer is disabled."),
         (r_led_ck_pd, "100kΩ pulldown that holds the 5V SK9822 clock input quiet when the AHCT buffer is disabled."),
-        (tp_sck, "1mm test pad for probing the shared SPI clock waveform."),
-        (tp_cs_a, "1mm test pad for probing IMU-A active-low chip-select."),
-        (tp_cs_b, "1mm test pad for probing IMU-B active-low chip-select."),
-        (tp_cs_c, "1mm test pad for probing IMU-C active-low chip-select."),
-        (tp_miso, "1mm test pad for probing shared SPI MISO after the IMU series resistors."),
-        (tp_ds1, "1mm test pad for probing AM32 channel 1 bidirectional DSHOT/EDT after the series resistor."),
-        (tp_ds2, "1mm test pad for probing AM32 channel 2 bidirectional DSHOT/EDT after the series resistor."),
-        (tp_crsf_rx, "1mm test pad for probing CRSF packets arriving from the ELRS receiver."),
-        (tp_crsf_tx, "1mm test pad for probing CRSF telemetry transmitted to the ELRS receiver."),
         (tp_vbat, "1mm test pad for measuring the scaled battery-voltage ADC node."),
-        (tp_head, "1mm test pad for checking orange TinySLED heading strobe timing before the MOSFET gate resistor."),
-        (tp_piezo, "1mm test pad for measuring the protected piezo impact-sensor ADC node."),
         (tp_swdio, "1mm test pad for XIAO RP2350 SWDIO debug access."),
         (tp_swdck, "1mm test pad for XIAO RP2350 SWD clock debug access."),
         (tp_gnd, "1mm test pad providing oscilloscope and logic-analyzer ground reference."),
