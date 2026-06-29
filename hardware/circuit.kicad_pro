@@ -433,6 +433,7 @@
       "footprint_filter": "ignore",
       "footprint_link_issues": "warning",
       "four_way_junction": "ignore",
+      "global_label_dangling": "warning",
       "ground_pin_not_ground": "warning",
       "hier_label_mismatch": "error",
       "isolated_pin_label": "warning",
@@ -506,10 +507,14 @@
   },
   "pcbnew": {
     "last_paths": {
+      "gencad": "",
       "idf": "",
       "netlist": "",
       "plot": "",
+      "pos_files": "",
       "specctra_dsn": "",
+      "step": "",
+      "svg": "",
       "vrml": ""
     },
     "page_layout_descr_file": ""
@@ -620,9 +625,17 @@
     "meta": {
       "version": 1
     },
+    "net_format_name": "",
     "page_layout_descr_file": "",
     "plot_directory": "",
     "reuse_designators": true,
+    "space_save_all_events": true,
+    "spice_current_sheet_as_root": false,
+    "spice_external_command": "spice \"%I\"",
+    "spice_model_current_sheet_as_root": true,
+    "spice_save_all_currents": false,
+    "spice_save_all_dissipations": false,
+    "spice_save_all_voltages": false,
     "subpart_first_id": 65,
     "subpart_id_separator": 0,
     "top_level_sheets": [
@@ -632,7 +645,7 @@
         "uuid": "5ff26309-9be7-4732-9683-b5a799424d79"
       }
     ],
-    "used_designators": "U11,TP11,TP18-19,R11,R18,L2,#PWR4,#PWR8,#PWR30-31,#PWR40-42,#PWR45-46,#PWR50-51,#PWR58-60,#PWR62,#PWR65,#PWR74,#PWR76,D5,C13,C17-22,J3",
+    "used_designators": "R16-17,Q1,J2,#PWR16,#PWR69-70",
     "variants": []
   },
   "sheets": [
@@ -643,6 +656,14 @@
     [
       "6d3b10cd-9256-4f74-9c47-bff4173e3a51",
       "Power Subsystem"
+    ],
+    [
+      "9e7afb3e-f6d0-4714-a3a9-7f1e1c051738",
+      "IMU Array"
+    ],
+    [
+      "6b70a2bc-130a-4171-86aa-9b05a1a552ce",
+      "Status Leds"
     ]
   ],
   "text_variables": {},
