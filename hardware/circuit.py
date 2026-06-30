@@ -8,7 +8,7 @@ from skidl import *
 @requirement("Repeat AM32 dual ESC connects through one signal connector carrying two direct RP2350 bidirectional DSHOT/EDT lines and ground; the ESC BEC is not tied to the carrier 5V rail.")
 @requirement("Dedicated orange 2-3S TinySLED meltybrain heading output uses XIAO edge pin D1/A1 and a low-side MOSFET so firmware can generate phase-locked 100-500us strobes at 4000rpm without underside GPIOs.")
 @requirement("Harness-exposed VBUS and DSHOT nets have local TVS/ESD clamp footprints; the permanently soldered ELRS receiver pads and internal SPI/IMU nets are not ESD-clamped.")
-@requirement("Expose only essential test pads for VBAT ADC calibration, SWD debug, GND reference, 3V3, and 5V rails.")
+@requirement("Expose only essential test pads for VBAT ADC calibration, SWD debug, and GND reference.")
 def build_circuit():
     gnd = Ground("GND")
     v5 = Power("5V", voltage_domain=5.0, current=2.0)
@@ -486,16 +486,6 @@ def build_circuit():
     design_intent(tp_gnd, "Ground reference test pad for oscilloscope/logic analyzer.", group="Production test", placement="Place adjacent to signal test pads where probe ground can reach.")
     gnd += tp_gnd[1]
 
-    tp_3v3 = Part("Connector", "TestPoint", ref="TP16", value="TP_3V3", footprint="TestPoint:TestPoint_Pad_D1.0mm")
-    tp_3v3.fields["LCSC"] = "NONE"
-    design_intent(tp_3v3, "3.3V rail probe pad to verify XIAO regulator output under sensor and receiver load.", group="Production test", placement="Place near 3V3 load cluster and accessible from top.")
-    v3v3 += tp_3v3[1]
-
-    tp_5v = Part("Connector", "TestPoint", ref="TP17", value="TP_5V", footprint="TestPoint:TestPoint_Pad_D1.0mm")
-    tp_5v.fields["LCSC"] = "NONE"
-    design_intent(tp_5v, "5V buck output probe pad to verify AP63205 output under load.", group="Production test", placement="Place near buck output capacitors and accessible from top.")
-    v5 += tp_5v[1]
-
     for part, info in [
         (j_pwr, "Two-pad solder-wire input for switched LiPo VBUS and GND feeding the carrier buck regulator; nominal 2S now, 3S-ready to 12.6V."),
         (d_vbus_tvs, "SMAJ15CA bidirectional 15V working-voltage TVS diode across switched VBUS and GND at the power-entry connector for 2S/3S headroom."),
@@ -524,7 +514,5 @@ def build_circuit():
         (tp_swdio, "1mm test pad for XIAO RP2350 SWDIO debug access."),
         (tp_swdck, "1mm test pad for XIAO RP2350 SWD clock debug access."),
         (tp_gnd, "1mm test pad providing oscilloscope and logic-analyzer ground reference."),
-        (tp_3v3, "1mm test pad for checking the XIAO-provided 3.3V rail."),
-        (tp_5v, "1mm test pad for checking the AP63205 5.0V buck output rail."),
     ]:
         part.fields["info"] = info
