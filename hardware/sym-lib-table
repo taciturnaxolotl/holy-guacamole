@@ -1,5 +1,6 @@
 (sym_lib_table
   (version 7)
+  (lib (name "Connector_Generic")(type "KiCad")(uri "${KIPRJMOD}/libs/Connector_Generic.kicad_sym")(options "")(descr "Project-local KiCad generic connector symbols used by this design"))
   (lib (name "Device")(type "KiCad")(uri "${KIPRJMOD}/libs/Device.kicad_sym")(options "")(descr "Project-local KiCad Device symbols used by this design"))
   (lib (name "Library")(type "KiCad")(uri "${KIPRJMOD}/libs/Library.kicad_sym")(options "")(descr ""))
 )
