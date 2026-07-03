@@ -1,6 +1,6 @@
 # Holy Guacamole — Carrier PCB Specification
 
-**Document status:** Draft v1.3b — updated to match current `circuit.py` Rev A schematic  
+**Document status:** Draft v1.3c — updated to match current `circuit.py` Rev A schematic: solder-down ELRS receiver `U7`, 3S-ready VBUS, protection diodes documented  
 **Robot:** Holy Guacamole — 1lb meltybrain antweight, MRCA full-combat  
 
 ---
@@ -12,8 +12,8 @@ The carrier PCB is a purpose-built board for a Seeed XIAO RP2350 module. It is *
 Primary carrier jobs:
 
 - Mount the XIAO RP2350 flat as an SMD/castellated module; no XIAO pin headers.
-- Generate a local regulated 5V rail from the switched 2S LiPo bus using an AP63205 fixed-5V buck regulator.
-- Use the XIAO 3.3V rail for IMUs, the SPI-loaded chip-select latch, analog sensing, and control logic; power the BetaFPV ELRS Lite receiver from the carrier 5V rail per its vendor spec.
+- Generate a local regulated 5V rail from the switched LiPo bus (2S nominal, 3S-ready to 12.6V) using an AP63205 fixed-5V buck regulator.
+- Use the XIAO 3.3V rail for IMUs, the SPI-loaded chip-select latch, analog sensing, and control logic; power the solder-down BetaFPV ELRS Lite receiver (`U7`) from the carrier 5V rail per its vendor spec.
 - Route SPI to one inner LSM6DSV320X 6-axis/high-G IMU and two outer H3LIS331DL high-G accelerometers.
 - Use a SN74HC595PWR SPI-loaded latch for IMU chip-selects and SK9822 LED-output enable; firmware blanks the latch outputs while shifting a new select byte.
 - Connect to the Repeat AM32 Dual Brushless Drive ESC using two direct bidirectional DSHOT/EDT lines.
@@ -37,15 +37,17 @@ These names match the current SKiDL schematic in `circuit.py`.
 | `U3` | SN74HC595PWR SPI-loaded chip-select / LED-enable latch |
 | `U4` | LSM6DSV320XTR inner 6-axis / high-G IMU |
 | `U5`, `U6` | H3LIS331DLTR outer high-G accelerometers |
+| `U7` | BetaFPV ELRS Lite receiver, solder-down module footprint |
 | `U8`, `U9` | SN74AHCT1G125 3.3V-to-5V SK9822 data/clock buffers |
 | `U10` | SK9822-EC20 2×2mm addressable status LED |
 | `Q1` | AO3402 low-side MOSFET for orange TinySLED heading LED |
-| `J1` | Switched 2S LiPo / VBUS carrier power input |
+| `J1` | Switched 2S/3S LiPo / VBUS carrier power input |
 | `J2` | External orange 2-3S TinySLED heading LED connector |
 | `J4` | Repeat AM32 dual ESC signal connector |
-| `J6` | ELRS receiver connector |
+| `D2` | SMAJ15CA bidirectional TVS across VBUS at power entry |
+| `D3`, `D4` | PESD5V0V1BB ESD clamps on DSHOT1/DSHOT2 at J4 |
 
-`J3` piezo and `J5` from the older two-separate-ESC-connector version are retired/deferred in the current edge-pin-only Rev A schematic.
+`J3` piezo and `J5` from the older two-separate-ESC-connector version are retired/deferred in the current edge-pin-only Rev A schematic. The older `J6` receiver fly-lead connector is replaced by the solder-down `U7` receiver footprint.
 
 ---
 
@@ -108,16 +110,17 @@ Firmware workload intent:
 Rev A keeps an independent controller buck regulator. The Repeat AM32 dual ESC BEC is **not connected** to the carrier 5V rail.
 
 ```text
-2S LiPo
+2S LiPo (3S-ready bus)
   -> Fingertech / main switch
       -> switched battery bus
           -> Repeat AM32 dual ESC power pads
           -> carrier J1 VBUS/GND
+              -> D2 SMAJ15CA TVS clamp at power entry
               -> AP63205 fixed 5.0V buck
                   -> 5V rail
                       -> XIAO 5V/VBUS pad
                       -> SK9822 status LED + AHCT buffers
-                      -> BetaFPV ELRS Lite receiver 5V input
+                      -> U7 BetaFPV ELRS Lite receiver 5V pad (solder-down)
                   -> XIAO onboard 3.3V regulator
                       -> LSM6DSV320X + H3LIS331DL IMUs
                       -> SN74HC595 chip-select latch
@@ -152,7 +155,7 @@ Possible Rev B change:
 | Parameter | Value |
 |---|---|
 | Package | TSOT-23-6 |
-| Input voltage | 3.8–32V part capability; design VBUS is 2S LiPo, 6.0–8.4V |
+| Input voltage | 3.8–32V part capability; design VBUS is 2S LiPo 6.0–8.4V nominal, 3S-ready to 12.6V |
 | Output voltage | Fixed 5.0V; FB pin connects to 5V, no feedback divider |
 | Output current | 2A device rating; actual board load is far lower unless external LEDs are overdriven |
 | Inductor | 4.7uH, Bourns SRP4020TA-4R7M / LCSC `C2041623` in current schematic |
@@ -166,6 +169,12 @@ Required local passives in current schematic:
 | `C3` | 100nF | Bootstrap capacitor from BST to SW |
 | `C4`, `C5` | 22uF each | 5V output capacitance near L1/U2 return path |
 | `C6` | 10uF | 3.3V bulk near sensor/control load cluster |
+
+Power-entry protection in current schematic:
+
+| Ref | Part | Function |
+|---|---|---|
+| `D2` | SMAJ15CA, LCSC `C110044` | Bidirectional 15V-standoff TVS across VBUS/GND at J1; clamps below the AP63205 32V input rating with margin for 3S |
 
 Layout requirements:
 
@@ -234,6 +243,8 @@ ST guidance for these IMUs calls for local 100nF bypassing at each supply pin pl
 | `CS_A` | SN74HC595 QA / pin 15 | IMU-A active-low chip-select |
 | `CS_B` | SN74HC595 QB / pin 1 | IMU-B active-low chip-select |
 | `CS_C` | SN74HC595 QC / pin 2 | IMU-C active-low chip-select |
+
+All three IMUs run in 4-wire SPI mode; I2C is not used anywhere on the carrier. With two identical H3LIS331DL parts, I2C would not work anyway: the part exposes only one SA0 address-select level, so both outer sensors would collide on the same bus address. Per-device SPI chip-selects from the SN74HC595 avoid that entirely, and the H3LIS SDO/SA0 pads are used as SPI data outputs, not address straps.
 
 `R6`, `R7`, and `R8` are 33Ω series resistors from each IMU SDO to shared MISO for ringing and bus-contention limiting.
 
@@ -352,6 +363,7 @@ Requirements:
 
 - Use RP2350 PIO/DMA/timer support; do not bit-bang in a jittery control loop.
 - Keep DSHOT lines direct from RP2350-capable GPIOs; do not route through the SN74HC595 latch.
+- `D3`/`D4` PESD5V0V1BB bidirectional 5V ESD clamps sit at J4 pins 2/3 to ground, on the connector side of `R12`/`R13`.
 - **Firmware must use DSHOT600** for normal bidirectional DSHOT/EDT operation at ~4000–4300RPM. DSHOT300 is allowed only for bench/low-speed testing because the effective bidirectional command/telemetry update rate is marginal near strike RPM.
 - Bidirectional DSHOT/EDT returns eRPM and extended telemetry over the same signal wires; no extra telemetry UART is required in Rev A.
 - Configure AM32 motor pole count correctly. For a 14-pole outrunner, pole pairs = 7 and mechanical RPM = eRPM / 7. Verify actual motor magnet pole count instead of guessing.
@@ -363,7 +375,7 @@ High-current ESC battery and motor phase wiring must not pass through the carrie
 
 ## CRSF / ELRS
 
-**Connector:** `J6`  
+**Reference:** `U7` — solder-down module footprint (Eyeliner repo landing pattern), no fly-lead connector  
 **Receiver:** BetaFPV ELRS Lite Receiver 2.4GHz, Flat Antenna V1.2 variant, https://betafpv.com/products/elrs-lite-receiver
 
 Vendor-listed receiver facts for the selected variant:
@@ -378,20 +390,20 @@ Vendor-listed receiver facts for the selected variant:
 | Size / mass | 11 × 10 × 3mm, 0.46g |
 | Antenna | Integrated SMD ceramic antenna |
 
-| J6 pin | Signal | Notes |
+| U7 pad | Signal | Notes |
 |---:|---|---|
-| 1 | 5V | Receiver power from carrier AP63205 5V rail; BetaFPV specifies 5V input |
-| 2 | GND | Receiver ground |
-| 3 | `CRSF_TX` | XIAO D6/GPIO0 -> receiver RX pad |
-| 4 | `CRSF_RX` | receiver TX pad -> XIAO D7/GPIO1 |
+| 1 | GND | Receiver ground |
+| 2 | 5V | Receiver power from carrier AP63205 5V rail; BetaFPV specifies 5V input |
+| 3 | receiver TX/T | Drives carrier `CRSF_RX` -> XIAO D7/GPIO1 |
+| 4 | receiver RX/R | Driven by carrier `CRSF_TX` <- XIAO D6/GPIO0 |
 
 CRSF caveat:
 
 - CRSF is normally non-inverted UART at 420000 baud. SBUS is the common inverted-serial trap; Rev A is using CRSF, not SBUS.
 - Rev A schematic has no discrete CRSF inverter, which is appropriate for the selected BetaFPV ELRS Lite CRSF output.
-- Before soldering, verify the physical `5V`/`GND`/`TX`/`RX` pad order on the actual receiver board and cross-connect receiver TX to XIAO RX and receiver RX to XIAO TX.
+- Pad order GND, 5V, TX/T, RX/R is user-confirmed against the Eyeliner landing pattern; re-verify on the physical receiver before soldering and keep the cross-connection: receiver TX -> XIAO RX (`CRSF_RX`), receiver RX <- XIAO TX (`CRSF_TX`).
 
-Receiver placement: off-PCB on chassis wall for antenna clearance, away from the buck inductor and motor phase wires.
+Receiver placement: soldered directly to the carrier with the antenna end at the board edge nearest the chassis wall; keep the antenna away from copper pours, battery, the buck inductor/switch node, and motor phase wires. Add foam/epoxy support after soldering so impacts do not peel the module pads.
 
 ---
 
@@ -409,6 +421,7 @@ The carrier keeps an independent battery divider even though the ESC can provide
 | Divider low-side | `R10` = 33kΩ to GND |
 | Filter | `C12` = 100nF to GND |
 | ADC voltage at 8.4V pack | ~1.81V |
+| ADC voltage at 12.6V 3S full charge | ~2.72V |
 | ADC voltage at 6.0V pack | ~1.29V |
 
 Use this for independent low-battery warning and telemetry. Firmware can fuse/compare this with AM32 EDT voltage.
@@ -540,7 +553,7 @@ Expose the following as 1mm solderable pads with silkscreen labels.
 | D12 | NC | — | Underside pad left unused in Rev A |
 | SWDIO | `SWDIO` | debug | Test pad |
 | SWDCLK | `SWDCK` | debug | Test pad |
-| 5V/VBUS | 5V | power in | Carrier AP63205 buck output; also powers the BetaFPV ELRS Lite receiver through J6 |
+| 5V/VBUS | 5V | power in | Carrier AP63205 buck output; also powers the BetaFPV ELRS Lite receiver through the `U7` solder-down pads |
 | 3V3 / 3V3_OUT | 3V3 | power out | Powers IMUs, latch, analog refs, and 3.3V logic |
 | GND | GND | power | Common ground |
 
@@ -559,11 +572,12 @@ These are planning numbers only; measure final PCB and populated assembly.
 | AP63205 buck IC + inductor + passives | 1 set | ~0.5g |
 | SN74HC595 latch + pullups/decoupling | 1 set | ~0.1g |
 | SK9822 + AHCT buffers + passives | 1 set | ~0.1g |
+| BetaFPV ELRS Lite receiver soldered on `U7` | 1 | ~0.5g |
 | Orange TinySLED MOSFET gate driver | 1 set | ~0.05g, not including external LED/module/wires |
 | Battery sense passives and essential test pads | — | ~0.1g |
 | PCB substrate, 38mm dia, 1.0mm FR4 | 1 | ~2.0–2.2g |
 | Solder + epoxy/strain relief | — | ~0.3g |
-| **Carrier PCB total** |  | **~6.2g estimate** |
+| **Carrier PCB total** |  | **~6.7g estimate** |
 
 Removed versus older spec:
 
@@ -575,7 +589,6 @@ Removed versus older spec:
 External/not included in carrier mass:
 
 - Repeat AM32 Dual Brushless Drive ESC.
-- BetaFPV ELRS Lite Receiver 2.4GHz Flat Antenna V1.2 and its fly-leads.
 - External orange 2-3S TinySLED module and its wires.
 - Piezo disc bonded to chassis.
 
@@ -600,7 +613,7 @@ External/not included in carrier mass:
    Resolve 38mm circular outline versus desired outer IMU radius. If outer sensors cannot reach 20mm centroid radius, choose final coordinates and update firmware constants.
 
 2. **BetaFPV ELRS Lite receiver integration**  
-   Use the selected BetaFPV ELRS Lite Receiver 2.4GHz Flat Antenna V1.2 on 5V power with CRSF. Before soldering, verify physical pad order, firmware target/version, binding phrase, packet rate, telemetry ratio, and failsafe behavior.
+   The receiver solders directly to the carrier `U7` footprint (pad order GND, 5V, TX/T, RX/R). Before soldering, re-verify the physical pad order on the actual receiver, plus firmware target/version, binding phrase, packet rate, telemetry ratio, and failsafe behavior.
 
 3. **AM32 configuration**  
    Set profile `AM32_RR_ROBOT_DUAL_ESC_F421`, bidirectional drive, bidirectional DSHOT/EDT, current limits, motor direction, and correct motor pole count.
@@ -622,3 +635,6 @@ External/not included in carrier mass:
 
 9. **Power integrity check**  
    Scope 5V, 3V3, and VBUS during heading LED strobes, DSHOT traffic, and motor spin-up. Ensure TinySLED pulses do not corrupt IMU reads, VBAT ADC readings, or reset the XIAO.
+
+10. **H3LIS331DL shared-bus I2C-listening exposure**  
+    The H3LIS331DL has no I2C-disable register bit (CTRL_REG4 = BDU/BLE/FS1/FS0/SIM only); whenever its CS is high it reverts to I2C mode and listens to `SPI_SCK`/`SPI_MOSI` as SCL/SDA. Bus traffic that mimics START + address `0x18/0x19` + W can make a deselected U5/U6 ACK onto MOSI or accept a phantom write into its own config registers. Firmware must set the LSM6DSV320X I2C/I3C-disable bit at init and periodically read back/verify H3LIS config registers; if field testing shows corruption, add per-sensor SCK|CS OR-gate clock gating or move to the Rev B parallel-MISO rework.
