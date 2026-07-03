@@ -1,4 +1,11 @@
 (fp_lib_table
   (version 7)
   (lib (name "Library")(type "KiCad")(uri "${KIPRJMOD}/libs/Library.pretty")(options "")(descr ""))
+  (lib (name "Device")(type "KiCad")(uri "${KIPRJMOD}/libs/Device.pretty")(options "")(descr "Project-local device footprints"))
+  (lib (name "Resistor_SMD")(type "KiCad")(uri "${KICAD8_FOOTPRINT_DIR}/Resistor_SMD.pretty")(options "")(descr "Global SMD resistor footprints"))
+  (lib (name "Capacitor_SMD")(type "KiCad")(uri "${KICAD8_FOOTPRINT_DIR}/Capacitor_SMD.pretty")(options "")(descr "Global SMD capacitor footprints"))
+  (lib (name "Diode_SMD")(type "KiCad")(uri "${KICAD8_FOOTPRINT_DIR}/Diode_SMD.pretty")(options "")(descr "Global SMD diode footprints"))
+  (lib (name "Inductor_SMD")(type "KiCad")(uri "${KICAD8_FOOTPRINT_DIR}/Inductor_SMD.pretty")(options "")(descr "Global SMD inductor footprints"))
+  (lib (name "TestPoint")(type "KiCad")(uri "${KICAD8_FOOTPRINT_DIR}/TestPoint.pretty")(options "")(descr "Global test point footprints"))
+  (lib (name "Connector_Wire")(type "KiCad")(uri "${KICAD8_FOOTPRINT_DIR}/Connector_Wire.pretty")(options "")(descr "Global wire connector footprints"))
 )
