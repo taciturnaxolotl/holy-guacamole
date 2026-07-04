@@ -1,12 +1,13 @@
 (footprint "BetaFPV_ELRS_Lite"
-	(version 20240108)
+	(version 20260206)
 	(generator "pcbnew")
-	(generator_version "8.0")
+	(generator_version "10.0")
 	(layer "F.Cu")
 	(property "Reference" "REF**"
 		(at 1.5 -3 0)
 		(unlocked yes)
 		(layer "F.SilkS")
+		(uuid "e8a9f2f1-997b-4e45-9e90-5ce8d5eb4e08")
 		(effects
 			(font
 				(size 1 1)
@@ -15,21 +16,10 @@
 		)
 	)
 	(property "Value" "BetaFPV ELRS Lite"
-		(at 1 -1 0)
+		(at 2 -1 0)
 		(unlocked yes)
 		(layer "F.Fab")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.15)
-			)
-		)
-	)
-	(property "Footprint" "Library:BetaFPV_ELRS_Lite"
-		(at 0 0 0)
-		(unlocked yes)
-		(layer "F.Fab")
-		(hide yes)
+		(uuid "0d5839b0-f5f2-4a95-82c2-f81676473d44")
 		(effects
 			(font
 				(size 1 1)
@@ -42,6 +32,7 @@
 		(unlocked yes)
 		(layer "F.Fab")
 		(hide yes)
+		(uuid "baa2b329-2a9b-4ba0-a766-33e8fea85014")
 		(effects
 			(font
 				(size 1 1)
@@ -54,6 +45,7 @@
 		(unlocked yes)
 		(layer "F.Fab")
 		(hide yes)
+		(uuid "202a19ec-5ac8-4ccf-b45f-3e7ce2900b22")
 		(effects
 			(font
 				(size 1 1)
@@ -62,30 +54,34 @@
 		)
 	)
 	(attr smd)
+	(duplicate_pad_numbers_are_jumpers no)
 	(fp_rect
-		(start -3.75 -4.25)
-		(end 6.25 5.75)
+		(start 6.75 -4.25)
+		(end -3.25 5.75)
 		(stroke
 			(width 0.1)
 			(type default)
 		)
-		(fill none)
+		(fill no)
 		(layer "F.SilkS")
+		(uuid "e89fd502-9d72-42cc-a354-fb4d45ad1cb9")
 	)
 	(fp_rect
-		(start -3.75 -4.25)
-		(end 6.25 5.75)
+		(start 6.75 -4.25)
+		(end -3.25 5.75)
 		(stroke
 			(width 0.1)
 			(type default)
 		)
-		(fill none)
+		(fill no)
 		(layer "F.CrtYd")
+		(uuid "69abd539-8a24-4663-986f-9d82506d4d2e")
 	)
 	(fp_text user "${REFERENCE}"
-		(at 1 1.25 0)
+		(at 2 1.25 0)
 		(unlocked yes)
 		(layer "F.Fab")
+		(uuid "16393c03-b191-459b-ad0a-a791626ed07c")
 		(effects
 			(font
 				(size 1 1)
@@ -94,43 +90,45 @@
 		)
 	)
 	(pad "1" smd roundrect
-		(at -2.5 6)
+		(at 5.5 6)
 		(size 1.75 2)
-		(layers "F.Cu" "F.Paste" "F.Mask")
+		(layers "F.Cu" "F.Mask" "F.Paste")
 		(roundrect_rratio 0.25)
 		(thermal_bridge_angle 45)
+		(uuid "114250ed-b40d-4fad-abc0-727a79f9d9bc")
 	)
 	(pad "2" smd roundrect
-		(at 0 6)
+		(at 3 6)
 		(size 1.75 2)
-		(layers "F.Cu" "F.Paste" "F.Mask")
+		(layers "F.Cu" "F.Mask" "F.Paste")
 		(roundrect_rratio 0.25)
 		(thermal_bridge_angle 45)
+		(uuid "7025f022-1249-4cc6-9f97-56c714b0db3a")
 	)
 	(pad "3" smd roundrect
-		(at 2.5 6)
+		(at 0.5 6)
 		(size 1.75 2)
-		(layers "F.Cu" "F.Paste" "F.Mask")
+		(layers "F.Cu" "F.Mask" "F.Paste")
 		(roundrect_rratio 0.25)
 		(thermal_bridge_angle 45)
+		(uuid "180f1ee1-3da2-4502-b98f-8e9ca338535e")
 	)
 	(pad "4" smd roundrect
-		(at 5 6)
+		(at -2 6)
 		(size 1.75 2)
-		(layers "F.Cu" "F.Paste" "F.Mask")
+		(layers "F.Cu" "F.Mask" "F.Paste")
 		(roundrect_rratio 0.25)
 		(thermal_bridge_angle 45)
+		(uuid "c06b3f73-d10c-4dd7-9d7c-45f331c2d9b7")
 	)
 	(zone
-		(net 0)
-		(net_name "")
 		(layers "F.Cu" "F.SilkS")
+		(uuid "e94fe9bc-06b4-44f4-b64c-02eb38935518")
 		(hatch edge 0.5)
 		(connect_pads
 			(clearance 0)
 		)
 		(min_thickness 0.25)
-		(filled_areas_thickness no)
 		(keepout
 			(tracks allowed)
 			(vias allowed)
@@ -138,14 +136,20 @@
 			(copperpour allowed)
 			(footprints not_allowed)
 		)
+		(placement
+			(enabled no)
+			(sheetname "")
+		)
 		(fill
 			(thermal_gap 0.5)
 			(thermal_bridge_width 0.5)
+			(island_removal_mode 0)
 		)
 		(polygon
 			(pts
-				(xy 6.25 -4.25) (xy -3.75 -4.25) (xy -3.75 5.75) (xy 6.25 5.75)
+				(xy -3.25 -4.25) (xy 6.75 -4.25) (xy 6.75 5.75) (xy -3.25 5.75)
 			)
 		)
 	)
+	(embedded_fonts no)
 )

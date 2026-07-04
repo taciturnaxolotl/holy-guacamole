@@ -20,7 +20,7 @@ Primary carrier jobs:
 - Keep independent battery voltage sensing on the carrier.
 - Rely on AM32 bidirectional DSHOT / EDT for motor eRPM/current/voltage telemetry; no external Kelvin shunt in Rev A.
 - Provide a dedicated orange 2-3S TinySLED meltybrain heading output using XIAO edge pin D1/A1 and one MOSFET low-side switch; no underside XIAO GPIOs are used for runtime IO.
-- Retain the SK9822 RGB status LED for boot/error/mode indication and expose only essential VBAT/SWD/GND test pads. The older piezo input is deferred because D2/A2 is now used by the chip-select latch output-enable.
+- Retain chained top/bottom SK9822 RGB status LEDs for boot/error/mode indication and expose only essential VBAT/SWD/GND test pads. The older piezo input is deferred because D2/A2 is now used by the chip-select latch output-enable.
 
 The PCB mounts near the chassis centre. Final IMU coordinates must be measured from the actual chassis rotation centre and copied into firmware calibration constants.
 
@@ -39,7 +39,7 @@ These names match the current SKiDL schematic in `circuit.py`.
 | `U5`, `U6` | H3LIS331DLTR outer high-G accelerometers |
 | `U7` | BetaFPV ELRS Lite receiver, solder-down module footprint |
 | `U8`, `U9` | SN74AHCT1G125 3.3V-to-5V SK9822 data/clock buffers |
-| `U10` | SK9822-EC20 2×2mm addressable status LED |
+| `U10`, `U11` | SK9822-EC20 2×2mm addressable status LEDs, top and bottom chained pair |
 | `Q1` | AO3402 low-side MOSFET for orange TinySLED heading LED |
 | `J1` | Switched 2S/3S LiPo / VBUS carrier power input |
 | `J2` | External orange 2-3S TinySLED heading LED connector |
@@ -55,25 +55,37 @@ These names match the current SKiDL schematic in `circuit.py`.
 
 | Parameter | Value |
 |---|---|
-| Board shape | Circular or rounded/lobed circular carrier |
-| Board diameter target | **38mm baseline**, not 35mm |
-| 35mm option | Treat as a stretch goal only after actual KiCad placement/routing proves it |
+| Board shape | Rectangular with rounded corners |
+| Board dimensions | **40mm × 50mm** (width × length) |
+| Front direction | 50mm axis is front-to-back; front = top edge in KiCad |
 | Max board thickness | 1.0mm preferred; standard 1.6mm may violate chassis Z budget |
 | Max component height above board | 2.5mm nominal, set by XIAO module height |
-| Mounting | 3× M3 brass heat-set inserts in chassis, M3×6 SHCS from below |
-| Connector exits | Radially outward via silicone wire fly-leads / solder pads, not fragile board-edge plug headers |
+| Mounting | 4× M3 brass heat-set inserts in chassis, M3×6 SHCS from below; holes at four corners inset ~2.5mm from edges |
+| Connector exits | J2 heading LED on front (top) edge; J1 power and J4 ESC signal on rear (bottom) edge; all via 26AWG silicone fly-leads on compact non-relief 0.25sqmm SolderWire pads, epoxied after soldering; 16AWG stays in the off-board battery/switch/ESC loop and never lands on the carrier |
 | Operating temperature | 0–60°C ambient expectation, with local motor/ESC heating nearby |
 | Vibration/impact | Extreme; reinforce heavy/tall components and wire exits with epoxy or strain relief |
 
-### IMU placement versus board diameter
+### Board coordinate system
 
-The older spec targeted outer IMUs at 20mm radius while also targeting a 35mm circular board. Those two constraints are geometrically inconsistent for a centred circular board. A 38mm circular board has only a 19mm radius before component edge clearance.
+KiCad origin at top-left corner of the 40×50mm rectangle. Board center is at (20mm, 25mm). The +Y axis points toward the rear edge; the front/heading edge is at Y=0.
+
+Mounting hole centers (4× M3):
+
+| Hole | X (mm) | Y (mm) |
+|---:|---:|---:|
+| MH1 | 2.5 | 2.5 |
+| MH2 | 37.5 | 2.5 |
+| MH3 | 2.5 | 47.5 |
+| MH4 | 37.5 | 47.5 |
+
+### IMU placement on rectangular board
+
+The 40×50mm rectangle provides ample clearance for the original IMU radii. All three IMU centroids fit well within the board outline with room for solder mask, routing, and connector pads.
 
 Rev A layout rule:
 
-- Use 38mm OD as the baseline mechanical envelope.
-- Place IMUs as far outward as practical while preserving solder-mask clearance, routing, and assembly yield.
-- If true 20mm IMU centroid radius is mandatory, the board outline needs local lobes or a larger local radius, or the sensor geometry must be revised.
+- Board center at (20, 25) is the rotation reference point.
+- Place IMUs at the nominal radii and angles listed below.
 - Firmware must use the **measured** post-layout IMU coordinates, not just nominal values from this document.
 
 ---
@@ -119,7 +131,7 @@ Rev A keeps an independent controller buck regulator. The Repeat AM32 dual ESC B
               -> AP63205 fixed 5.0V buck
                   -> 5V rail
                       -> XIAO 5V/VBUS pad
-                      -> SK9822 status LED + AHCT buffers
+                      -> chained top/bottom SK9822 status LEDs + AHCT buffers
                       -> U7 BetaFPV ELRS Lite receiver 5V pad (solder-down)
                   -> XIAO onboard 3.3V regulator
                       -> LSM6DSV320X + H3LIS331DL IMUs
@@ -196,11 +208,11 @@ All three IMUs share SPI SCK/MOSI/MISO and use independent active-low chip-selec
 
 Nominal geometry intent:
 
-| Sensor | Nominal angle | Nominal radius | Rationale |
-|---|---:|---:|---|
-| IMU-A | 0° / East | 12mm | Inner LSM6DSV320X reference sensor with gyro and lower G loading |
-| IMU-B | 90° / North | 18mm target | Orthogonal outer H3LIS331DL sensor for X/Y decomposition |
-| IMU-C | 210° | 18mm target | Asymmetric outer H3LIS331DL placement breaks heading singularities |
+| Sensor | Nominal angle | Nominal radius | Centroid (mm from board center) | Rationale |
+|---|---:|---:|---|---|
+| IMU-A | 0° / +X right | 12mm | (+12, 0) → KiCad (32, 25) | Inner LSM6DSV320X reference sensor with gyro and lower G loading |
+| IMU-B | 90° / +Y rear | 18mm | (0, +18) → KiCad (20, 43) | Orthogonal outer H3LIS331DL sensor for X/Y decomposition |
+| IMU-C | 210° | 18mm | (-15.6, -9) → KiCad (4.4, 16) | Asymmetric outer H3LIS331DL placement breaks heading singularities |
 
 G loading at 4000RPM:
 
@@ -208,10 +220,8 @@ G loading at 4000RPM:
 |---:|---:|
 | 12mm | ~216G |
 | 18mm | ~324G |
-| 20mm | ~360G |
-| 400G limit at 20mm | ~4300RPM |
 
-Do not blindly place outer IMUs beyond what the final board outline and package clearance allow. If the outer radius changes, update the firmware measurement model.
+All IMU centroids are at least 4mm from the nearest board edge on the 40×50mm rectangle, providing comfortable clearance for solder mask, silkscreen, and routing. If the outer radius changes, update the firmware measurement model.
 
 ### IMU configuration
 
@@ -229,9 +239,9 @@ Current schematic has:
 
 - `C8` and `C11` = 100nF local capacitors for IMU-A LSM6DSV320X `VDD` and `VDDIO`.
 - `C9`, `C10` = 100nF local capacitors for IMU-B/IMU-C H3LIS331DL `Vdd`.
-- `C6` = 10uF shared 3.3V bulk capacitor for the sensor/control cluster.
+- `C6` and `C13` = 10uF 3.3V bulk capacitors for the sensor/control cluster (C13 at the far end of the IMU spread).
 
-ST guidance for these IMUs calls for local 100nF bypassing at each supply pin plus nearby bulk capacitance. In layout, keep `C6` close to the IMU/3.3V/latch cluster or add extra local 10uF if the shared bulk cap ends up far away.
+ST guidance for these IMUs calls for local 100nF bypassing at each supply pin plus nearby bulk capacitance. In layout, keep `C6` close to the IMU/3.3V/latch cluster and place `C13` near whichever outer IMU (U5/U6) lands farthest from C6, so the radial 3V3 route stays stiff at both ends.
 
 ### SPI wiring
 
@@ -446,10 +456,10 @@ The older protected piezo impact input is not populated in the current edge-pin-
 
 ## Status LED: SK9822
 
-**Reference:** `U10`  
+**References:** `U10` top / first in chain, `U11` bottom / second in chain  
 **Part:** SK9822-EC20, 2×2mm, LCSC `C2909059`
 
-This RGB status LED is intentionally retained in Rev A. It is a small top-visible status/debug indicator, not the primary meltybrain heading indicator.
+The RGB status LEDs are intentionally retained in Rev A. They are small top/bottom-visible status/debug indicators, not the primary meltybrain heading indicator.
 
 | Parameter | Value |
 |---|---|
@@ -458,10 +468,10 @@ This RGB status LED is intentionally retained in Rev A. It is a small top-visibl
 | Data buffer | `U8` SN74AHCT1G125, 3.3V input to 5V output |
 | Clock buffer | `U9` SN74AHCT1G125, 3.3V input to 5V output |
 | Output-enable control | `LED_OE_N` from SN74HC595 QD, pulled up by `R2` |
-| Local bypass | `C16` = 100nF |
-| Worst-case LED current budget | ~61mA full white |
+| Local bypass | `C16` = 100nF at U10, `C17` = 100nF at U11 |
+| Worst-case LED current budget | ~61mA full white per LED, ~122mA for both |
 
-Keep this subsystem populated for Rev A unless board area becomes impossible. It provides multi-color boot/error/mode indication without consuming extra direct XIAO GPIOs. Because the SK9822 shares the IMU SPI SCK/MOSI nets before the AHCT buffers, firmware must keep `LED_OE_N` disabled during normal IMU/latch SPI traffic and only enable the buffers when intentionally updating the status LED. This avoids accidental LED updates during high-rate IMU bursts.
+Keep this subsystem populated for Rev A unless board area becomes impossible. It provides multi-color boot/error/mode indication on both sides of the robot without consuming extra direct XIAO GPIOs. Because the SK9822 chain shares the IMU SPI SCK/MOSI nets before the AHCT buffers, firmware must keep `LED_OE_N` disabled during normal IMU/latch SPI traffic and only enable the buffers when intentionally updating status LEDs. This avoids accidental LED updates during high-rate IMU bursts. Firmware must send two LED frames; duplicate the frame if top and bottom should show the same colour.
 
 State/color mapping is firmware-defined. Suggested defaults:
 
@@ -571,13 +581,13 @@ These are planning numbers only; measure final PCB and populated assembly.
 | LSM6DSV320X + H3LIS331DL IMUs | 3 | ~0.15g |
 | AP63205 buck IC + inductor + passives | 1 set | ~0.5g |
 | SN74HC595 latch + pullups/decoupling | 1 set | ~0.1g |
-| SK9822 + AHCT buffers + passives | 1 set | ~0.1g |
+| 2× SK9822 + AHCT buffers + passives | 1 set | ~0.15g |
 | BetaFPV ELRS Lite receiver soldered on `U7` | 1 | ~0.5g |
 | Orange TinySLED MOSFET gate driver | 1 set | ~0.05g, not including external LED/module/wires |
 | Battery sense passives and essential test pads | — | ~0.1g |
-| PCB substrate, 38mm dia, 1.0mm FR4 | 1 | ~2.0–2.2g |
+| PCB substrate, 40×50mm, 1.0mm FR4 | 1 | ~3.0–3.3g |
 | Solder + epoxy/strain relief | — | ~0.3g |
-| **Carrier PCB total** |  | **~6.7g estimate** |
+| **Carrier PCB total** |  | **~7.7g estimate** |
 
 Removed versus older spec:
 
@@ -609,8 +619,8 @@ External/not included in carrier mass:
 
 ## Open items before fab
 
-1. **Final board outline and IMU coordinates**  
-   Resolve 38mm circular outline versus desired outer IMU radius. If outer sensors cannot reach 20mm centroid radius, choose final coordinates and update firmware constants.
+1. **Final IMU coordinates**  
+   Board outline is now 40×50mm rectangular. Nominal IMU centroids are listed in the IMU placement table. After assembly, measure actual positions and update firmware constants.
 
 2. **BetaFPV ELRS Lite receiver integration**  
    The receiver solders directly to the carrier `U7` footprint (pad order GND, 5V, TX/T, RX/R). Before soldering, re-verify the physical pad order on the actual receiver, plus firmware target/version, binding phrase, packet rate, telemetry ratio, and failsafe behavior.

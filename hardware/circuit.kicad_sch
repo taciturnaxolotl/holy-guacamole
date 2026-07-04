@@ -2047,6 +2047,16 @@
 	)
 	(wire
 		(pts
+			(xy 52.07 95.25) (xy 53.34 95.25)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6dae2de4-1021-41a3-9ffc-38b16951d105")
+	)
+	(wire
+		(pts
 			(xy 29.21 125.73) (xy 33.02 125.73)
 		)
 		(stroke
@@ -2454,6 +2464,16 @@
 			(justify left bottom)
 		)
 		(uuid "71211315-001b-468c-a944-6bffc8755daf")
+	)
+	(label "HEAD_LED"
+		(at 53.34 95.25 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "791a4ba0-2a3f-4fe8-8cc7-89ec79ae780b")
 	)
 	(label "SPI_SCK"
 		(at 53.34 58.42 0)
@@ -4141,7 +4161,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Connector_Wire:SolderWire-0.25sqmm_1x04_P4.2mm_D0.65mm_OD1.7mm_Relief"
+		(property "Footprint" "Connector_Wire:SolderWire-0.25sqmm_1x04_P4.2mm_D0.65mm_OD1.7mm"
 			(at 149.86 86.36 0)
 			(hide yes)
 			(show_name no)
@@ -4569,6 +4589,16 @@
 		(pin "SPI_SCK" input
 			(at 52.07 92.71 0)
 			(uuid "0fcdd05f-77d6-41ea-bc10-24ae5b1549e9")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "HEAD_LED" input
+			(at 52.07 95.25 0)
+			(uuid "661312f9-1d7c-40c7-9aa6-78eaf5167e10")
 			(effects
 				(font
 					(size 1.27 1.27)

@@ -8,4 +8,5 @@
   (lib (name "Inductor_SMD")(type "KiCad")(uri "${KICAD8_FOOTPRINT_DIR}/Inductor_SMD.pretty")(options "")(descr "Global SMD inductor footprints"))
   (lib (name "TestPoint")(type "KiCad")(uri "${KICAD8_FOOTPRINT_DIR}/TestPoint.pretty")(options "")(descr "Global test point footprints"))
   (lib (name "Connector_Wire")(type "KiCad")(uri "${KICAD8_FOOTPRINT_DIR}/Connector_Wire.pretty")(options "")(descr "Global wire connector footprints"))
+  (lib (name "MountingHole")(type "KiCad")(uri "${KICAD8_FOOTPRINT_DIR}/MountingHole.pretty")(options "")(descr "Global mounting hole footprints"))
 )
