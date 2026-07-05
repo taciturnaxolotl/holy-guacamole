@@ -94,4 +94,23 @@ I did pretty much nothing these two days because I flew to NYC to spend 2 days o
 
 ### Day 14: June 3rd
 
-This brings me to the present where I'm writing this and just finished a final review of my schematic. It took actually a shockingly long time I write this all out (about 2 hours 😭) but it was really fun to recap and kind of insane to realize that this entire project came together in 2 weeks. I'm going on a mission trip tomorrow so I have to finish routing the pcb tonight and get it sent off for one final design review from a real EE (i'm so thankful for this) and then get it made at JLC! I'm really hoping that I can get everything made quickly enough bc outpost and opensauce are coming up wayyyy too quickly (18th and 19th for opensauce) and I have practically no time left.
+[15:00ish] This brings me to the present where I'm writing this and just finished a final review of my schematic. It took actually a shockingly long time I write this all out (about 2 hours 😭) but it was really fun to recap and kind of insane to realize that this entire project came together in 2 weeks. I'm going on a mission trip tomorrow so I have to finish routing the pcb tonight and get it sent off for one final design review from a real EE (i'm so thankful for this) and then get it made at JLC! I'm really hoping that I can get everything made quickly enough bc outpost and opensauce are coming up wayyyy too quickly (18th and 19th for opensauce) and I have practically no time left.
+
+[23:30] I stayed up far too late to get the pcb finished (skipped the review and will have them check the pcb hopefully quickly ish). I'm not really happy with the shape but I already had to reroute it several times so i'm not partiularly excited to do it again. I decided to see how good freerouting has gotten and its still miserable. I had to delete everything it produced as it skipped the simplest of traces. Who knows the mind of the autorouter :shrug:
+
+![image of the horrible first pass](https://cdn.hackclub.com/019f32b5-e843-7ce7-9056-54ea9275701f/image.png)
+
+I was able to discover a pretty good trick for designing the pcb though. If you export a top down view of the onshape model and then clean it up in an svg editor you can import it as a user drawing layer into kicad and then size your edgecuts relative to that. You do need to calibrate the scale via a reference line though.
+
+### Day 15: June 4th (14 days to opensauce)
+
+It's the 4th of July and i'm on the road. Started driving down to north carolina about 9 and ended up completely ripping out the entire pcb and redesigning the edgecuts so its a bit more compact. Originally started out with a 2 layer board but was having problems keeping the ground plane clean for the spi traces and was also having some problems reaching all of the components. I got inspired by someone in the melty discord to add these little protrusions off the side for screw holes.
+
+After moving to a 4 layer design I decided on a signal-power-gnd-signal stackup splitting the power plane into 3 seconds for vbus, 3.3v, and 5v. Happily the components almost perfectly split across these lines so I only needed two traces on the powerplane. Also added a bunch of stiching vias to tie the gnd planes together and added a copper pour on the top and bottom of the board.
+
+I'm really hoping that that i've covered everything here. I'm 90% sure I have and I've done a million reviews of the schematic and tripple checked everything. I just need to get the BOM for jlc ready which mostly just means picking caps and resisters and then get this producing. It's going to be a crazy tight turnaround as even with fast shipping JLC takes about 8 days to get to the US. I'm really hoping to have everything arrive in time.
+
+| | |
+|---|---|
+| ![render 4](https://cdn.hackclub.com/019f3009-b824-7d76-9c00-3245f6e4a3f1/image.png) | ![render 3](https://cdn.hackclub.com/019f3009-b593-7781-90cb-2fa0930e5c0d/image.png) |
+| ![render 2](https://cdn.hackclub.com/019f3009-b2b2-7b43-a9a8-2a6c71dd9c52/image.png) | ![render 1](https://cdn.hackclub.com/019f3009-afdf-76ce-bdc6-43f065732723/image.png) |
