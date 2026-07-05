@@ -1,8 +1,15 @@
 # holy-guacamole
 
+![the assembled cad](https://cdn.hackclub.com/019f3009-ad2e-7909-89e6-e58519e5faaf/edited-image.png)
+
 meltybrain avacado
 
 The canonical repo for this is hosted on tangled over at [`dunkirk.sh/holy-guacamole`](https://tangled.org/dunkirk.sh/holy-guacamole)
+
+| | |
+|---|---|
+| ![render 4](https://cdn.hackclub.com/019f3009-b824-7d76-9c00-3245f6e4a3f1/image.png) | ![render 3](https://cdn.hackclub.com/019f3009-b593-7781-90cb-2fa0930e5c0d/image.png) |
+| ![render 2](https://cdn.hackclub.com/019f3009-b2b2-7b43-a9a8-2a6c71dd9c52/image.png) | ![render 1](https://cdn.hackclub.com/019f3009-afdf-76ce-bdc6-43f065732723/image.png) |
 
 <p align="center">
     <img src="https://raw.githubusercontent.com/taciturnaxolotl/carriage/main/.github/images/line-break.svg" />
