@@ -18,6 +18,12 @@ add_executable(holy_guacamole
     src/imu/latch.c
     src/imu/imu_spi.c
     src/crsf/crsf.c
+    src/math/linalg.c
+    src/estimation/imu_geom.c
+    src/estimation/meas_model.c
+    src/estimation/ekf.c
+    src/estimation/imu_convert.c
+    src/control/drift.c
 )
 
 # Generate PIO header from .pio file

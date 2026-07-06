@@ -1,0 +1,126 @@
+#include "ekf.h"
+
+#include <math.h>
+
+void ekf_init(ekf_t *e, float omega0) {
+    mat_zero(&e->x, ST_DIM, 1);
+    mat_set(&e->x, ST_OMEGA, 0, omega0);
+
+    /* Large initial uncertainty: we don't trust the starting guess. */
+    mat_identity(&e->P, ST_DIM);
+    mat_set(&e->P, ST_THETA, ST_THETA, 100.0f);
+    mat_set(&e->P, ST_OMEGA, ST_OMEGA, 100.0f);
+    mat_set(&e->P, ST_ALPHA, ST_ALPHA, 100.0f);
+
+    /* Defaults; tune against the simulator and later real logs. */
+    e->q_theta = 1e-5f;
+    e->q_omega = 5.0f;    /* omega can change fast under motor torque/impact */
+    e->q_alpha = 50.0f;
+    e->r_accel = 4.0f;    /* (m/s^2)^2, from datasheet noise density */
+    e->r_gyro  = 0.01f;   /* (rad/s)^2 */
+    e->sat_inflation = 1e6f;
+}
+
+void ekf_predict(ekf_t *e, float dt) {
+    float theta = mat_get(&e->x, ST_THETA, 0);
+    float omega = mat_get(&e->x, ST_OMEGA, 0);
+    float alpha = mat_get(&e->x, ST_ALPHA, 0);
+
+    /* State transition (constant-alpha kinematics). */
+    mat_set(&e->x, ST_THETA, 0, theta + omega * dt + 0.5f * alpha * dt * dt);
+    mat_set(&e->x, ST_OMEGA, 0, omega + alpha * dt);
+    /* alpha unchanged */
+
+    /* Jacobian F of the transition. */
+    mat_t F;
+    mat_identity(&F, ST_DIM);
+    mat_set(&F, ST_THETA, ST_OMEGA, dt);
+    mat_set(&F, ST_THETA, ST_ALPHA, 0.5f * dt * dt);
+    mat_set(&F, ST_OMEGA, ST_ALPHA, dt);
+
+    /* P = F P F^T + Q */
+    mat_t FP, FPFt;
+    mat_mul(&FP, &F, &e->P);
+    mat_mul_transpose(&FPFt, &FP, &F);
+
+    mat_t Q;
+    mat_zero(&Q, ST_DIM, ST_DIM);
+    mat_set(&Q, ST_THETA, ST_THETA, e->q_theta * dt);
+    mat_set(&Q, ST_OMEGA, ST_OMEGA, e->q_omega * dt);
+    mat_set(&Q, ST_ALPHA, ST_ALPHA, e->q_alpha * dt);
+
+    mat_add(&e->P, &FPFt, &Q);
+    mat_symmetrize(&e->P);
+}
+
+void ekf_update(ekf_t *e, const mat_t *z) {
+    /* Predicted measurement and Jacobian at the current state. */
+    mat_t h, H;
+    meas_predict(&e->x, &h);
+    meas_jacobian(&e->x, &H);
+
+    /* Innovation y = z - h. */
+    mat_t y;
+    mat_sub(&y, z, &h);
+
+    /* Measurement noise R (diagonal), with saturation inflation. */
+    bool sat[MEAS_DIM];
+    meas_saturation_flags(mat_get(&e->x, ST_OMEGA, 0), sat);
+
+    mat_t R;
+    mat_zero(&R, MEAS_DIM, MEAS_DIM);
+    for (int i = 0; i < MEAS_DIM; i++) {
+        float base = (i == MEAS_A_GYRO) ? e->r_gyro : e->r_accel;
+        if (sat[i]) base *= e->sat_inflation;
+        mat_set(&R, i, i, base);
+    }
+
+    /* S = H P H^T + R */
+    mat_t HP, S;
+    mat_mul(&HP, &H, &e->P);
+    mat_mul_transpose(&S, &HP, &H);
+    mat_add(&S, &S, &R);
+
+    /* K = P H^T S^-1 */
+    mat_t Sinv;
+    if (!mat_invert(&Sinv, &S)) return;  /* skip update if degenerate */
+
+    mat_t Ht, PHt, K;
+    mat_transpose(&Ht, &H);
+    mat_mul(&PHt, &e->P, &Ht);
+    mat_mul(&K, &PHt, &Sinv);
+
+    /* x += K y */
+    mat_t Ky;
+    mat_mul(&Ky, &K, &y);
+    mat_add(&e->x, &e->x, &Ky);
+
+    /* Joseph form: P = (I - KH) P (I - KH)^T + K R K^T
+     * Numerically robust; keeps P positive-definite under float32. */
+    mat_t KH, ImKH, I;
+    mat_mul(&KH, &K, &H);
+    mat_identity(&I, ST_DIM);
+    mat_sub(&ImKH, &I, &KH);
+
+    mat_t tmp, term1;
+    mat_mul(&tmp, &ImKH, &e->P);
+    mat_mul_transpose(&term1, &tmp, &ImKH);
+
+    mat_t KR, term2;
+    mat_mul(&KR, &K, &R);
+    mat_mul_transpose(&term2, &KR, &K);
+
+    mat_add(&e->P, &term1, &term2);
+    mat_symmetrize(&e->P);
+}
+
+float ekf_theta(const ekf_t *e) { return mat_get(&e->x, ST_THETA, 0); }
+float ekf_omega(const ekf_t *e) { return mat_get(&e->x, ST_OMEGA, 0); }
+float ekf_alpha(const ekf_t *e) { return mat_get(&e->x, ST_ALPHA, 0); }
+
+float ekf_heading_wrapped(const ekf_t *e) {
+    float two_pi = 2.0f * (float)M_PI;
+    float t = fmodf(ekf_theta(e), two_pi);
+    if (t < 0.0f) t += two_pi;
+    return t;
+}

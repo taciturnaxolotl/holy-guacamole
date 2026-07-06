@@ -32,3 +32,14 @@ function(add_hg_test name)
 endfunction()
 
 add_hg_test(test_linalg ${SRC_DIR}/math/linalg.c)
+
+set(EKF_SRCS
+    ${SRC_DIR}/math/linalg.c
+    ${SRC_DIR}/estimation/imu_geom.c
+    ${SRC_DIR}/estimation/meas_model.c
+    ${SRC_DIR}/estimation/ekf.c
+)
+
+add_hg_test(test_ekf ${EKF_SRCS})
+add_hg_test(test_sim_convergence ${EKF_SRCS} ${SIM_DIR}/robot_sim.c)
+add_hg_test(test_drift ${SRC_DIR}/control/drift.c)
