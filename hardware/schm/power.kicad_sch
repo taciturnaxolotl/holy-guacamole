@@ -2552,7 +2552,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "NONE"
+		(property "LCSC Part" "C169834"
 			(at 152.4 -59.69 0)
 			(hide yes)
 			(show_name no)
@@ -2644,7 +2644,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "NONE"
+		(property "LCSC Part" "C169834"
 			(at 17.78 1.27 0)
 			(hide yes)
 			(show_name no)
@@ -2847,7 +2847,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "33kΩ"
+		(property "Value" "33.2kΩ"
 			(at 39.37 80.01 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -2890,7 +2890,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "NONE"
+		(property "LCSC Part" "C3008937"
 			(at -312.42 -49.53 0)
 			(hide yes)
 			(show_name no)
@@ -3159,7 +3159,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "NONE"
+		(property "LCSC Part" "C602037"
 			(at 26.67 3.81 0)
 			(hide yes)
 			(show_name no)
@@ -3326,7 +3326,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "NONE"
+		(property "LCSC Part" "C409883"
 			(at -83.82 424.18 0)
 			(hide yes)
 			(show_name no)
@@ -3418,7 +3418,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "NONE"
+		(property "LCSC Part" "C602037"
 			(at 26.67 3.81 0)
 			(hide yes)
 			(show_name no)
@@ -3964,7 +3964,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "NONE"
+		(property "LCSC Part" "C913532"
 			(at 21.59 2.54 0)
 			(hide yes)
 			(show_name no)
@@ -4056,7 +4056,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "NONE"
+		(property "LCSC Part" "C913532"
 			(at 31.75 2.54 0)
 			(hide yes)
 			(show_name no)
@@ -4224,7 +4224,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "NONE"
+		(property "LCSC Part" "C602037"
 			(at 17.78 1.27 0)
 			(hide yes)
 			(show_name no)
@@ -4485,9 +4485,9 @@
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
-		(in_pos_files yes)
+		(in_pos_files no)
 		(dnp no)
 		(uuid "c987f21f-04ee-4603-8afc-0e0490a8c5c2")
 		(property "Reference" "TP10"
@@ -4633,7 +4633,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "NONE"
+		(property "LCSC Part" "C169834"
 			(at -307.34 -46.99 0)
 			(hide yes)
 			(show_name no)
@@ -4740,9 +4740,9 @@
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
-		(in_pos_files yes)
+		(in_pos_files no)
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "dfbb3f11-e406-47d5-9266-aad6e92710b5")

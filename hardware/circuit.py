@@ -110,49 +110,49 @@ def build_circuit():
     v5 += l_buck[2]
 
     c_buck_in = Part("Device", "C_Small", ref="C1", value="22uF", footprint="Capacitor_SMD:C_0805_2012Metric")
-    c_buck_in.lcsc = "NONE"
+    c_buck_in.lcsc = "C602037"
     c_buck_in.info = "Use X7R/X5R ceramic rated at least 25V for 2S/3S LiPo input transients and DC-bias margin."
     design_intent(c_buck_in, "AP63205 input bulk capacitor from VBUS to GND.", group="5V buck", placement="Place at U2 VIN/GND pins with the smallest possible loop.")
     vbus += c_buck_in[1]
     gnd += c_buck_in[2]
 
     c_buck_in_hf = Part("Device", "C_Small", ref="C2", value="100nF", footprint="Capacitor_SMD:C_0402_1005Metric")
-    c_buck_in_hf.lcsc = "NONE"
+    c_buck_in_hf.lcsc = "C169834"
     c_buck_in_hf.info = "Use at least 25V rating; this is the high-frequency bypass for the 2S/3S LiPo buck input."
     design_intent(c_buck_in_hf, "High-frequency bypass at AP63205 VIN.", group="5V buck", placement="Place directly beside U2 VIN/GND pins, inside the input current loop.")
     vbus += c_buck_in_hf[1]
     gnd += c_buck_in_hf[2]
 
     c_boot = Part("Device", "C_Small", ref="C3", value="100nF", footprint="Capacitor_SMD:C_0402_1005Metric")
-    c_boot.lcsc = "NONE"
+    c_boot.lcsc = "C169834"
     c_boot.info = "Bootstrap capacitor between BST and SW; 10V or higher ceramic is sufficient for the AP63205 gate drive bootstrap voltage."
     design_intent(c_boot, "AP63205 bootstrap capacitor.", group="5V buck", placement="Place immediately between U2 BST and SW pins.")
     bst += c_boot[1]
     sw += c_boot[2]
 
     c_buck_out1 = Part("Device", "C_Small", ref="C4", value="22uF", footprint="Capacitor_SMD:C_0805_2012Metric")
-    c_buck_out1.lcsc = "NONE"
+    c_buck_out1.lcsc = "C602037"
     c_buck_out1.info = "Use 10V or 16V X5R/X7R ceramic to retain capacitance under 5V DC bias."
     design_intent(c_buck_out1, "AP63205 5V output capacitor, first of two 22uF ceramics.", group="5V buck", placement="Place from 5V to GND near L1 output and U2 ground return.")
     v5 += c_buck_out1[1]
     gnd += c_buck_out1[2]
 
     c_buck_out2 = Part("Device", "C_Small", ref="C5", value="22uF", footprint="Capacitor_SMD:C_0805_2012Metric")
-    c_buck_out2.lcsc = "NONE"
+    c_buck_out2.lcsc = "C602037"
     c_buck_out2.info = "Use 10V or 16V X5R/X7R ceramic to retain capacitance under 5V DC bias."
     design_intent(c_buck_out2, "AP63205 5V output capacitor, second of two 22uF ceramics.", group="5V buck", placement="Place from 5V to GND near L1 output and U2 ground return.")
     v5 += c_buck_out2[1]
     gnd += c_buck_out2[2]
 
     c_3v3_bulk = Part("Device", "C_Small", ref="C6", value="10uF", footprint="Capacitor_SMD:C_0603_1608Metric")
-    c_3v3_bulk.lcsc = "NONE"
+    c_3v3_bulk.lcsc = "C913532"
     c_3v3_bulk.info = "Use 6.3V or higher ceramic with DC-bias margin on the XIAO 3V3 output rail."
     design_intent(c_3v3_bulk, "Local bulk capacitor for 3V3 sensors and 74HC595 chip-select latch logic.", group="3V3 rail", placement="Place near the cluster of 3V3 loads, not at the buck switching node.")
     v3v3 += c_3v3_bulk[1]
     gnd += c_3v3_bulk[2]
 
     c_3v3_bulk2 = Part("Device", "C_Small", ref="C13", value="10uF", footprint="Capacitor_SMD:C_0603_1608Metric")
-    c_3v3_bulk2.lcsc = "NONE"
+    c_3v3_bulk2.lcsc = "C913532"
     c_3v3_bulk2.info = "Use 6.3V or higher ceramic with DC-bias margin; second 3V3 bulk reservoir for the IMU placed farthest from C6 so the rail stays stiff at the end of the long radial 3V3 route."
     design_intent(c_3v3_bulk2, "Second 10uF bulk capacitor for the 3V3 rail at the far end of the sensor cluster.", group="3V3 rail", placement="Place near whichever outer IMU (U5 or U6) ends up farthest from C6 after layout; keep its ground return short into the plane.")
     v3v3 += c_3v3_bulk2[1]
@@ -180,44 +180,44 @@ def build_circuit():
     v3v3 += u_exp[16]
 
     c_exp = Part("Device", "C_Small", ref="C7", value="100nF", footprint="Capacitor_SMD:C_0402_1005Metric")
-    c_exp.lcsc = "NONE"
+    c_exp.lcsc = "C169834"
     c_exp.info = "6.3V or higher ceramic local bypass for the SN74HC595 3.3V VCC pin."
     design_intent(c_exp, "SN74HC595 3V3 decoupling capacitor.", group="SPI chip-select latch", placement="Place directly at U3 VCC/GND pins.")
     v3v3 += c_exp[1]
     gnd += c_exp[2]
 
     r_sel_oe = Part("Device", "R_Small", ref="R1", value="10kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
-    r_sel_oe.lcsc = "NONE"
+    r_sel_oe.lcsc = "C844715"
     design_intent(r_sel_oe, "Pull-up holds the SN74HC595 /OE high so IMU chip-select and LED-enable outputs are high-Z/inactive while the XIAO boots.", group="SPI chip-select latch", placement="Place near U3 /OE pin.")
     v3v3 += r_sel_oe[1]
     sel_oe_n += r_sel_oe[2]
 
     r_sel_lat = Part("Device", "R_Small", ref="R11", value="100kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
-    r_sel_lat.lcsc = "NONE"
+    r_sel_lat.lcsc = "C2077080"
     design_intent(r_sel_lat, "Pulldown keeps the SN74HC595 latch clock low during XIAO reset so shifted garbage is not latched into the CS outputs.", group="SPI chip-select latch", placement="Place near U3 RCLK/SEL_LAT pin.")
     sel_lat += r_sel_lat[1]
     gnd += r_sel_lat[2]
 
     r_led_oe = Part("Device", "R_Small", ref="R2", value="10kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
-    r_led_oe.lcsc = "NONE"
+    r_led_oe.lcsc = "C844715"
     design_intent(r_led_oe, "Pull-up disables 5V LED level-shifter outputs while the SN74HC595 output is high-Z/blanked or before firmware latches the LED-enable state.", group="Status LED", placement="Place near the level-shifter OE pins.")
     v3v3 += r_led_oe[1]
     led_oe_n += r_led_oe[2]
 
     r_cs_a = Part("Device", "R_Small", ref="R3", value="10kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
-    r_cs_a.lcsc = "NONE"
+    r_cs_a.lcsc = "C844715"
     design_intent(r_cs_a, "Boot-safe pull-up for active-low IMU-A chip select while the SN74HC595 outputs are high-Z/blanked.", group="IMU SPI", placement="Place near U4 CS pin or latch output fanout.")
     v3v3 += r_cs_a[1]
     cs_a += r_cs_a[2]
 
     r_cs_b = Part("Device", "R_Small", ref="R4", value="10kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
-    r_cs_b.lcsc = "NONE"
+    r_cs_b.lcsc = "C844715"
     design_intent(r_cs_b, "Boot-safe pull-up for active-low IMU-B chip select while the SN74HC595 outputs are high-Z/blanked.", group="IMU SPI", placement="Place near U5 CS pin or latch output fanout.")
     v3v3 += r_cs_b[1]
     cs_b += r_cs_b[2]
 
     r_cs_c = Part("Device", "R_Small", ref="R5", value="10kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
-    r_cs_c.lcsc = "NONE"
+    r_cs_c.lcsc = "C844715"
     design_intent(r_cs_c, "Boot-safe pull-up for active-low IMU-C chip select while the SN74HC595 outputs are high-Z/blanked.", group="IMU SPI", placement="Place near U6 CS pin or latch output fanout.")
     v3v3 += r_cs_c[1]
     cs_c += r_cs_c[2]
@@ -240,21 +240,21 @@ def build_circuit():
     spi_mosi += imu_a[14]
 
     c_imu_a = Part("Device", "C_Small", ref="C8", value="100nF", footprint="Capacitor_SMD:C_0402_1005Metric")
-    c_imu_a.lcsc = "NONE"
+    c_imu_a.lcsc = "C169834"
     c_imu_a.info = "Use 6.3V or higher ceramic at LSM6DSV320X VDD pin 8."
     design_intent(c_imu_a, "Local VDD decoupling for IMU-A LSM6DSV320X.", group="IMU array", placement="Place as close as possible to U4 pin 8 and nearby ground pins 6/7.")
     v3v3 += c_imu_a[1]
     gnd += c_imu_a[2]
 
     c_imu_a_io = Part("Device", "C_Small", ref="C11", value="100nF", footprint="Capacitor_SMD:C_0402_1005Metric")
-    c_imu_a_io.lcsc = "NONE"
+    c_imu_a_io.lcsc = "C169834"
     c_imu_a_io.info = "Use 6.3V or higher ceramic at LSM6DSV320X VDDIO pin 5."
     design_intent(c_imu_a_io, "Local VDDIO decoupling for IMU-A LSM6DSV320X.", group="IMU array", placement="Place as close as possible to U4 pin 5 and nearby ground pins 6/7.")
     v3v3 += c_imu_a_io[1]
     gnd += c_imu_a_io[2]
 
     r_miso_a = Part("Device", "R_Small", ref="R6", value="33Ω", footprint="Resistor_SMD:R_0402_1005Metric")
-    r_miso_a.lcsc = "NONE"
+    r_miso_a.lcsc = "C3008986"
     design_intent(r_miso_a, "Series isolation resistor from IMU-A SDO to shared MISO to limit bus-contention current and ringing.", group="IMU SPI", placement="Place close to U4 SDO pin.")
     miso_a += r_miso_a[1]
     spi_miso += r_miso_a[2]
@@ -275,14 +275,14 @@ def build_circuit():
     imu_b[11] += NC
 
     c_imu_b = Part("Device", "C_Small", ref="C9", value="100nF", footprint="Capacitor_SMD:C_0402_1005Metric")
-    c_imu_b.lcsc = "NONE"
+    c_imu_b.lcsc = "C169834"
     c_imu_b.info = "Use 6.3V or higher ceramic at H3LIS331DL Vdd."
     design_intent(c_imu_b, "Local Vdd decoupling for IMU-B.", group="IMU array", placement="Place as close as possible to U5 pin 14 and nearby ground pins.")
     v3v3 += c_imu_b[1]
     gnd += c_imu_b[2]
 
     r_miso_b = Part("Device", "R_Small", ref="R7", value="33Ω", footprint="Resistor_SMD:R_0402_1005Metric")
-    r_miso_b.lcsc = "NONE"
+    r_miso_b.lcsc = "C3008986"
     design_intent(r_miso_b, "Series isolation resistor from IMU-B SDO to shared MISO to limit bus-contention current and ringing.", group="IMU SPI", placement="Place close to U5 SDO pin.")
     miso_b += r_miso_b[1]
     spi_miso += r_miso_b[2]
@@ -303,33 +303,33 @@ def build_circuit():
     imu_c[11] += NC
 
     c_imu_c = Part("Device", "C_Small", ref="C10", value="100nF", footprint="Capacitor_SMD:C_0402_1005Metric")
-    c_imu_c.lcsc = "NONE"
+    c_imu_c.lcsc = "C169834"
     c_imu_c.info = "Use 6.3V or higher ceramic at H3LIS331DL Vdd."
     design_intent(c_imu_c, "Local Vdd decoupling for IMU-C.", group="IMU array", placement="Place as close as possible to U6 pin 14 and nearby ground pins.")
     v3v3 += c_imu_c[1]
     gnd += c_imu_c[2]
 
     r_miso_c = Part("Device", "R_Small", ref="R8", value="33Ω", footprint="Resistor_SMD:R_0402_1005Metric")
-    r_miso_c.lcsc = "NONE"
+    r_miso_c.lcsc = "C3008986"
     design_intent(r_miso_c, "Series isolation resistor from IMU-C SDO to shared MISO to limit bus-contention current and ringing.", group="IMU SPI", placement="Place close to U6 SDO pin.")
     miso_c += r_miso_c[1]
     spi_miso += r_miso_c[2]
 
     r_vbat_hi = Part("Device", "R_Small", ref="R9", value="120kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
-    r_vbat_hi.lcsc = "NONE"
-    design_intent(r_vbat_hi, "High-side resistor for LiPo voltage divider to XIAO A0; 8.4V maps to about 1.81V and 12.6V maps to about 2.72V with R10=33kΩ.", group="Battery voltage sense", placement="Place near XIAO A0 with short ADC node; high side can route from VBUS after switch.")
+    r_vbat_hi.lcsc = "C409883"
+    design_intent(r_vbat_hi, "High-side resistor for LiPo voltage divider to XIAO A0; 8.4V maps to about 1.80V and 12.6V maps to about 2.71V with R10=33.2kΩ.", group="Battery voltage sense", placement="Place near XIAO A0 with short ADC node; high side can route from VBUS after switch.")
     vbus += r_vbat_hi[1]
     vbat_sense += r_vbat_hi[2]
 
-    r_vbat_lo = Part("Device", "R_Small", ref="R10", value="33kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
-    r_vbat_lo.lcsc = "NONE"
-    design_intent(r_vbat_lo, "Low-side resistor for 3S-ready battery voltage divider to XIAO A0.", group="Battery voltage sense", placement="Place adjacent to R9 and C12 at the ADC node.")
+    r_vbat_lo = Part("Device", "R_Small", ref="R10", value="33.2kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
+    r_vbat_lo.lcsc = "C3008937"
+    design_intent(r_vbat_lo, "Low-side resistor for 3S-ready battery voltage divider to XIAO A0; 33.2kΩ substituted for 33kΩ (LCSC C3008937) with negligible effect on divider ratio.", group="Battery voltage sense", placement="Place adjacent to R9 and C12 at the ADC node.")
     vbat_sense += r_vbat_lo[1]
     gnd += r_vbat_lo[2]
 
     c_vbat = Part("Device", "C_Small", ref="C12", value="100nF", footprint="Capacitor_SMD:C_0402_1005Metric")
-    c_vbat.lcsc = "NONE"
-    c_vbat.info = "6.3V or higher ceramic; ADC node sees about 1.81V at 8.4V battery and about 2.72V maximum at 12.6V 3S full charge."
+    c_vbat.lcsc = "C169834"
+    c_vbat.info = "6.3V or higher ceramic; ADC node sees about 1.80V at 8.4V battery and about 2.71V maximum at 12.6V 3S full charge (33.2kΩ low-side)."
     design_intent(c_vbat, "Noise filter capacitor on VBAT ADC divider output.", group="Battery voltage sense", placement="Place at XIAO A0 / VBAT_SNS node.")
     vbat_sense += c_vbat[1]
     gnd += c_vbat[2]
@@ -350,25 +350,25 @@ def build_circuit():
     head_sw += q_head[3]
 
     r_head_gate = Part("Device", "R_Small", ref="R16", value="100Ω", footprint="Resistor_SMD:R_0402_1005Metric")
-    r_head_gate.lcsc = "NONE"
+    r_head_gate.lcsc = "C1884631"
     design_intent(r_head_gate, "Gate stopper between XIAO D1/A1 and Q1 for the orange TinySLED heading switch.", group="Heading LED", placement="Place close to Q1 gate.")
     head_led += r_head_gate[1]
     head_gate += r_head_gate[2]
 
     r_head_pd = Part("Device", "R_Small", ref="R17", value="100kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
-    r_head_pd.lcsc = "NONE"
+    r_head_pd.lcsc = "C2077080"
     design_intent(r_head_pd, "Gate pulldown holding the orange TinySLED heading MOSFET off while the RP2350 boots or resets.", group="Heading LED", placement="Place close to Q1 gate/source.")
     head_gate += r_head_pd[1]
     gnd += r_head_pd[2]
 
     r_ds1 = Part("Device", "R_Small", ref="R12", value="33Ω", footprint="Resistor_SMD:R_0402_1005Metric")
-    r_ds1.lcsc = "NONE"
+    r_ds1.lcsc = "C3008986"
     design_intent(r_ds1, "Series damping resistor for Repeat AM32 dual ESC channel 1 bidirectional DSHOT/EDT line.", group="DSHOT outputs", placement="Place at the PCB wire-exit side of the route, before J4.")
     dshot1_io += r_ds1[1]
     dshot1 += r_ds1[2]
 
     r_ds2 = Part("Device", "R_Small", ref="R13", value="33Ω", footprint="Resistor_SMD:R_0402_1005Metric")
-    r_ds2.lcsc = "NONE"
+    r_ds2.lcsc = "C3008986"
     design_intent(r_ds2, "Series damping resistor for Repeat AM32 dual ESC channel 2 bidirectional DSHOT/EDT line.", group="DSHOT outputs", placement="Place at the PCB wire-exit side of the route, before J4.")
     dshot2_io += r_ds2[1]
     dshot2 += r_ds2[2]
@@ -417,7 +417,7 @@ def build_circuit():
     u_led_mosi[5].set_current_sink(0.00151)
 
     c_led_mosi = Part("Device", "C_Small", ref="C14", value="100nF", footprint="Capacitor_SMD:C_0402_1005Metric")
-    c_led_mosi.lcsc = "NONE"
+    c_led_mosi.lcsc = "C169834"
     c_led_mosi.info = "6.3V or higher ceramic local bypass for 5V AHCT buffer."
     design_intent(c_led_mosi, "Decoupling capacitor for U8 MOSI level shifter.", group="Status LED", placement="Place at U8 VCC/GND pins.")
     v5 += c_led_mosi[1]
@@ -435,20 +435,20 @@ def build_circuit():
     u_led_sck[5].set_current_sink(0.00151)
 
     c_led_sck = Part("Device", "C_Small", ref="C15", value="100nF", footprint="Capacitor_SMD:C_0402_1005Metric")
-    c_led_sck.lcsc = "NONE"
+    c_led_sck.lcsc = "C169834"
     c_led_sck.info = "6.3V or higher ceramic local bypass for 5V AHCT buffer."
     design_intent(c_led_sck, "Decoupling capacitor for U9 SCK level shifter.", group="Status LED", placement="Place at U9 VCC/GND pins.")
     v5 += c_led_sck[1]
     gnd += c_led_sck[2]
 
     r_led_di_pd = Part("Device", "R_Small", ref="R14", value="100kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
-    r_led_di_pd.lcsc = "NONE"
+    r_led_di_pd.lcsc = "C2077080"
     design_intent(r_led_di_pd, "Weak pulldown holds SK9822 data input quiet while AHCT buffer output is disabled/high-Z.", group="Status LED", placement="Place near U10 SDI pin.")
     led_di += r_led_di_pd[1]
     gnd += r_led_di_pd[2]
 
     r_led_ck_pd = Part("Device", "R_Small", ref="R15", value="100kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
-    r_led_ck_pd.lcsc = "NONE"
+    r_led_ck_pd.lcsc = "C2077080"
     design_intent(r_led_ck_pd, "Weak pulldown holds SK9822 clock input quiet while AHCT buffer output is disabled/high-Z.", group="Status LED", placement="Place near U10 CKI/CKL pin.")
     led_ck += r_led_ck_pd[1]
     gnd += r_led_ck_pd[2]
@@ -466,7 +466,7 @@ def build_circuit():
     led[5].set_current_sink(0.061)
 
     c_led = Part("Device", "C_Small", ref="C16", value="100nF", footprint="Capacitor_SMD:C_0402_1005Metric")
-    c_led.lcsc = "NONE"
+    c_led.lcsc = "C169834"
     c_led.info = "Use 6.3V or higher ceramic at SK9822 5V VDD."
     design_intent(c_led, "Local decoupling for the 5V SK9822/APA102 status LED.", group="Status LED", placement="Place directly at U10 VDD/GND pins.")
     v5 += c_led[1]
@@ -485,7 +485,7 @@ def build_circuit():
     led_bottom[5].set_current_sink(0.061)
 
     c_led_bottom = Part("Device", "C_Small", ref="C17", value="100nF", footprint="Capacitor_SMD:C_0402_1005Metric")
-    c_led_bottom.lcsc = "NONE"
+    c_led_bottom.lcsc = "C169834"
     c_led_bottom.info = "Use 6.3V or higher ceramic at U11 SK9822 5V VDD."
     design_intent(c_led_bottom, "Local decoupling for the bottom SK9822 status LED.", group="Status LED", placement="Place directly at U11 VDD/GND pins, on the same side as U11 if possible.")
     v5 += c_led_bottom[1]
@@ -523,8 +523,8 @@ def build_circuit():
         (r_miso_a, "33Ω series resistor from IMU-A SDO to the shared MISO bus for ringing and bus-contention limiting."),
         (r_miso_b, "33Ω series resistor from IMU-B SDO to the shared MISO bus for ringing and bus-contention limiting."),
         (r_miso_c, "33Ω series resistor from IMU-C SDO to the shared MISO bus for ringing and bus-contention limiting."),
-        (r_vbat_hi, "120kΩ high-side resistor of the 3S-ready battery voltage divider feeding XIAO A0."),
-        (r_vbat_lo, "33kΩ low-side resistor of the 3S-ready battery voltage divider feeding XIAO A0."),
+        (r_vbat_hi, "120kΩ high-side resistor of the 3S-ready battery voltage divider feeding XIAO A0; paired with 33.2kΩ low-side."),
+        (r_vbat_lo, "33.2kΩ low-side resistor of the 3S-ready battery voltage divider feeding XIAO A0; substituted for 33kΩ (LCSC C3008937)."),
         (j_head, "Two-pad solder-wire connector for the external orange 2-3S TinySLED heading marker: switched VBUS feed and MOSFET-switched return."),
         (r_head_gate, "100Ω gate stopper from XIAO edge pin D1/A1 to the orange TinySLED MOSFET gate."),
         (r_head_pd, "100kΩ pulldown keeping the orange TinySLED MOSFET off during boot/reset."),

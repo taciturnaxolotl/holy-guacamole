@@ -2570,9 +2570,9 @@
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
-		(in_pos_files yes)
+		(in_pos_files no)
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "0f2fbef4-77a5-442f-a985-b5e89fb54ed9")
@@ -2796,7 +2796,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "NONE"
+		(property "LCSC Part" "C2077080"
 			(at 113.51 -235.9 0)
 			(hide yes)
 			(show_name no)
@@ -3290,7 +3290,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "NONE"
+		(property "LCSC Part" "C169834"
 			(at -231.14 -153.67 0)
 			(hide yes)
 			(show_name no)
@@ -3382,7 +3382,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "NONE"
+		(property "LCSC Part" "C169834"
 			(at -269.24 -142.24 0)
 			(hide yes)
 			(show_name no)
@@ -3551,7 +3551,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "NONE"
+		(property "LCSC Part" "C2077080"
 			(at 339.09 275.59 0)
 			(hide yes)
 			(show_name no)
@@ -3643,7 +3643,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "NONE"
+		(property "LCSC Part" "C2077080"
 			(at -266.7 -184.15 0)
 			(hide yes)
 			(show_name no)
@@ -3912,7 +3912,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "NONE"
+		(property "LCSC Part" "C169834"
 			(at -259.08 -120.65 0)
 			(hide yes)
 			(show_name no)
@@ -4079,7 +4079,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "NONE"
+		(property "LCSC Part" "C169834"
 			(at -279.4 -166.37 0)
 			(hide yes)
 			(show_name no)
@@ -4170,7 +4170,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "NONE"
+		(property "LCSC Part" "C1884631"
 			(at 201.69 314.64 0)
 			(hide yes)
 			(show_name no)
@@ -4800,9 +4800,9 @@
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
-		(in_pos_files yes)
+		(in_pos_files no)
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "f1877eab-4f3f-4919-8fd6-76484215bb5a")
