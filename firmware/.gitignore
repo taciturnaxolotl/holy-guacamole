@@ -1,4 +1,5 @@
 build/
+build-tests/
 *.uf2
 *.elf
 *.bin
@@ -6,3 +7,4 @@ build/
 *.dis
 .direnv/
 compile_commands.json
+.cache
