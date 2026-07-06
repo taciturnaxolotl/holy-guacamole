@@ -114,3 +114,11 @@ I'm really hoping that that i've covered everything here. I'm 90% sure I have an
 |---|---|
 | ![render 4](https://cdn.hackclub.com/019f3009-b824-7d76-9c00-3245f6e4a3f1/image.png) | ![render 3](https://cdn.hackclub.com/019f3009-b593-7781-90cb-2fa0930e5c0d/image.png) |
 | ![render 2](https://cdn.hackclub.com/019f3009-b2b2-7b43-a9a8-2a6c71dd9c52/image.png) | ![render 1](https://cdn.hackclub.com/019f3009-afdf-76ce-bdc6-43f065732723/image.png) |
+
+### Day 16: June 5th
+
+I added some stiching vias as mpk recommended on slack and got proper copper pours on top and bottom. Started working on getting all of the bom parts ready for JLC and discovered a bug with my original SPI idea where the H3LIS331DLTR used the CS pin to enable and disable SPI is slightly broken as for some (in my dumb opionion insane but probably perfectly reasonable) reason when CS is 0 it switches to I2C instead of SPI. If I use mode 0 SPI and add a 100k pulldown to gnd on spi sck i think it should be fine. The pcb is unfortunately scarrily expensive with shipping and assembly and came out to just over $350.
+
+![jlc quote](https://cdn.hackclub.com/019f35e9-6036-7d13-8a65-e36cf99e916d/image.png)
+
+Also started working on the firmware and I got some good benchtest code ready and am working on the EKF fusing code. Ideally I can get a sim ready soon but that seems unlikely to get done this week (saying that i'll stay up till 4am tmrw and finish wont I :pf:).
