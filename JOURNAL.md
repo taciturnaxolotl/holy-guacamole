@@ -2,7 +2,7 @@
 
 Okay this is a wee bit out of order bc I didn't start writing all of this down into after I realized I could do this for Outpost but from screenshots and git time stamps and my memory this is the best recontruction of the process up till now.
 
-### Day numero uno: Saturday June 20th
+### Day numero uno: Saturday June 20th [5:15h]
 
 I saw this [amazing video](https://www.youtube.com/watch?v=c7CI6yBTKMc) by Maker's Muse about a technique in orcaslicer to print stronger solid prints and then got fascinated by antweight combat robotics. I ended up going down a whole rabbit hole for the rest of the day. I discovered ring spinners pretty quickly (huge spinning blade around the outside) which seemed fascinating but a ton of work to build (some people have even made their [own motors](https://www.youtube.com/watch?v=scGufLuW8Do)). I also discovered that there was a competition ([Buckeye Bash](https://www.robotcombatevents.com/events/7385)) less then 45 minutes from me that was happening in August.
 
@@ -16,13 +16,13 @@ Now that I know I absolutely had to build a meltybrain I started looking at the 
 
 I knew I probably wanted to use an rp2350 for the board since they are just really nice to build with and their software stack is lovely. Finding an imu took ages especially since there are very few proper writeups about meltys on the public internet. But I basically stayed in this research hole getting more and more confused and rapidly feeling the complexity rise for the rest of the night. I went to bed at 23:45 that night having worked on this entirely since dinner at around 18:30ish.
 
-### Day 2: June 21st
+### Day 2: June 21st [4h]
 
 I started writing up a doc and a [google sheet](https://docs.google.com/spreadsheets/d/1paAJ0Wakvn5M726pM15FUGLVGKdC47_Wt41PN1yA9PQ/edit?gid=0#gid=0) of the things I was going to need for this and quickly realized it was going to be a ton of stuff. My goal from the start was to keep everything sub $250 though which did seem doable. I did some research and from what I could find PLA+ seemed to be a fairly well recommended choice for antweight bots in general and my local microcenter had some pretty green filament which looked nice.
 
 I also ended up changing the name from Bogey One to Holy Guacamole once I saw the green filament as it kinda just fit perfectly. I also started looking for specific IMUs and nailed down the motors I wanted to get to the [Palm Beach Bots D2822](https://palmbeachbots.com/products/palm-beach-bots-d2822-brushless-outrunner-1100kv-0-125in-shaft) motors as they had a low enough kv that they could spin at a "low" rpm of 2-4k rpm. Finding a lower kv high torque motor was actually suprisingly hard especially since I was coming from the drone world so thats where I looked first and those are the exact opposite type of motor especially in this size range.
 
-### Day 3: June 22nd
+### Day 3: June 22nd [2.5h]
 
 I finally made it to microcenter and bought the filament. I had to drag out my A1 mini from the closet and shockingly it still worked great! I printed a test cube and it was amazingly solid. It felt almost like an injection molded part which was crazy.
 
@@ -32,18 +32,18 @@ I also was able to finalize where I wanted to buy my main parts from and find li
 
 ![google sheets](https://cdn.hackclub.com/019f29b9-d372-7dd4-8a48-a7b5d472382d/image.png)
 
-### Day 4: June 23rd
+### Day 4: June 23rd [3h]
 
 I started the cad and got an okayish looking round hockey puck thing but then wasn't entirely sure what to do next so I ended up emailing Palm Beach Bots and they actually had cad models for almost all of the parts I was planning on using! I started working on making holes for the motors to sit in and started also experimenting with parametric variables but I very much didn't know what I was doing and also got sucked down a rabbit hole of trying to reverse engineer the bambu lab network plugin (absolute hell btw) to get it to work with OrcaSlicer.
 
-### Day 5: June 24th
+### Day 5: June 24th [5h]
 
 I started fleshing out the pcb design! I realized that my inital ideas about how to do the gyro were a bit flawed and started reading a few research papers about using just accelerometers to measure rotation reliably. I ended up coming up with a really interesting approach that uses 3 accelerometers arranged in a triangle shape with one of them a bit closer to the center. This arrangement was inspired by a [paper](https://arxiv.org/abs/2108.09834
 ) on arxiv and theoretically should help be able to discriminate better between changes in different axis as well as elimentating deadzones. I settled on the [H3LIS331DL](https://www.st.com/resource/en/datasheet/h3lis331dl.pdf) from ST which is able to withstand up to 400gs and placed it at 20mm from the center which should keep it at about 350gs at max rpm.
 
 I also realized I had a bit of a GPIO problem and needed an expander eventually settling on the [MCP23S17](https://ww1.microchip.com/downloads/aemDocuments/documents/APID/ProductDocuments/DataSheets/MCP23017-Data-Sheet-DS20001952.pdf) spi expander to help manage the CS pins on the accelerometers. I was able to get a fair bit of the schematic done before the day was done which I was fairly happy with.
 
-### Day 6-8: June 25-27th - the amazing breakthrough
+### Day 6-8: June 25-27th - the amazing breakthrough [9h]
 
 At this point I was kind of limping along with what i could glean from the internet and it was kind of a struggle to get more info on meltys. My friend Adam found out that I was looking to build a melty and invited me to the Hockey Pucks Of D̰͆͝E͕͆ͅA̤ͭ̂TͮͫH̞̃̎ discord server. This was the best thing that ever happened to this project. There are some absolutely incredible humans on there who have been working on meltys for the past 5 or more years and know so incredibly much. I started reading through as much of the discord as I could but there was just so much information available it was hard to stop lol.
 
@@ -55,7 +55,7 @@ I made a project channel in the discord and also started working on the cad a bi
 
 I also did a bunch of research into wheels and found that foam wheels with a conformal coating and then silicone seem to be pretty highly recommended as having great traction and durability
 
-### Day 9: June 28th
+### Day 9: June 28th [5h]
 
 I actually got some good cad working!!!!!
 
@@ -67,7 +67,7 @@ I also had gotten the schematic mostly to a place where I liked to and gotten it
 
 ![schematic round 1](https://cdn.hackclub.com/019f29d8-8dcf-7c57-9735-a8f8f4cb50d5/image.png)
 
-### Day 10: June 29th
+### Day 10: June 29th [4.5h]
 
 ![nice schematic](https://cdn.hackclub.com/019f29d9-f9b8-7135-a23b-37a2ee21226e/image.png)
 
@@ -77,7 +77,7 @@ I also printed the first iteration of the CAD at this point to see if it fit the
 
 ![printed model](https://cdn.hackclub.com/019f29db-d08c-7887-9f49-3c05a1e6ce42/image.png)
 
-### Day 11: June 30th
+### Day 11: June 30th [3.5h]
 
 I spent a bit researching screw types which are more complicated then I realized and then ended up redoing to the cad again to switch to partially sunk machine screws instead of the fully countersunk screws I was attempting to put in the cad before.
 
@@ -85,14 +85,14 @@ I spent a bit researching screw types which are more complicated then I realized
 
 I also spent a while double checking my BOM and making sure I had all the things I was going to need. Ended up staying up way too late thinking about melties and the ways I could optimize mine.
 
-### Days 12 and 13: July 1st and 2nd
+### Days 12 and 13: July 1st and 2nd [0h]
 
 I did pretty much nothing these two days because I flew to NYC to spend 2 days onsite with [Charm](https://charm.land/). It was a ton of fun to meet everyone IRL and I got to visit the slack office in salesforce tower! I also was able to play with my new camera a bunch and took a bunch of great photos :)
 
 ![photo of me and my host Ale in salesforce tower](https://cdn.hackclub.com/019f29e3-6dcf-7037-9df0-f1211e137724/image.png)
 ![some photos I took](https://cdn.hackclub.com/019f29e4-2a8a-7881-ae03-399f2ea9c33f/image.png)
 
-### Day 14: June 3rd
+### Day 14: June 3rd [8h]
 
 [15:00ish] This brings me to the present where I'm writing this and just finished a final review of my schematic. It took actually a shockingly long time I write this all out (about 2 hours 😭) but it was really fun to recap and kind of insane to realize that this entire project came together in 2 weeks. I'm going on a mission trip tomorrow so I have to finish routing the pcb tonight and get it sent off for one final design review from a real EE (i'm so thankful for this) and then get it made at JLC! I'm really hoping that I can get everything made quickly enough bc outpost and opensauce are coming up wayyyy too quickly (18th and 19th for opensauce) and I have practically no time left.
 
@@ -102,7 +102,7 @@ I did pretty much nothing these two days because I flew to NYC to spend 2 days o
 
 I was able to discover a pretty good trick for designing the pcb though. If you export a top down view of the onshape model and then clean it up in an svg editor you can import it as a user drawing layer into kicad and then size your edgecuts relative to that. You do need to calibrate the scale via a reference line though.
 
-### Day 15: June 4th (14 days to opensauce)
+### Day 15: June 4th (14 days to opensauce) [5h]
 
 It's the 4th of July and i'm on the road. Started driving down to north carolina about 9 and ended up completely ripping out the entire pcb and redesigning the edgecuts so its a bit more compact. Originally started out with a 2 layer board but was having problems keeping the ground plane clean for the spi traces and was also having some problems reaching all of the components. I got inspired by someone in the melty discord to add these little protrusions off the side for screw holes.
 
@@ -115,7 +115,7 @@ I'm really hoping that that i've covered everything here. I'm 90% sure I have an
 | ![render 4](https://cdn.hackclub.com/019f3009-b824-7d76-9c00-3245f6e4a3f1/image.png) | ![render 3](https://cdn.hackclub.com/019f3009-b593-7781-90cb-2fa0930e5c0d/image.png) |
 | ![render 2](https://cdn.hackclub.com/019f3009-b2b2-7b43-a9a8-2a6c71dd9c52/image.png) | ![render 1](https://cdn.hackclub.com/019f3009-afdf-76ce-bdc6-43f065732723/image.png) |
 
-### Day 16: June 5th
+### Day 16: June 5th [4h]
 
 I added some stiching vias as mpk recommended on slack and got proper copper pours on top and bottom. Started working on getting all of the bom parts ready for JLC and discovered a bug with my original SPI idea where the H3LIS331DLTR used the CS pin to enable and disable SPI is slightly broken as for some (in my dumb opionion insane but probably perfectly reasonable) reason when CS is 0 it switches to I2C instead of SPI. If I use mode 0 SPI and add a 100k pulldown to gnd on spi sck i think it should be fine. The pcb is unfortunately scarrily expensive with shipping and assembly and came out to just over $350.
 
