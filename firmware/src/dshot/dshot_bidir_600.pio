@@ -1,0 +1,96 @@
+; Copyright 2023, Connor Douthat
+; Telemetry read_telemetry Copyright 2023, Joseph Duchesne
+; Adapted for Holy Guacamole RP2350 carrier board.
+
+.program dshot_bidir_600
+
+.define public BIT_PERIOD 40
+
+.define ONE_HIGH 30
+.define ONE_LOW (BIT_PERIOD - ONE_HIGH)
+.define ONE_HIGH_DELAY (ONE_HIGH - 1)
+.define ONE_LOW_DELAY (ONE_LOW - 5)
+
+.define ZERO_HIGH 15
+.define ZERO_LOW (BIT_PERIOD - ZERO_HIGH)
+.define ZERO_HIGH_DELAY (ZERO_HIGH - 1)
+.define ZERO_LOW_DELAY (ZERO_LOW - 5)
+
+start_frame:
+	set pindirs, 1 [31] ; output
+    set pins, 1  [31]   ; high for bidir
+    pull block
+    out y, 16           ; discard 16 most significant bits
+
+check_bit:
+    jmp !osre start_bit
+    jmp read_delay
+start_bit:
+    out y, 1
+    jmp !y do_zero
+do_one:
+    set pins, 0 [ONE_HIGH_DELAY]
+    set pins, 1 [ONE_LOW_DELAY]
+    jmp check_bit
+do_zero:
+    set pins, 0 [ZERO_HIGH_DELAY]
+    set pins, 1 [ZERO_LOW_DELAY]
+    jmp check_bit
+
+; Wait for telemetry response from ESC.
+; BLHeli_32 can be slow at DSHOT600, responding after ~33us.
+read_delay:
+    set y, 21
+delay_before_read_loop:
+    jmp y--, delay_before_read_loop [31]
+    set pindirs, 0
+
+; Wait for pin to go low (start of GCR telemetry), with timeout.
+    set y, 31
+wait_for_low:
+    nop [1]
+    jmp !y, read_telemetry
+    jmp y--, keep_waiting
+keep_waiting:
+    jmp pin wait_for_low
+
+read_telemetry:
+    set y, 30
+read_first32:
+    in pins, 1 [9]
+    jmp y--, read_first32
+
+    in pins, 1 [8]
+    push
+
+    set y, 31
+read_next32:
+    in pins, 1 [10]
+    jmp y--, read_next32
+
+    push
+    jmp start_frame
+
+
+% c-sdk {
+#include "hardware/clocks.h"
+
+static inline void dshot_bidir_600_program_init(PIO pio, uint sm, uint offset, uint pin) {
+    pio_sm_config c = dshot_bidir_600_program_get_default_config(offset);
+
+    sm_config_set_set_pins(&c, pin, 1);
+    sm_config_set_in_pins(&c, pin);
+    sm_config_set_jmp_pin(&c, pin);
+    pio_gpio_init(pio, pin);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+    gpio_set_pulls(pin, true, false);
+
+    sm_config_set_out_shift(&c, false, false, 32);
+    sm_config_set_in_shift(&c, false, false, 32);
+
+    double clocks_per_us = clock_get_hz(clk_sys) / 1000000.0;
+    sm_config_set_clkdiv(&c, 1.667 / dshot_bidir_600_BIT_PERIOD * clocks_per_us);
+
+    pio_sm_init(pio, sm, offset, &c);
+}
+%}
