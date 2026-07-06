@@ -1,10 +1,12 @@
-# holy-guacamole
+# Holy Guacamole 
 
 ![the assembled cad](https://cdn.hackclub.com/019f3009-ad2e-7909-89e6-e58519e5faaf/edited-image.png)
 
-meltybrain avacado
+Meltybrain avacado.
 
 The canonical repo for this is hosted on tangled over at [`dunkirk.sh/holy-guacamole`](https://tangled.org/dunkirk.sh/holy-guacamole)
+
+This is a meltybrain style combat robot that's main weapon is simply its own spinning kinect energy. The BOM is on a google sheet [here](https://docs.google.com/spreadsheets/d/1paAJ0Wakvn5M726pM15FUGLVGKdC47_Wt41PN1yA9PQ/edit?gid=0#gid=0).
 
 | | |
 |---|---|
