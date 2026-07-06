@@ -1,4 +1,4 @@
-# Holy Guacamole 
+# Holy Guacamole 🥑
 
 ![the assembled cad](https://cdn.hackclub.com/019f3009-ad2e-7909-89e6-e58519e5faaf/edited-image.png)
 

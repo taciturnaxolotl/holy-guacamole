@@ -9,6 +9,8 @@ from skidl import *
 @requirement("Dedicated orange 2-3S TinySLED meltybrain heading output uses XIAO edge pin D1/A1 and a low-side MOSFET so firmware can generate phase-locked 100-500us strobes at 4000rpm without underside GPIOs.")
 @requirement("Harness-exposed VBUS and DSHOT nets have local TVS/ESD clamp footprints; the permanently soldered ELRS receiver pads and internal SPI/IMU nets are not ESD-clamped.")
 @requirement("Expose only essential test pads for VBAT ADC calibration, SWD debug, and GND reference.")
+@requirement("U5", "Deselected H3LIS331DL has no I2C-disable bit, so the shared SPI bus must run Mode 0 (SCK idle-low) and SPI_SCK carries a pulldown (R18) that holds SCL idle-low through boot/reset; a deselected U5 therefore never sees an I2C START (SDA falling while SCL high) on SPI_SCK/SPI_MOSI and cannot take a phantom config write.")
+@requirement("U6", "Deselected H3LIS331DL has no I2C-disable bit, so the shared SPI bus must run Mode 0 (SCK idle-low) and SPI_SCK carries a pulldown (R18) that holds SCL idle-low through boot/reset; a deselected U6 therefore never sees an I2C START (SDA falling while SCL high) on SPI_SCK/SPI_MOSI and cannot take a phantom config write.")
 def build_circuit():
     gnd = Ground("GND")
     v5 = Power("5V", voltage_domain=5.0, current=2.0)
@@ -222,6 +224,12 @@ def build_circuit():
     v3v3 += r_cs_c[1]
     cs_c += r_cs_c[2]
 
+    r_sck_pd = Part("Device", "R_Small", ref="R18", value="100kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
+    r_sck_pd.lcsc = "C2077080"
+    design_intent(r_sck_pd, "Idle-low pulldown on the shared SPI_SCK enforcing the Mode-0 SCK-idle-low guarantee: holds SCL low so a deselected H3LIS331DL (U5/U6) I2C front-end never sees a START, even while the RP2350 tri-states the bus at boot/reset. SCK is the START-critical line; MOSI does not need pinning.", group="IMU SPI", placement="Place at the SPI clock fanout near U1/U3 where SPI_SCK branches to the IMUs; keep the stub short.")
+    spi_sck += r_sck_pd[1]
+    gnd += r_sck_pd[2]
+
     imu_a = Part("Library", "LSM6DSV320XTR", ref="U4", value="LSM6DSV320XTR", footprint="Library:LGA-14_L3.0-W2.5-P0.50-TL")
     imu_a.lcsc = "C26633007"
     imu_a.info = "Inner 6-axis IMU with high-g accelerometer and gyro. 4-wire SPI mode: SCL pin 13 to SPI_SCK, SDA pin 14 to SPI_MOSI, SDO/TA0 pin 1 through the IMU-A MISO isolation resistor to shared SPI_MISO, and CS pin 12 to CS_A. VDDIO pin 5 and VDD pin 8 to 3V3; GND pins 6 and 7 to GND. Unused auxiliary bus pins SDx pin 2 and SCx pin 3 are tied to GND per datasheet guidance; INT1/INT2 and OSC_AUX/SDO_AUX are unused/NC. Datasheet gives typical 0.80mA for 9-axis combo high-performance mode but no maximum active current, so IMU rail current is not fully current-verified. Axis intent from package top view: +X points from pins 1-4 side toward pins 8-11 side, +Y points from pins 5-7 side toward pins 12-14 side, +Z out of the top face."
@@ -261,7 +269,7 @@ def build_circuit():
 
     imu_b = Part("Library", "H3LIS331DLTR", ref="U5", value="H3LIS331DLTR", footprint="Library:LGA-16_L3.0-W3.0-P0.50-BL")
     imu_b.lcsc = "C2655074"
-    imu_b.info = "SPI mode: Vdd_IO pin 1 and Vdd pin 14 to 3V3, reserved pin 10 to GND, reserved pin 15 to Vdd, INT pins unused/NC. Datasheet gives typical 300uA normal-mode supply current but no maximum; rail budget is therefore not fully current-verified for IMUs. Axis intent: +X points toward pins 1-4 edge, +Y toward pins 5-8 edge."
+    imu_b.info = "SPI mode: Vdd_IO pin 1 and Vdd pin 14 to 3V3, reserved pin 10 to GND, reserved pin 15 to Vdd, INT pins unused/NC. Datasheet gives typical 300uA normal-mode supply current but no maximum; rail budget is therefore not fully current-verified for IMUs. Axis intent: +X points toward pins 1-4 edge, +Y toward pins 5-8 edge. The H3LIS331DL has no I2C-disable bit, so whenever CS_B is high this part reverts to I2C and reads SPI_SCK as SCL and SPI_MOSI as SDA; the shared bus must run SPI Mode 0 (SCK idle-low) and SPI_SCK carries a 100kΩ pulldown (R18) so SCL is held low and a phantom I2C START can never form from foreign SPI traffic or during boot/reset. Periodic config-register readback is the firmware backstop."
     design_intent(imu_b, "IMU-B high-G accelerometer at nominal 90°/North, outer radius target 18mm; X axis radial outward and Y axis tangential.", group="IMU array", placement="Place centroid at r=18mm, angle 90°. Orient pin 1 for radial +X per the H3LIS331DL axis diagram.")
     v3v3 += imu_b[1], imu_b[14], imu_b[15]
     gnd += imu_b[5], imu_b[10], imu_b[12], imu_b[13], imu_b[16]
@@ -289,7 +297,7 @@ def build_circuit():
 
     imu_c = Part("Library", "H3LIS331DLTR", ref="U6", value="H3LIS331DLTR", footprint="Library:LGA-16_L3.0-W3.0-P0.50-BL")
     imu_c.lcsc = "C2655074"
-    imu_c.info = "SPI mode: Vdd_IO pin 1 and Vdd pin 14 to 3V3, reserved pin 10 to GND, reserved pin 15 to Vdd, INT pins unused/NC. Datasheet gives typical 300uA normal-mode supply current but no maximum; rail budget is therefore not fully current-verified for IMUs. Axis intent: +X points toward pins 1-4 edge, +Y toward pins 5-8 edge."
+    imu_c.info = "SPI mode: Vdd_IO pin 1 and Vdd pin 14 to 3V3, reserved pin 10 to GND, reserved pin 15 to Vdd, INT pins unused/NC. Datasheet gives typical 300uA normal-mode supply current but no maximum; rail budget is therefore not fully current-verified for IMUs. Axis intent: +X points toward pins 1-4 edge, +Y toward pins 5-8 edge. The H3LIS331DL has no I2C-disable bit, so whenever CS_C is high this part reverts to I2C and reads SPI_SCK as SCL and SPI_MOSI as SDA; the shared bus must run SPI Mode 0 (SCK idle-low) and SPI_SCK carries a 100kΩ pulldown (R18) so SCL is held low and a phantom I2C START can never form from foreign SPI traffic or during boot/reset. Periodic config-register readback is the firmware backstop."
     design_intent(imu_c, "IMU-C high-G accelerometer at nominal 210°, outer radius target 18mm; asymmetric placement breaks heading singularities.", group="IMU array", placement="Place centroid at r=18mm, angle 210°. Orient pin 1 for radial +X per the H3LIS331DL axis diagram.")
     v3v3 += imu_c[1], imu_c[14], imu_c[15]
     gnd += imu_c[5], imu_c[10], imu_c[12], imu_c[13], imu_c[16]
@@ -523,6 +531,7 @@ def build_circuit():
         (r_miso_a, "33Ω series resistor from IMU-A SDO to the shared MISO bus for ringing and bus-contention limiting."),
         (r_miso_b, "33Ω series resistor from IMU-B SDO to the shared MISO bus for ringing and bus-contention limiting."),
         (r_miso_c, "33Ω series resistor from IMU-C SDO to the shared MISO bus for ringing and bus-contention limiting."),
+        (r_sck_pd, "100kΩ pulldown on shared SPI_SCK enforcing the Mode-0 SCK-idle-low guarantee so a deselected H3LIS331DL (no I2C-disable bit) never sees an I2C START on SPI_SCK/SPI_MOSI during boot/reset or foreign SPI traffic; SCK is the START-critical line."),
         (r_vbat_hi, "120kΩ high-side resistor of the 3S-ready battery voltage divider feeding XIAO A0; paired with 33.2kΩ low-side."),
         (r_vbat_lo, "33.2kΩ low-side resistor of the 3S-ready battery voltage divider feeding XIAO A0; substituted for 33kΩ (LCSC C3008937)."),
         (j_head, "Two-pad solder-wire connector for the external orange 2-3S TinySLED heading marker: switched VBUS feed and MOSFET-switched return."),

@@ -20,7 +20,7 @@ Primary carrier jobs:
 - Keep independent battery voltage sensing on the carrier.
 - Rely on AM32 bidirectional DSHOT / EDT for motor eRPM/current/voltage telemetry; no external Kelvin shunt in Rev A.
 - Provide a dedicated orange 2-3S TinySLED meltybrain heading output using XIAO edge pin D1/A1 and one MOSFET low-side switch; no underside XIAO GPIOs are used for runtime IO.
-- Retain chained top/bottom SK9822 RGB status LEDs for boot/error/mode indication and expose only essential VBAT/SWD/GND test pads. The older piezo input is deferred because D2/A2 is now used by the chip-select latch output-enable.
+- Retain chained top/bottom SK9822 RGB status LEDs for boot/error/mode indication and expose only essential VBAT/SWD/GND test pads.
 
 The PCB mounts near the chassis centre. Final IMU coordinates must be measured from the actual chassis rotation centre and copied into firmware calibration constants.
 
@@ -47,7 +47,7 @@ These names match the current SKiDL schematic in `circuit.py`.
 | `D2` | SMAJ15CA bidirectional TVS across VBUS at power entry |
 | `D3`, `D4` | PESD5V0V1BB ESD clamps on DSHOT1/DSHOT2 at J4 |
 
-`J3` piezo and `J5` from the older two-separate-ESC-connector version are retired/deferred in the current edge-pin-only Rev A schematic. The older `J6` receiver fly-lead connector is replaced by the solder-down `U7` receiver footprint.
+`J3` piezo and `J5` from older revisions are retired and not present in the current Rev A schematic. The older `J6` receiver fly-lead connector is replaced by the solder-down `U7` receiver footprint.
 
 ---
 
@@ -260,6 +260,8 @@ All three IMUs run in 4-wire SPI mode; I2C is not used anywhere on the carrier. 
 
 Each CS line has a 10kΩ pull-up (`R3`, `R4`, `R5`) so the IMUs remain deselected while the RP2350 boots or while the SN74HC595 outputs are high-Z/blanked.
 
+`R18` (100kΩ) pulls `SPI_SCK` low so the shared clock idles low even while the RP2350 tri-states the bus at boot/reset. The bus runs SPI Mode 0 specifically so a deselected H3LIS331DL — which reverts to I2C and reads `SPI_SCK`/`SPI_MOSI` as SCL/SDA when its CS is high — never sees an I2C START (SDA falling while SCL high) on foreign traffic. See open item 10.
+
 ### IMU readout timing
 
 Rev A uses one shared `SPI_MISO` net, so firmware must select **only one IMU at a time**. Do not assert `CS_A`, `CS_B`, and `CS_C` simultaneously on this hardware: all selected IMUs would drive the same MISO net through the 33Ω resistors, causing contention and invalid data.
@@ -448,9 +450,6 @@ Current/eRPM telemetry path:
 
 If future testing shows AM32 current telemetry is insufficient, add an external inline shunt and INA180 in a later revision. Do not route motor current through this carrier PCB.
 
-### Deferred piezo / impact input
-
-The older protected piezo impact input is not populated in the current edge-pin-only Rev A schematic because XIAO D2/A2/GPIO42 is used as `SEL_OE_N` for the SN74HC595 output blanking. Impact classification can be revisited in Rev B using an underside GPIO/ADC pad or a different IO tradeoff.
 
 ---
 
@@ -594,7 +593,7 @@ Removed versus older spec:
 - No INA180 current-sense amplifier.
 - No 5mΩ external shunt in the carrier BOM.
 - No separate two-ESC signal connector pair.
-- No protected piezo input in the current edge-pin-only Rev A schematic; D2/A2 is used for `SEL_OE_N`.
+- No protected piezo input; removed from Rev A.
 
 External/not included in carrier mass:
 
@@ -647,4 +646,10 @@ External/not included in carrier mass:
    Scope 5V, 3V3, and VBUS during heading LED strobes, DSHOT traffic, and motor spin-up. Ensure TinySLED pulses do not corrupt IMU reads, VBAT ADC readings, or reset the XIAO.
 
 10. **H3LIS331DL shared-bus I2C-listening exposure**  
-    The H3LIS331DL has no I2C-disable register bit (CTRL_REG4 = BDU/BLE/FS1/FS0/SIM only); whenever its CS is high it reverts to I2C mode and listens to `SPI_SCK`/`SPI_MOSI` as SCL/SDA. Bus traffic that mimics START + address `0x18/0x19` + W can make a deselected U5/U6 ACK onto MOSI or accept a phantom write into its own config registers. Firmware must set the LSM6DSV320X I2C/I3C-disable bit at init and periodically read back/verify H3LIS config registers; if field testing shows corruption, add per-sensor SCK|CS OR-gate clock gating or move to the Rev B parallel-MISO rework.
+    The H3LIS331DL has no I2C-disable register bit (CTRL_REG4 = BDU/BLE/FS1/FS0/SIM only); whenever its CS is high it reverts to I2C mode and listens to `SPI_SCK`/`SPI_MOSI` as SCL/SDA. Bus traffic that mimics START + address `0x18/0x19` + W can make a deselected U5/U6 ACK onto MOSI or accept a phantom write into its own config registers.
+
+    **Primary mitigation — SPI Mode 0 (SCK idle-low), no hardware cost.** Every device on the shared bus samples on the rising clock edge and tolerates an idle-low clock, so the bus runs Mode 0: U1 RP2350 master (PL022, all modes), U3 SN74HC595 (rising-edge shift), U4 LSM6DSV320X (datasheet-confirmed Mode 0/3), U5/U6 H3LIS331DL (datasheet-confirmed Mode 0/3), and the U8/U9 AHCT→SK9822 path (rising-edge data latch). In Mode 0 `SPI_SCK` (= SCL to a deselected sensor) idles low and stays stable through every SCK-high phase, and `SPI_MOSI` (= SDA) only transitions while SCK is low. An I2C START requires SDA to fall while SCL is *high*, which therefore never occurs — the deselected sensor's I2C state machine never leaves idle, so no phantom address match or config write is possible. Mode 3 (SCK idle-high) is the exposed case and must not be used.
+
+    **Boot/reset hardening.** `R18` (100kΩ) pulls `SPI_SCK` to GND so SCL is held idle-low even while the RP2350 tri-states the bus before SPI init and during resets — closing the only window where SCK could float high. SCK is the START-critical line, so MOSI does not need pinning.
+
+    **Defense-in-depth (firmware).** Firmware still sets the LSM6DSV320X `IF_CFG` (0x03) `I2C_DISABLE` bit at init (the LSM6DSV320X has this bit; the H3LIS331DL does not) and periodically reads back/verifies the H3LIS config registers. If field testing ever shows corruption despite Mode 0, add per-sensor SCK|CS OR-gate clock gating or move to the Rev B parallel-MISO rework.

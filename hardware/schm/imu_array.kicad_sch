@@ -1824,6 +1824,29 @@
 		)
 		(uuid "c092f4a1-8cc0-494f-91dd-8ea009a1ac65")
 	)
+	(rectangle
+		(start 126.365 77.47)
+		(end 230.505 117.475)
+		(stroke
+			(width 0.1)
+			(type dash)
+		)
+		(fill
+			(type none)
+		)
+		(uuid "d7725f34-8e87-4dd6-a183-64878fad3527")
+	)
+	(text "SPI pulldown"
+		(exclude_from_sim no)
+		(at 229.616 116.078 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "0acc35d5-907b-4d61-a58f-839d6345bf30")
+	)
 	(text "SPI CS expander"
 		(exclude_from_sim no)
 		(at 120.65 149.352 0)
@@ -2235,6 +2258,16 @@
 			(type default)
 		)
 		(uuid "0e2908e8-8942-4e55-ad05-c383c7566d4c")
+	)
+	(wire
+		(pts
+			(xy 146.05 96.52) (xy 146.05 91.44)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "108dd36f-4214-455d-936f-4cb050233b94")
 	)
 	(wire
 		(pts
@@ -2805,6 +2838,16 @@
 			(type default)
 		)
 		(uuid "828f1f42-8d98-4682-8bb1-5bff0a9b5171")
+	)
+	(wire
+		(pts
+			(xy 146.05 101.6) (xy 146.05 104.14)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "82c2e090-3b8f-4429-a366-8a1987b48fa4")
 	)
 	(wire
 		(pts
@@ -3552,6 +3595,17 @@
 	)
 	(hierarchical_label "SPI_SCK"
 		(shape input)
+		(at 146.05 91.44 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "7d658715-192e-42ed-8f7f-5533f49586d7")
+	)
+	(hierarchical_label "SPI_SCK"
+		(shape input)
 		(at 93.98 120.65 0)
 		(effects
 			(font
@@ -3790,6 +3844,82 @@
 			(project "circuit"
 				(path "/5ff26309-9be7-4732-9683-b5a799424d79/9e7afb3e-f6d0-4714-a3a9-7f1e1c051738"
 					(reference "R3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 146.05 104.14 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "0c6c20b2-bfa5-4a5c-89f5-64857139e60a")
+		(property "Reference" "#PWR030"
+			(at 146.05 106.68 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 146.05 107.95 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 146.05 104.14 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 146.05 104.14 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 146.05 104.14 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "53b8baf2-c0d4-4f9e-bd80-cf6000355c30")
+		)
+		(instances
+			(project "circuit"
+				(path "/5ff26309-9be7-4732-9683-b5a799424d79/9e7afb3e-f6d0-4714-a3a9-7f1e1c051738"
+					(reference "#PWR030")
 					(unit 1)
 				)
 			)
@@ -5794,6 +5924,97 @@
 			(project "circuit"
 				(path "/5ff26309-9be7-4732-9683-b5a799424d79/9e7afb3e-f6d0-4714-a3a9-7f1e1c051738"
 					(reference "C7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R_Small")
+		(at 146.05 99.06 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "d9db4173-a4d3-4599-8ad8-b9b1c1dc864d")
+		(property "Reference" "R22"
+			(at 147.574 97.79 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "100kΩ"
+			(at 147.574 100.33 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 146.05 99.06 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 146.05 99.06 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 146.05 99.06 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC Part" "C2077080"
+			(at -139.7 50.8 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "fe063921-316e-46dd-9991-dfb20f30c108")
+		)
+		(pin "2"
+			(uuid "fd2689dc-8fbf-4894-b7e4-88562305415c")
+		)
+		(instances
+			(project "circuit"
+				(path "/5ff26309-9be7-4732-9683-b5a799424d79/9e7afb3e-f6d0-4714-a3a9-7f1e1c051738"
+					(reference "R22")
 					(unit 1)
 				)
 			)
