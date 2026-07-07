@@ -1,10 +1,10 @@
 # Holy Guacamole 🥑
 
-![the assembled cad](https://cdn.hackclub.com/019f3009-ad2e-7909-89e6-e58519e5faaf/edited-image.png)
-
-> The canonical repo for this is hosted on tangled over at [`dunkirk.sh/holy-guacamole`](https://tangled.org/dunkirk.sh/holy-guacamole)
+![the assembled cad](https://cdn.hackclub.com/019f3e8a-4057-7a4b-85e5-a1290ddeb5f7/image.png)
 
 This is a meltybrain style combat robot that's main weapon is simply its own spinning kinect energy. The BOM is on a google sheet [here](https://docs.google.com/spreadsheets/d/1paAJ0Wakvn5M726pM15FUGLVGKdC47_Wt41PN1yA9PQ/edit?gid=0#gid=0) and the CAD is done in onshape and available [here](https://cad.onshape.com/documents/a046eeb92ff2319e557090a2/w/6774deed54414bae93c63cc1/e/4d0675cbf797ff5c6c8f60bb?renderMode=0&uiState=6a4b13893c4a31ee1cf2e4f3)
+
+The canonical repo for this is hosted on tangled over at [`dunkirk.sh/holy-guacamole`](https://tangled.org/dunkirk.sh/holy-guacamole)
 
 | | |
 |---|---|
