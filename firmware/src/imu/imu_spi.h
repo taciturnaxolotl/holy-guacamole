@@ -27,6 +27,3 @@ bool imu_init(void);
  * Fills samples[0..2]. Returns true on success.
  * Completes within ~30us at 10MHz SPI. */
 bool imu_read_all(imu_sample_t samples[IMU_COUNT]);
-
-/* Read a single IMU by index. Caller manages latch selection. */
-bool imu_read_single(uint8_t imu_id, imu_sample_t *sample);

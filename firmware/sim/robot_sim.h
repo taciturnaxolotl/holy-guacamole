@@ -19,6 +19,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "math/linalg.h"
+#include "imu_synth.h"
 
 typedef struct {
     /* True state (double for an accurate ground-truth reference). */
@@ -26,12 +27,7 @@ typedef struct {
     double omega;
     double alpha;
 
-    uint64_t rng;              /* xorshift PRNG state (seedable, reproducible) */
-
-    float accel_noise_sigma;   /* m/s^2, per accel axis */
-    float gyro_noise_sigma;    /* rad/s */
-    bool  enable_noise;
-    bool  enable_saturation;
+    imu_synth_t synth;   /* shared IMU reading model (noise + saturation) */
 } robot_sim_t;
 
 /* Initialize truth at omega0 (rad/s), zero heading, given PRNG seed.

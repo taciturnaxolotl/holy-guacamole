@@ -23,6 +23,3 @@ void latch_select(uint8_t bit);
 
 /* Convenience: load safe image + disable. All outputs inactive. */
 void latch_deselect_all(void);
-
-/* Get the current cached latch image. */
-uint8_t latch_get_image(void);

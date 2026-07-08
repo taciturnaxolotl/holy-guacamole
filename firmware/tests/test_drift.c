@@ -5,30 +5,36 @@
 
 #define PI ((float)M_PI)
 
-/* At theta == phi, cos is 1: motor A gets max boost, B max cut. */
+/* drift_compute uses cos(theta - phi - pi/2).
+ * At theta = phi - pi/2: cos(-pi) = -1 -> mod negative -> B > A
+ * At theta = phi:        cos(-pi/2) = 0 -> no differential
+ * At theta = phi + pi/2: cos(0) = 1   -> mod positive -> A > B */
+
+/* At theta = phi + pi/2, cos is 1: motor A gets max boost, B max cut. */
 static void test_peak_differential(void) {
-    drift_throttles_t t = drift_compute(0.5f, 0.5f, 0.3f, 0.5f);
+    drift_throttles_t t = drift_compute(0.5f + PI / 2.0f, 0.5f, 0.3f, 0.5f);
     ASSERT_NEAR(t.a, 0.8f, 1e-5f);
     ASSERT_NEAR(t.b, 0.2f, 1e-5f);
 }
 
-/* At theta - phi == pi/2, cos is 0: both motors at base. */
+/* At theta == phi, cos(-pi/2) = 0: both motors at base. */
 static void test_quadrature_no_diff(void) {
-    drift_throttles_t t = drift_compute(0.5f + PI / 2.0f, 0.5f, 0.3f, 0.5f);
+    drift_throttles_t t = drift_compute(0.5f, 0.5f, 0.3f, 0.5f);
     ASSERT_NEAR(t.a, 0.5f, 1e-5f);
     ASSERT_NEAR(t.b, 0.5f, 1e-5f);
 }
 
-/* Half a revolution later the differential flips sign. */
+/* At theta = phi - pi/2, cos(-pi) = -1: B gets max boost, A max cut. */
 static void test_antiphase_flips(void) {
-    drift_throttles_t t = drift_compute(0.5f + PI, 0.5f, 0.3f, 0.5f);
+    drift_throttles_t t = drift_compute(0.5f - PI / 2.0f, 0.5f, 0.3f, 0.5f);
     ASSERT_NEAR(t.a, 0.2f, 1e-5f);
     ASSERT_NEAR(t.b, 0.8f, 1e-5f);
 }
 
 /* Throttles clamp to [0,1] when base + authority exceeds range. */
 static void test_clamp(void) {
-    drift_throttles_t t = drift_compute(0.0f, 0.9f, 0.5f, 0.0f);
+    /* Peak positive mod at theta = phi + pi/2 */
+    drift_throttles_t t = drift_compute(PI / 2.0f, 0.9f, 0.5f, 0.0f);
     ASSERT_NEAR(t.a, 1.0f, 1e-5f);   /* 0.9 + 0.5 -> clamped 1.0 */
     ASSERT_NEAR(t.b, 0.4f, 1e-5f);   /* 0.9 - 0.5 */
 }

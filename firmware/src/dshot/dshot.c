@@ -11,7 +11,7 @@ static bool program_loaded = false;
 
 /* ---- Encoder ---- */
 
-uint32_t dshot_encode(uint16_t command) {
+static uint32_t dshot_encode(uint16_t command) {
     /* DSHOT frame: 11-bit value + 4-bit CRC + 1 telemetry request bit = 16 bits
      * Telemetry request bit is always set for bidirectional mode. */
     uint16_t packet = (command << 1) | 1;  /* telemetry bit = 1 */
@@ -55,7 +55,7 @@ static uint8_t decode_gcr_nibble(uint8_t gcr) {
     }
 }
 
-bool dshot_decode_telemetry(uint64_t raw, dshot_telemetry_t *tel) {
+static bool dshot_decode_telemetry(uint64_t raw, dshot_telemetry_t *tel) {
     tel->reads++;
 
     /* Telemetry must start with a 0 bit */
@@ -203,9 +203,7 @@ void dshot_set_throttle(dshot_esc_t *esc, float throttle) {
     dshot_send(esc, cmd);
 }
 
-void dshot_stop(dshot_esc_t *esc) {
-    dshot_send(esc, DSHOT_STOP);
-}
+
 
 bool dshot_read_telemetry(dshot_esc_t *esc) {
     if (!esc->initialized) return false;

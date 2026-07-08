@@ -43,8 +43,7 @@ void meas_predict(const mat_t *x, mat_t *z);
 /* Measurement Jacobian H (MEAS_DIM x ST_DIM) evaluated at state x. */
 void meas_jacobian(const mat_t *x, mat_t *H);
 
-/* Flag which radial measurement rows would be saturated at the given
- * omega (outer H3LIS sensors clip at +/-400g). saturated[] has MEAS_DIM
- * entries; only radial rows can be set true. The EKF inflates R for
- * flagged rows instead of trusting a railed reading. */
-void meas_saturation_flags(float omega, bool saturated[MEAS_DIM]);
+/* Flag which measurement rows are saturated (accelerometer at the rail),
+ * detected from the measurement vector z itself. The EKF inflates R for
+ * flagged rows instead of trusting a clipped reading. */
+void meas_saturation_flags(const mat_t *z, bool saturated[MEAS_DIM]);

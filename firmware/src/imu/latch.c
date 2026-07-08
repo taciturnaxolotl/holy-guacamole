@@ -56,6 +56,6 @@ void latch_deselect_all(void) {
     latch_load(LATCH_SAFE);
 }
 
-uint8_t latch_get_image(void) {
+static uint8_t latch_get_image(void) {
     return latch_shadow;
 }

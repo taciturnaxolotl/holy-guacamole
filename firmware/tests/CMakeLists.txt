@@ -41,5 +41,5 @@ set(EKF_SRCS
 )
 
 add_hg_test(test_ekf ${EKF_SRCS})
-add_hg_test(test_sim_convergence ${EKF_SRCS} ${SIM_DIR}/robot_sim.c)
+add_hg_test(test_sim_convergence ${EKF_SRCS} ${SIM_DIR}/robot_sim.c ${SIM_DIR}/imu_synth.c)
 add_hg_test(test_drift ${SRC_DIR}/control/drift.c)

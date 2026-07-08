@@ -50,15 +50,5 @@ void dshot_send(dshot_esc_t *esc, uint16_t command);
 /* Set throttle as a fraction [0.0, 1.0]. Maps to DSHOT command range. */
 void dshot_set_throttle(dshot_esc_t *esc, float throttle);
 
-/* Send stop command. */
-void dshot_stop(dshot_esc_t *esc);
-
 /* Check for and decode pending telemetry. Returns true if new data available. */
 bool dshot_read_telemetry(dshot_esc_t *esc);
-
-/* Encode a DSHOT command into the 16-bit frame with CRC. */
-uint32_t dshot_encode(uint16_t command);
-
-/* Decode raw 64-bit GCR telemetry into structured telemetry.
- * Returns true on valid decode. */
-bool dshot_decode_telemetry(uint64_t raw, dshot_telemetry_t *tel);

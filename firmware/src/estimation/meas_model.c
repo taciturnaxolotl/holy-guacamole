@@ -1,6 +1,8 @@
 #include "meas_model.h"
 #include "imu_geom.h"
 
+#include <math.h>
+
 void meas_predict(const mat_t *x, mat_t *z) {
     float omega = mat_get(x, ST_OMEGA, 0);
     float alpha = mat_get(x, ST_ALPHA, 0);
@@ -41,16 +43,22 @@ void meas_jacobian(const mat_t *x, mat_t *H) {
     mat_set(H, MEAS_C_TANGENTIAL, ST_ALPHA, rc);
 }
 
-void meas_saturation_flags(float omega, bool saturated[MEAS_DIM]) {
-    float w2 = omega * omega;
+void meas_saturation_flags(const mat_t *z, bool saturated[MEAS_DIM]) {
     for (int i = 0; i < MEAS_DIM; i++) saturated[i] = false;
 
-    /* Only the outer H3LIS radial axes can rail (inner LSM6DSV320X is
-     * +/-320g but at 12mm never reaches it in the operating range;
-     * still, flag any radial channel whose predicted centrifugal
-     * magnitude exceeds the outer sensor ceiling). */
-    if (w2 * imu_geom[1].radius_m >= H3LIS_FULL_SCALE_MS2)
-        saturated[MEAS_B_RADIAL] = true;
-    if (w2 * imu_geom[2].radius_m >= H3LIS_FULL_SCALE_MS2)
-        saturated[MEAS_C_RADIAL] = true;
+    /* Flag any accelerometer channel whose reading is at the sensor
+     * rail (detected from the measurement itself, not a predicted omega,
+     * so it catches saturation regardless of estimator lag). A railed
+     * reading is clipped garbage; the EKF inflates its noise to ignore
+     * it and lean on the remaining sensors + gyro. Inner IMU-A is
+     * +/-320g; outer H3LIS are +/-400g. The gyro never rails here. */
+    const float inner = SATURATION_FRAC * LSM6_FULL_SCALE_MS2;
+    const float outer = SATURATION_FRAC * H3LIS_FULL_SCALE_MS2;
+
+    if (fabsf(mat_get(z, MEAS_A_RADIAL, 0))     >= inner) saturated[MEAS_A_RADIAL] = true;
+    if (fabsf(mat_get(z, MEAS_A_TANGENTIAL, 0)) >= inner) saturated[MEAS_A_TANGENTIAL] = true;
+    if (fabsf(mat_get(z, MEAS_B_RADIAL, 0))     >= outer) saturated[MEAS_B_RADIAL] = true;
+    if (fabsf(mat_get(z, MEAS_B_TANGENTIAL, 0)) >= outer) saturated[MEAS_B_TANGENTIAL] = true;
+    if (fabsf(mat_get(z, MEAS_C_RADIAL, 0))     >= outer) saturated[MEAS_C_RADIAL] = true;
+    if (fabsf(mat_get(z, MEAS_C_TANGENTIAL, 0)) >= outer) saturated[MEAS_C_TANGENTIAL] = true;
 }

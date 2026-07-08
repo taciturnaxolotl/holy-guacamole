@@ -13,6 +13,7 @@
  */
 
 #include <stdbool.h>
+#include <math.h>
 
 #define IMU_COUNT_GEOM 3
 
@@ -23,6 +24,24 @@
  * this rail are clipped in hardware and must be treated as invalid. */
 #define H3LIS_FULL_SCALE_G   400.0f
 #define H3LIS_FULL_SCALE_MS2 (H3LIS_FULL_SCALE_G * G_TO_MS2)
+
+/* LSM6DSV320X full-scale ceiling (inner sensor). */
+#define LSM6_FULL_SCALE_G    320.0f
+#define LSM6_FULL_SCALE_MS2  (LSM6_FULL_SCALE_G * G_TO_MS2)
+
+/* Saturation detection threshold as fraction of full scale. Readings at
+ * or above this fraction are considered railed. Shared by EKF and sim
+ * so both use the same boundary. */
+#define SATURATION_FRAC 0.98f
+
+/* Wrap angle into [0, 2*pi). Single canonical implementation to prevent
+ * drift between EKF, plant, and visualization. */
+static inline float wrap_0_2pi(float a) {
+    float two_pi = 2.0f * (float)M_PI;
+    a = fmodf(a, two_pi);
+    if (a < 0.0f) a += two_pi;
+    return a;
+}
 
 typedef struct {
     float radius_m;    /* distance from rotation centre */

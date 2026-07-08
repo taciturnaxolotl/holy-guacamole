@@ -24,6 +24,7 @@ add_executable(holy_guacamole
     src/estimation/ekf.c
     src/estimation/imu_convert.c
     src/control/drift.c
+    src/app/control_loop.c
 )
 
 # Generate PIO header from .pio file

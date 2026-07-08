@@ -149,7 +149,7 @@ static void select_and_read(uint8_t imu_id, imu_sample_t *s) {
     }
 }
 
-bool imu_read_single(uint8_t imu_id, imu_sample_t *sample) {
+static bool imu_read_single(uint8_t imu_id, imu_sample_t *sample) {
     if (imu_id >= IMU_COUNT) return false;
     select_and_read(imu_id, sample);
     latch_deselect_all();

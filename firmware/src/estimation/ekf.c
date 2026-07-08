@@ -1,4 +1,5 @@
 #include "ekf.h"
+#include "imu_geom.h"
 
 #include <math.h>
 
@@ -12,12 +13,15 @@ void ekf_init(ekf_t *e, float omega0) {
     mat_set(&e->P, ST_OMEGA, ST_OMEGA, 100.0f);
     mat_set(&e->P, ST_ALPHA, ST_ALPHA, 100.0f);
 
-    /* Defaults; tune against the simulator and later real logs. */
+    /* Defaults; tune against the simulator and later real logs.
+     * r_gyro/r_accel are variances matched to expected sensor noise:
+     * an over-large r_gyro makes omega lag during spin-up (heading
+     * offset), so it tracks the gyro's true ~0.02 rad/s sigma. */
     e->q_theta = 1e-5f;
-    e->q_omega = 5.0f;    /* omega can change fast under motor torque/impact */
-    e->q_alpha = 50.0f;
-    e->r_accel = 4.0f;    /* (m/s^2)^2, from datasheet noise density */
-    e->r_gyro  = 0.01f;   /* (rad/s)^2 */
+    e->q_omega = 20.0f;   /* omega changes fast under motor torque/impact */
+    e->q_alpha = 2.0f;
+    e->r_accel = 1.0f;    /* (m/s^2)^2 */
+    e->r_gyro  = 0.00001f; /* (rad/s)^2, matches ~0.02 rad/s sigma */
     e->sat_inflation = 1e6f;
 }
 
@@ -26,8 +30,13 @@ void ekf_predict(ekf_t *e, float dt) {
     float omega = mat_get(&e->x, ST_OMEGA, 0);
     float alpha = mat_get(&e->x, ST_ALPHA, 0);
 
-    /* State transition (constant-alpha kinematics). */
-    mat_set(&e->x, ST_THETA, 0, theta + omega * dt + 0.5f * alpha * dt * dt);
+    /* State transition (constant-alpha kinematics). Wrap theta into
+     * [0, 2*pi) so the stored angle never grows large: at high RPM an
+     * unbounded float32 heading loses precision (tens of degrees of
+     * phantom drift over a match). theta is decoupled from the
+     * measurement model, so wrapping it is exact and side-effect-free. */
+    float new_theta = wrap_0_2pi(theta + omega * dt + 0.5f * alpha * dt * dt);
+    mat_set(&e->x, ST_THETA, 0, new_theta);
     mat_set(&e->x, ST_OMEGA, 0, omega + alpha * dt);
     /* alpha unchanged */
 
@@ -65,7 +74,7 @@ void ekf_update(ekf_t *e, const mat_t *z) {
 
     /* Measurement noise R (diagonal), with saturation inflation. */
     bool sat[MEAS_DIM];
-    meas_saturation_flags(mat_get(&e->x, ST_OMEGA, 0), sat);
+    meas_saturation_flags(z, sat);
 
     mat_t R;
     mat_zero(&R, MEAS_DIM, MEAS_DIM);
@@ -119,8 +128,5 @@ float ekf_omega(const ekf_t *e) { return mat_get(&e->x, ST_OMEGA, 0); }
 float ekf_alpha(const ekf_t *e) { return mat_get(&e->x, ST_ALPHA, 0); }
 
 float ekf_heading_wrapped(const ekf_t *e) {
-    float two_pi = 2.0f * (float)M_PI;
-    float t = fmodf(ekf_theta(e), two_pi);
-    if (t < 0.0f) t += two_pi;
-    return t;
+    return wrap_0_2pi(ekf_theta(e));
 }
