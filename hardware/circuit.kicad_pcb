@@ -1512,6 +1512,17 @@
 			(uuid "aea5927b-a505-48c8-ab4d-fed3cae49b18")
 		)
 		(embedded_fonts no)
+		(model "${KICAD10_3DMODEL_DIR}/Package_LGA.3dshapes/LGA-16_3x3mm_P0.5mm.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "Connector_Wire:SolderWire-0.25sqmm_1x02_P4.2mm_D0.65mm_OD1.7mm"
 		(layer "F.Cu")
@@ -1680,17 +1691,6 @@
 			(uuid "b1ad4d87-eed4-41a0-adad-8a05bfa71ef3")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Connector_Wire.3dshapes/SolderWire-0.25sqmm_1x02_P4.2mm_D0.65mm_OD1.7mm.step"
-			(offset
-				(xyz 0 0 0)
-			)
-			(scale
-				(xyz 1 1 1)
-			)
-			(rotate
-				(xyz 0 0 0)
-			)
-		)
 	)
 	(footprint "Capacitor_SMD:C_0402_1005Metric"
 		(placed yes)
@@ -3160,6 +3160,17 @@
 			(uuid "1aa1f092-733b-4c33-9aec-316925f86112")
 		)
 		(embedded_fonts no)
+		(model "${KICAD10_3DMODEL_DIR}/Package_LGA.3dshapes/LGA-16_3x3mm_P0.5mm.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "Library:TSOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL"
 		(placed yes)
@@ -3408,6 +3419,17 @@
 			(uuid "cb444240-9d63-431b-8bfb-d8fd54ad1652")
 		)
 		(embedded_fonts no)
+		(model "${KICAD10_3DMODEL_DIR}/Package_TO_SOT_SMD.3dshapes/TSOT-23-6.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "Resistor_SMD:R_0402_1005Metric"
 		(placed yes)
@@ -4697,6 +4719,17 @@
 			(uuid "1e92c656-9559-4831-9ee4-19c390901813")
 		)
 		(embedded_fonts no)
+		(model "${KICAD10_3DMODEL_DIR}/Package_TO_SOT_SMD.3dshapes/SOT-23.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "Capacitor_SMD:C_0402_1005Metric"
 		(placed yes)
@@ -6543,17 +6576,6 @@
 			(uuid "a6ef5d15-f66e-4d19-90e7-d147f8d85915")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Connector_Wire.3dshapes/SolderWire-0.25sqmm_1x04_P4.2mm_D0.65mm_OD1.7mm.step"
-			(offset
-				(xyz 0 0 0)
-			)
-			(scale
-				(xyz 1 1 1)
-			)
-			(rotate
-				(xyz 0 0 0)
-			)
-		)
 	)
 	(footprint "Device:TSSOP-16_L5.0-W4.4-P0.65-LS6.4-BL"
 		(layer "F.Cu")
@@ -6935,6 +6957,17 @@
 			(uuid "727ab12b-7c56-44a5-815a-0c7e5c29a427")
 		)
 		(embedded_fonts no)
+		(model "${KICAD10_3DMODEL_DIR}/Package_SO.3dshapes/TSSOP-16_4.4x5mm_P0.65mm.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "Resistor_SMD:R_0402_1005Metric"
 		(placed yes)
@@ -8815,63 +8848,15 @@
 			(uuid "062221ea-8263-4dd0-8bab-f0119c86fd92")
 		)
 		(embedded_fonts no)
-		(model "${AMZPATH}/3dmodels/AMz3D.3dshapes/XIAO-nRF52840 v15.step"
-			(hide yes)
+		(model "${KIPRJMOD}/libs/3DModels/XIAO RP2350_.step"
 			(offset
-				(xyz -1.778 -6.096 0.381)
+				(xyz -1.6 -6 0)
 			)
 			(scale
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz -90 0 0)
-			)
-		)
-		(model "${AMZPATH}/3dmodels/AMz3D.3dshapes/Seeeduino XIAO SAMD21 v4.step"
-			(offset
-				(xyz 0 0 0)
-			)
-			(scale
-				(xyz 1 1 1)
-			)
-			(rotate
-				(xyz 0 0 0)
-			)
-		)
-		(model "${AMZPATH}/3dmodels/AMz3D.3dshapes/Seeed Studio XIAO RP2040 v26.step"
-			(hide yes)
-			(offset
-				(xyz 0 0 0)
-			)
-			(scale
-				(xyz 1 1 1)
-			)
-			(rotate
-				(xyz 0 0 90)
-			)
-		)
-		(model "${AMZPATH}/3dmodels/AMz3D.3dshapes/Seeed Studio XIAO-ESP32-C3.step"
-			(hide yes)
-			(offset
-				(xyz -1.7018 -6.096 0)
-			)
-			(scale
-				(xyz 1 1 1)
-			)
-			(rotate
-				(xyz -90 0 0)
-			)
-		)
-		(model "${AMZPATH}/3dmodels/AMz3D.3dshapes/XIAO-ESP32S3 v2.step"
-			(hide yes)
-			(offset
-				(xyz -1.778 -6.1722 0)
-			)
-			(scale
-				(xyz 1 1 1)
-			)
-			(rotate
-				(xyz -90 0 0)
+				(xyz -90 -0 -0)
 			)
 		)
 	)
@@ -9670,17 +9655,6 @@
 			(uuid "bfdba906-55f6-472c-ae36-7e386abfe67b")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Connector_Wire.3dshapes/SolderWire-0.25sqmm_1x02_P4.2mm_D0.65mm_OD1.7mm.step"
-			(offset
-				(xyz 0 0 0)
-			)
-			(scale
-				(xyz 1 1 1)
-			)
-			(rotate
-				(xyz 0 0 0)
-			)
-		)
 	)
 	(footprint "Resistor_SMD:R_0402_1005Metric"
 		(layer "F.Cu")
@@ -10161,6 +10135,17 @@
 			(uuid "1c46c6da-1b74-4ff5-b1fd-5187a98ad26e")
 		)
 		(embedded_fonts no)
+		(model "${KICAD10_3DMODEL_DIR}/Package_DFN_QFN.3dshapes/DFN-8_2x2mm_P0.5mm.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "Resistor_SMD:R_0402_1005Metric"
 		(placed yes)
@@ -11661,6 +11646,17 @@
 			(uuid "591d262c-7152-4610-b6db-0bf028a81315")
 		)
 		(embedded_fonts no)
+		(model "${KICAD10_3DMODEL_DIR}/Package_LGA.3dshapes/LGA-14_3x2.5mm_P0.5mm_LayoutBorder3x4y.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "Capacitor_SMD:C_0402_1005Metric"
 		(placed yes)
@@ -12176,17 +12172,6 @@
 			(uuid "50d71ff6-3916-4ddc-a0b6-adb575122655")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Connector_Wire.3dshapes/SolderWire-0.25sqmm_1x02_P4.2mm_D0.65mm_OD1.7mm.step"
-			(offset
-				(xyz 0 0 0)
-			)
-			(scale
-				(xyz 1 1 1)
-			)
-			(rotate
-				(xyz 0 0 0)
-			)
-		)
 	)
 	(footprint "Library:SC-70-5_L2.0-W1.3-P0.65-LS2.1-BL"
 		(placed yes)
@@ -12478,6 +12463,17 @@
 			(uuid "0aef5886-672c-40c4-949d-d02a5ef0ae16")
 		)
 		(embedded_fonts no)
+		(model "${KICAD10_3DMODEL_DIR}/Package_TO_SOT_SMD.3dshapes/SOT-353_SC-70-5.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "Resistor_SMD:R_0402_1005Metric"
 		(placed yes)
@@ -12942,6 +12938,17 @@
 			(uuid "69c47b41-1e1a-4328-b953-b647b8515a54")
 		)
 		(embedded_fonts no)
+		(model "${KICAD10_3DMODEL_DIR}/Package_TO_SOT_SMD.3dshapes/SOT-353_SC-70-5.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "Resistor_SMD:R_0402_1005Metric"
 		(placed yes)
@@ -14810,6 +14817,17 @@
 			(uuid "25cfa1e9-606c-4003-b63e-46cc16ba682b")
 		)
 		(embedded_fonts no)
+		(model "${KICAD10_3DMODEL_DIR}/Package_DFN_QFN.3dshapes/DFN-8_2x2mm_P0.5mm.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "TestPoint:TestPoint_Pad_D1.0mm"
 		(placed yes)

@@ -342,4 +342,15 @@
 		(layer "F.SilkS")
 		(uuid "1c758993-4f34-4ced-aba0-55887ff821f6")
 	)
+	(model "${KICAD10_3DMODEL_DIR}/Package_LGA.3dshapes/LGA-16_3x3mm_P0.5mm.step"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
 )

@@ -312,4 +312,15 @@
 		(layer "Cmts.User")
 		(uuid "49ba0600-7981-4a5b-bf91-53e3ee79dc8c")
 	)
+	(model "${KICAD10_3DMODEL_DIR}/Package_SO.3dshapes/TSSOP-16_4.4x5mm_P0.65mm.step"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
 )

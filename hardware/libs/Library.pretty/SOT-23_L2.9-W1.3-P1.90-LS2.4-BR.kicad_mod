@@ -224,4 +224,15 @@
 		(layer "Cmts.User")
 		(uuid "3179a104-4463-49cf-a98c-d5844b97c8c0")
 	)
+	(model "${KICAD10_3DMODEL_DIR}/Package_TO_SOT_SMD.3dshapes/SOT-23.step"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
 )

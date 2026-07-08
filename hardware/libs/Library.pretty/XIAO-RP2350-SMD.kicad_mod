@@ -1,4 +1,4 @@
-(footprint "XIAO-RP2350-SMD"
+	(footprint "XIAO-RP2350-SMD"
 	(version 20241229)
 	(generator "pcbnew")
 	(generator_version "9.0")
@@ -457,58 +457,10 @@
 		(thermal_bridge_angle 45)
 		(uuid "143f7ed4-69ce-49c4-9fa5-8b9e600e7bf6")
 	)
-	(embedded_fonts no)
-	(model "${AMZPATH}/3dmodels/AMz3D.3dshapes/XIAO-nRF52840 v15.step"
-		(hide yes)
+	(embedded_fonts no)		
+	(model "${KIPRJMOD}/libs/3DModels/XIAO RP2350_.step"
 		(offset
-			(xyz -1.778 -6.096 0.381)
-		)
-		(scale
-			(xyz 1 1 1)
-		)
-		(rotate
-			(xyz -90 0 0)
-		)
-	)
-	(model "${AMZPATH}/3dmodels/AMz3D.3dshapes/Seeeduino XIAO SAMD21 v4.step"
-		(offset
-			(xyz 0 0 0)
-		)
-		(scale
-			(xyz 1 1 1)
-		)
-		(rotate
-			(xyz 0 0 0)
-		)
-	)
-	(model "${AMZPATH}/3dmodels/AMz3D.3dshapes/Seeed Studio XIAO RP2040 v26.step"
-		(hide yes)
-		(offset
-			(xyz 0 0 0)
-		)
-		(scale
-			(xyz 1 1 1)
-		)
-		(rotate
-			(xyz 0 0 90)
-		)
-	)
-	(model "${AMZPATH}/3dmodels/AMz3D.3dshapes/Seeed Studio XIAO-ESP32-C3.step"
-		(hide yes)
-		(offset
-			(xyz -1.7018 -6.096 0)
-		)
-		(scale
-			(xyz 1 1 1)
-		)
-		(rotate
-			(xyz -90 0 0)
-		)
-	)
-	(model "${AMZPATH}/3dmodels/AMz3D.3dshapes/XIAO-ESP32S3 v2.step"
-		(hide yes)
-		(offset
-			(xyz -1.778 -6.1722 0)
+			(xyz -1.6 -6 0)
 		)
 		(scale
 			(xyz 1 1 1)
