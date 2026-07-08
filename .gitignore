@@ -10,3 +10,5 @@
 .direnv/
 result
 result-*
+
+crush.json

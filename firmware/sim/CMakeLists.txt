@@ -24,6 +24,7 @@ add_executable(drive
     ${SRC_DIR}/estimation/ekf.c
     ${SRC_DIR}/estimation/imu_convert.c
     ${SRC_DIR}/control/drift.c
+    ${SRC_DIR}/control/pid.c
     ${SRC_DIR}/app/control_loop.c
 )
 

@@ -15,7 +15,12 @@
 #include "imu/imu_spi.h"
 #include "estimation/ekf.h"
 #include "control/drift.h"
-#include "math/linalg.h"
+
+/* rad/s → RPM conversion factor. */
+#define RAD_S_TO_RPM 9.5493f
+
+/* Control loop timestep in seconds. Must match the sleep in core 1. */
+#define CONTROL_DT 0.0005f
 
 /* Estimator output, published sensor-side to control-side. */
 typedef struct {
@@ -38,7 +43,8 @@ typedef struct {
     float throttle_b;
 } app_motors_t;
 
-/* Tunables shared by both callers. */
+/* Tunables shared by both callers. PID state is intentionally NOT here;
+ * it's runtime state managed internally by control_loop.c. */
 typedef struct {
     float max_authority;      /* drift authority cap [0,1] */
     bool  drift_enabled;      /* false = open-loop spin (motors follow base) */
@@ -49,6 +55,8 @@ typedef struct {
     float drift_phase;        /* rad; residual drive-phase calibration after
                                  geometric +90 deg compensation in drift_compute.
                                  0 nominal; bench-tune per robot. */
+    bool  pid_enabled;        /* true = PID regulates RPM from stick; false = direct throttle */
+    float target_rpm_max;     /* RPM at full stick deflection when PID enabled */
 } app_config_t;
 
 /* Sensor-side tick: run the EKF on one IMU sample set over dt seconds
@@ -62,9 +70,13 @@ app_estimate_t app_sensor_tick(ekf_t *ekf, const imu_sample_t samples[IMU_COUNT]
 app_estimate_t app_sensor_tick_si(ekf_t *ekf, const mat_t *z, float dt);
 
 /* Control-side tick: turn RC command + latest estimate into motor
- * throttles using the drift controller. */
-app_motors_t app_control_tick(const app_config_t *cfg, const app_command_t *cmd,
-                              const app_estimate_t *est);
+ * throttles using the drift controller. dt is the time since last call
+ * (for PID integration). */
+app_motors_t app_control_tick(app_config_t *cfg, const app_command_t *cmd,
+                              const app_estimate_t *est, float dt);
+
+/* Reset PID state (e.g., on disarm or mode change). */
+void app_pid_reset(void);
 
 /* Sensible defaults. */
 void app_config_default(app_config_t *cfg);

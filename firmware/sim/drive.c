@@ -98,7 +98,7 @@ int main(void) {
             plant_read_imu(plant, &z);
             last_z = z;
             est = app_sensor_tick_si(&ekf, &z, TICK_DT);
-            motors = app_control_tick(&cfg, &cmd, &est);
+            motors = app_control_tick(&cfg, &cmd, &est, TICK_DT);
             plant_step(plant, motors.throttle_a, motors.throttle_b, TICK_DT);
             accumulator -= TICK_DT;
 

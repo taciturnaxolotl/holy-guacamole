@@ -23,8 +23,13 @@ add_executable(holy_guacamole
     src/estimation/meas_model.c
     src/estimation/ekf.c
     src/estimation/imu_convert.c
+    src/estimation/accel_cal.c
     src/control/drift.c
+    src/control/pid.c
     src/app/control_loop.c
+    src/safety/watchdog.c
+    src/safety/battery.c
+    src/safety/rc_health.c
 )
 
 # Generate PIO header from .pio file
