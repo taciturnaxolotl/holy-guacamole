@@ -122,3 +122,19 @@ I added some stiching vias as mpk recommended on slack and got proper copper pou
 ![jlc quote](https://cdn.hackclub.com/019f35e9-6036-7d13-8a65-e36cf99e916d/image.png)
 
 Also started working on the firmware and I got some good benchtest code ready and am working on the EKF fusing code. Ideally I can get a sim ready soon but that seems unlikely to get done this week (saying that i'll stay up till 4am tmrw and finish wont I :pf:).
+
+### Day 17: June 6th [5h]
+
+Well my prediction from yesterday was correct lol. I now have a simulator albiate a not crazy good one but it will improve. I need to do quite a lot of hardware in the loop testing before hand to iron out the bugs before I get the actual hardware. The lovely thing is that this is all pretty simple physics and so not terribly hard to model in software. I'm doing an end to end simulation running the exact same code as on the bot just with a simulation mock for the receiver, escs, and imus.
+
+I also did a bunch of iteration on the blades as I wasn't super happy with the way that I got them initally. I tweaked them a ton but eventually had to go to sleep after messing up one of the sides and realizing I was far too tired to do good work.
+
+![the first blades](https://cdn.hackclub.com/019f4026-944c-7564-996c-43692119e6d3/image.png)
+
+### Day 18: June 7th [5h]
+
+I did a bunch more work on the firmware and now have full ekf working and the sim mostly behaving! I also received my design review from solderable's EE Tyler (thank you ^^) and discovered that I put my caps too far away from the buck covertor and the imu. Thankfully it wasn't a terrible fix but I also discovered a few other issues in the process. I got a quote back from pcbway as well and they are offering $280ish which is better than jlc's $360. The main downside is that pcbway moves a wee bit slower in my experience but the quality is usually really good.
+
+I also redesigned the toothies (my offical name for them) to be wayyyy smaller and far more lightweight than last night. They should weight about 40g each now and hopefully be a bit stronger since they don't have massive parallograms in the middle anymore.
+
+I stayed up far too late working on this yet again and now i'm typing this up as I wait to see if i heard back from pcbway quickly and can get my design into motion. I also probably need to add a low battery cutoff to the buck convertor but thats annoying and may have to wait depending on how long everything takes and how fast pcbway gets back.
