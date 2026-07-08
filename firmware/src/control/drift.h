@@ -3,23 +3,33 @@
 /*
  * Translational drift control for the meltybrain.
  *
- * The two drive motors are modulated sinusoidally against the estimated
- * heading so that net thrust points in a commanded world-frame
- * direction (see braindump section 11.5):
+ * Two modulation modes are available:
  *
- *   throttle_A(theta) = base + A * cos(theta - phi)
- *   throttle_B(theta) = base - A * cos(theta - phi)
+ * SINUSOIDAL (default):
+ *   throttle_A(theta) = base + A * cos(theta - phi - pi/2)
+ *   throttle_B(theta) = base - A * cos(theta - phi - pi/2)
+ *   Smooth modulation, less RPM ripple. Community-standard approach.
  *
- *   base  - symmetric throttle setting the spin RPM
- *   A     - drift authority (0 = pure spin, higher = stronger translation)
- *   phi   - desired world-frame translation direction (rad)
- *   theta - current estimated heading (rad)
+ * SQUARE:
+ *   Motor A gets base+authority for half a revolution centered on phi,
+ *   motor B gets base+authority for the other half. Short braking window
+ *   at transitions. From arithebiker's proven approach with AM32: better
+ *   translation authority at high throttle, AM32's internal ramping
+ *   smooths the edges.
  *
- * Pure functions: no hardware, no state. The sign/phase convention that
- * maps a given phi to the physical translation direction is confirmed
- * on the bench; these functions provide the modulation shape and safe
- * clamping, which is what can be verified without the robot.
+ * In both modes:
+ *   base      - symmetric throttle setting the spin RPM
+ *   authority - drift strength [0, max_authority]
+ *   phi       - desired world-frame translation direction (rad)
+ *   theta     - current estimated heading (rad)
+ *
+ * Pure functions: no hardware, no state.
  */
+
+typedef enum {
+    DRIFT_MOD_SINUSOIDAL = 0,
+    DRIFT_MOD_SQUARE     = 1,
+} drift_mod_t;
 
 typedef struct {
     float a;  /* motor A throttle, [0, 1] */
@@ -28,7 +38,7 @@ typedef struct {
 
 /* Per-motor throttle for the current heading. Results clamped to [0, 1]. */
 drift_throttles_t drift_compute(float theta, float base, float authority,
-                                float phi);
+                                float phi, drift_mod_t mode);
 
 /* Map an RC stick vector to drift authority and world-frame direction.
  * stick_x/stick_y are in [-1, 1]. Stick magnitude is clamped to 1 and

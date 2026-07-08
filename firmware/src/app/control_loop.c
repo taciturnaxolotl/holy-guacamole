@@ -63,7 +63,7 @@ app_motors_t app_control_tick(app_config_t *cfg, const app_command_t *cmd,
                      &authority, &phi);
     float heading = est->heading - cfg->heading_trim;
     phi -= cfg->drift_phase;
-    drift_throttles_t d = drift_compute(heading, base, authority, phi);
+    drift_throttles_t d = drift_compute(heading, base, authority, phi, cfg->mod_mode);
     out.throttle_a = d.a;
     out.throttle_b = d.b;
     return out;
@@ -80,6 +80,7 @@ void app_config_default(app_config_t *cfg) {
     cfg->drift_phase = -0.225f;
     cfg->pid_enabled = false;
     cfg->target_rpm_max = 3000.0f;
+    cfg->mod_mode = DRIFT_MOD_SINUSOIDAL;
     /* Initialize module-level PID with conservative gains. */
     pid_init(&rpm_pid, 0.002f, 0.001f, 0.0f, 0.0f, 1.0f);
 }

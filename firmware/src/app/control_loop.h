@@ -57,6 +57,7 @@ typedef struct {
                                  0 nominal; bench-tune per robot. */
     bool  pid_enabled;        /* true = PID regulates RPM from stick; false = direct throttle */
     float target_rpm_max;     /* RPM at full stick deflection when PID enabled */
+    drift_mod_t mod_mode;     /* DRIFT_MOD_SINUSOIDAL or DRIFT_MOD_SQUARE */
 } app_config_t;
 
 /* Sensor-side tick: run the EKF on one IMU sample set over dt seconds
