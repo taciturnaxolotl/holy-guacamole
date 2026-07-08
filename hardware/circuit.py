@@ -9,8 +9,8 @@ from skidl import *
 @requirement("Dedicated orange 2-3S TinySLED meltybrain heading output uses XIAO edge pin D1/A1 and a low-side MOSFET so firmware can generate phase-locked 100-500us strobes at 4000rpm without underside GPIOs.")
 @requirement("Harness-exposed VBUS and DSHOT nets have local TVS/ESD clamp footprints; the permanently soldered ELRS receiver pads and internal SPI/IMU nets are not ESD-clamped.")
 @requirement("Expose only essential test pads for VBAT ADC calibration, SWD debug, and GND reference.")
-@requirement("U5", "Deselected H3LIS331DL has no I2C-disable bit, so the shared SPI bus must run Mode 0 (SCK idle-low) and SPI_SCK carries a pulldown (R18) that holds SCL idle-low through boot/reset; a deselected U5 therefore never sees an I2C START (SDA falling while SCL high) on SPI_SCK/SPI_MOSI and cannot take a phantom config write.")
-@requirement("U6", "Deselected H3LIS331DL has no I2C-disable bit, so the shared SPI bus must run Mode 0 (SCK idle-low) and SPI_SCK carries a pulldown (R18) that holds SCL idle-low through boot/reset; a deselected U6 therefore never sees an I2C START (SDA falling while SCL high) on SPI_SCK/SPI_MOSI and cannot take a phantom config write.")
+@requirement("U5", "Deselected H3LIS331DL has no I2C-disable bit, so the shared SPI bus must run Mode 0 (SCK idle-low) and SPI_SCK carries pulldown R22 that holds SCL idle-low through boot/reset; a deselected U5 therefore never sees an I2C START (SDA falling while SCL high) on SPI_SCK/SPI_MOSI and cannot take a phantom config write.")
+@requirement("U6", "Deselected H3LIS331DL has no I2C-disable bit, so the shared SPI bus must run Mode 0 (SCK idle-low) and SPI_SCK carries pulldown R22 that holds SCL idle-low through boot/reset; a deselected U6 therefore never sees an I2C START (SDA falling while SCL high) on SPI_SCK/SPI_MOSI and cannot take a phantom config write.")
 def build_circuit():
     gnd = Ground("GND")
     v5 = Power("5V", voltage_domain=5.0, current=2.0)
@@ -148,19 +148,19 @@ def build_circuit():
 
     c_3v3_bulk = Part("Device", "C_Small", ref="C6", value="10uF", footprint="Capacitor_SMD:C_0603_1608Metric")
     c_3v3_bulk.lcsc = "C913532"
-    c_3v3_bulk.info = "Use 6.3V or higher ceramic with DC-bias margin on the XIAO 3V3 output rail."
-    design_intent(c_3v3_bulk, "Local bulk capacitor for 3V3 sensors and 74HC595 chip-select latch logic.", group="3V3 rail", placement="Place near the cluster of 3V3 loads, not at the buck switching node.")
+    c_3v3_bulk.info = "Use 6.3V or higher ceramic with DC-bias margin on the XIAO 3V3 output rail. PCB source-of-truth places this as the local 10uF bulk capacitor for U6 H3LIS331DL."
+    design_intent(c_3v3_bulk, "Local 10uF bulk capacitor for U6 H3LIS331DL 3V3 decoupling.", group="IMU array", placement="Place near U6 Vdd pin 14 and its nearby ground pins/vias.")
     v3v3 += c_3v3_bulk[1]
     gnd += c_3v3_bulk[2]
 
     c_3v3_bulk2 = Part("Device", "C_Small", ref="C13", value="10uF", footprint="Capacitor_SMD:C_0603_1608Metric")
     c_3v3_bulk2.lcsc = "C913532"
-    c_3v3_bulk2.info = "Use 6.3V or higher ceramic with DC-bias margin; second 3V3 bulk reservoir for the IMU placed farthest from C6 so the rail stays stiff at the end of the long radial 3V3 route."
-    design_intent(c_3v3_bulk2, "Second 10uF bulk capacitor for the 3V3 rail at the far end of the sensor cluster.", group="3V3 rail", placement="Place near whichever outer IMU (U5 or U6) ends up farthest from C6 after layout; keep its ground return short into the plane.")
+    c_3v3_bulk2.info = "Use 6.3V or higher ceramic with DC-bias margin; PCB source-of-truth places this as the local 10uF bulk capacitor for U5 H3LIS331DL."
+    design_intent(c_3v3_bulk2, "Local 10uF bulk capacitor for U5 H3LIS331DL 3V3 decoupling.", group="IMU array", placement="Place near U5 Vdd pin 14 and its nearby ground pins/vias.")
     v3v3 += c_3v3_bulk2[1]
     gnd += c_3v3_bulk2[2]
 
-    u_exp = Part("Device", "SN74HC595PWR", ref="U3", value="SN74HC595PWR", footprint="Device:TSSOP-16_L5.0-W4.4-P0.65-LS6.4-BL")
+    u_exp = Part("Device", "SN74HC595PWR", ref="U11", value="SN74HC595PWR", footprint="Device:TSSOP-16_L5.0-W4.4-P0.65-LS6.4-BL")
     u_exp.lcsc = "C273642"
     u_exp.info = "TI SN74HC595PWR 8-bit serial-in/parallel-out shift register with output latch and active-low 3-state output enable. Powered at 3.3V; datasheet VIH min is about 0.7*VCC = 2.31V at 3.3V, so RP2350 3.3V SPI/GPIO levels are compatible. SER pin 14 is driven by SPI_MOSI, SRCLK pin 11 by SPI_SCK, RCLK pin 12 by XIAO D3/A3 SEL_LAT, and /OE pin 13 by XIAO D2/A2 SEL_OE_N. /SRCLR pin 10 is tied high so the shift register is not asynchronously cleared. Outputs QA/QB/QC/QD generate active-low CS_A/CS_B/CS_C and LED_OE_N respectively; external 10k pull-ups keep all targets inactive while /OE is high during boot or latch updates. Firmware must set SEL_OE_N high to blank outputs, shift a byte, pulse SEL_LAT, then drive SEL_OE_N low for the selected target transaction; QH' and unused outputs are left NC. Datasheet static ICC max is 80uA over temperature at 6V; dynamic current depends on SPI clock and load capacitance and is not fixed in the datasheet."
     design_intent(u_exp, "SPI-loaded 74HC595 latch that generates IMU chip-selects and LED buffer enable using only XIAO edge pins D2/D3 plus shared SPI SCK/MOSI.", group="SPI chip-select latch", placement="Place near XIAO/SPI fanout and IMU CS routing; keep SEL_LAT quiet and route CS_A/CS_B/CS_C away from the buck switch node.")
@@ -184,29 +184,29 @@ def build_circuit():
     c_exp = Part("Device", "C_Small", ref="C7", value="100nF", footprint="Capacitor_SMD:C_0402_1005Metric")
     c_exp.lcsc = "C169834"
     c_exp.info = "6.3V or higher ceramic local bypass for the SN74HC595 3.3V VCC pin."
-    design_intent(c_exp, "SN74HC595 3V3 decoupling capacitor.", group="SPI chip-select latch", placement="Place directly at U3 VCC/GND pins.")
+    design_intent(c_exp, "SN74HC595 3V3 decoupling capacitor.", group="SPI chip-select latch", placement="Place directly at U11 VCC/GND pins.")
     v3v3 += c_exp[1]
     gnd += c_exp[2]
 
     r_sel_oe = Part("Device", "R_Small", ref="R1", value="10kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
     r_sel_oe.lcsc = "C844715"
-    design_intent(r_sel_oe, "Pull-up holds the SN74HC595 /OE high so IMU chip-select and LED-enable outputs are high-Z/inactive while the XIAO boots.", group="SPI chip-select latch", placement="Place near U3 /OE pin.")
+    design_intent(r_sel_oe, "Pull-up holds the SN74HC595 /OE high so IMU chip-select and LED-enable outputs are high-Z/inactive while the XIAO boots.", group="SPI chip-select latch", placement="Place near U11 /OE pin.")
     v3v3 += r_sel_oe[1]
     sel_oe_n += r_sel_oe[2]
 
-    r_sel_lat = Part("Device", "R_Small", ref="R11", value="100kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
+    r_sel_lat = Part("Device", "R_Small", ref="R18", value="100kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
     r_sel_lat.lcsc = "C2077080"
-    design_intent(r_sel_lat, "Pulldown keeps the SN74HC595 latch clock low during XIAO reset so shifted garbage is not latched into the CS outputs.", group="SPI chip-select latch", placement="Place near U3 RCLK/SEL_LAT pin.")
+    design_intent(r_sel_lat, "Pulldown keeps the SN74HC595 latch clock low during XIAO reset so shifted garbage is not latched into the CS outputs.", group="SPI chip-select latch", placement="Place near U11 RCLK/SEL_LAT pin.")
     sel_lat += r_sel_lat[1]
     gnd += r_sel_lat[2]
 
-    r_led_oe = Part("Device", "R_Small", ref="R2", value="10kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
+    r_led_oe = Part("Device", "R_Small", ref="R21", value="10kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
     r_led_oe.lcsc = "C844715"
     design_intent(r_led_oe, "Pull-up disables 5V LED level-shifter outputs while the SN74HC595 output is high-Z/blanked or before firmware latches the LED-enable state.", group="Status LED", placement="Place near the level-shifter OE pins.")
     v3v3 += r_led_oe[1]
     led_oe_n += r_led_oe[2]
 
-    r_cs_a = Part("Device", "R_Small", ref="R3", value="10kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
+    r_cs_a = Part("Device", "R_Small", ref="R11", value="10kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
     r_cs_a.lcsc = "C844715"
     design_intent(r_cs_a, "Boot-safe pull-up for active-low IMU-A chip select while the SN74HC595 outputs are high-Z/blanked.", group="IMU SPI", placement="Place near U4 CS pin or latch output fanout.")
     v3v3 += r_cs_a[1]
@@ -218,15 +218,29 @@ def build_circuit():
     v3v3 += r_cs_b[1]
     cs_b += r_cs_b[2]
 
+    r_cs_b_aux = Part("Device", "R_Small", ref="R20", value="10kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
+    r_cs_b_aux.lcsc = "C844715"
+    r_cs_b_aux.info = "PCB-source-truth duplicate 10kΩ pull-up from CS_B to 3V3; R4 already performs the same function, so keep this documented for this manufacturing spin and review/removal in the next schematic-driven revision."
+    design_intent(r_cs_b_aux, "PCB-source-truth duplicate boot-safe pull-up footprint for IMU-B chip select.", group="IMU SPI", placement="Keep with the PCB-source-truth CS_B pull-up cluster; review after the next schematic-driven revision because R4 already pulls CS_B up.")
+    v3v3 += r_cs_b_aux[1]
+    cs_b += r_cs_b_aux[2]
+
     r_cs_c = Part("Device", "R_Small", ref="R5", value="10kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
     r_cs_c.lcsc = "C844715"
     design_intent(r_cs_c, "Boot-safe pull-up for active-low IMU-C chip select while the SN74HC595 outputs are high-Z/blanked.", group="IMU SPI", placement="Place near U6 CS pin or latch output fanout.")
     v3v3 += r_cs_c[1]
     cs_c += r_cs_c[2]
 
-    r_sck_pd = Part("Device", "R_Small", ref="R18", value="100kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
+    r_cs_c_aux = Part("Device", "R_Small", ref="R19", value="10kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
+    r_cs_c_aux.lcsc = "C844715"
+    r_cs_c_aux.info = "PCB-source-truth duplicate 10kΩ pull-up from CS_C to 3V3; R5 already performs the same function, so keep this documented for this manufacturing spin and review/removal in the next schematic-driven revision."
+    design_intent(r_cs_c_aux, "PCB-source-truth duplicate boot-safe pull-up footprint for IMU-C chip select.", group="IMU SPI", placement="Keep with the PCB-source-truth CS_C pull-up cluster; review after the next schematic-driven revision because R5 already pulls CS_C up.")
+    v3v3 += r_cs_c_aux[1]
+    cs_c += r_cs_c_aux[2]
+
+    r_sck_pd = Part("Device", "R_Small", ref="R22", value="100kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
     r_sck_pd.lcsc = "C2077080"
-    design_intent(r_sck_pd, "Idle-low pulldown on the shared SPI_SCK enforcing the Mode-0 SCK-idle-low guarantee: holds SCL low so a deselected H3LIS331DL (U5/U6) I2C front-end never sees a START, even while the RP2350 tri-states the bus at boot/reset. SCK is the START-critical line; MOSI does not need pinning.", group="IMU SPI", placement="Place at the SPI clock fanout near U1/U3 where SPI_SCK branches to the IMUs; keep the stub short.")
+    design_intent(r_sck_pd, "100k pulldown on shared SPI_SCK enforcing the Mode-0 SCK-idle-low guarantee: holds SCL low so a deselected H3LIS331DL (U5/U6) I2C front-end never sees a START, even while the RP2350 tri-states the bus at boot/reset.", group="IMU SPI", placement="Place at the SPI clock fanout near U1/U11 where SPI_SCK branches to the IMUs; keep the stub short.")
     spi_sck += r_sck_pd[1]
     gnd += r_sck_pd[2]
 
@@ -269,7 +283,7 @@ def build_circuit():
 
     imu_b = Part("Library", "H3LIS331DLTR", ref="U5", value="H3LIS331DLTR", footprint="Library:LGA-16_L3.0-W3.0-P0.50-BL")
     imu_b.lcsc = "C2655074"
-    imu_b.info = "SPI mode: Vdd_IO pin 1 and Vdd pin 14 to 3V3, reserved pin 10 to GND, reserved pin 15 to Vdd, INT pins unused/NC. Datasheet gives typical 300uA normal-mode supply current but no maximum; rail budget is therefore not fully current-verified for IMUs. Axis intent: +X points toward pins 1-4 edge, +Y toward pins 5-8 edge. The H3LIS331DL has no I2C-disable bit, so whenever CS_B is high this part reverts to I2C and reads SPI_SCK as SCL and SPI_MOSI as SDA; the shared bus must run SPI Mode 0 (SCK idle-low) and SPI_SCK carries a 100kΩ pulldown (R18) so SCL is held low and a phantom I2C START can never form from foreign SPI traffic or during boot/reset. Periodic config-register readback is the firmware backstop."
+    imu_b.info = "SPI mode: Vdd_IO pin 1 and Vdd pin 14 to 3V3, reserved pin 10 to GND, reserved pin 15 to Vdd, INT pins unused/NC. Datasheet gives typical 300uA normal-mode supply current but no maximum; rail budget is therefore not fully current-verified for IMUs. Axis intent: +X points toward pins 1-4 edge, +Y toward pins 5-8 edge. The H3LIS331DL has no I2C-disable bit, so whenever CS_B is high this part reverts to I2C and reads SPI_SCK as SCL and SPI_MOSI as SDA; the shared bus must run SPI Mode 0 (SCK idle-low) and SPI_SCK carries 100kΩ pulldown R22 so SCL is held low and a phantom I2C START can never form from foreign SPI traffic or during boot/reset. Periodic config-register readback is the firmware backstop."
     design_intent(imu_b, "IMU-B high-G accelerometer at nominal 90°/North, outer radius target 18mm; X axis radial outward and Y axis tangential.", group="IMU array", placement="Place centroid at r=18mm, angle 90°. Orient pin 1 for radial +X per the H3LIS331DL axis diagram.")
     v3v3 += imu_b[1], imu_b[14], imu_b[15]
     gnd += imu_b[5], imu_b[10], imu_b[12], imu_b[13], imu_b[16]
@@ -297,7 +311,7 @@ def build_circuit():
 
     imu_c = Part("Library", "H3LIS331DLTR", ref="U6", value="H3LIS331DLTR", footprint="Library:LGA-16_L3.0-W3.0-P0.50-BL")
     imu_c.lcsc = "C2655074"
-    imu_c.info = "SPI mode: Vdd_IO pin 1 and Vdd pin 14 to 3V3, reserved pin 10 to GND, reserved pin 15 to Vdd, INT pins unused/NC. Datasheet gives typical 300uA normal-mode supply current but no maximum; rail budget is therefore not fully current-verified for IMUs. Axis intent: +X points toward pins 1-4 edge, +Y toward pins 5-8 edge. The H3LIS331DL has no I2C-disable bit, so whenever CS_C is high this part reverts to I2C and reads SPI_SCK as SCL and SPI_MOSI as SDA; the shared bus must run SPI Mode 0 (SCK idle-low) and SPI_SCK carries a 100kΩ pulldown (R18) so SCL is held low and a phantom I2C START can never form from foreign SPI traffic or during boot/reset. Periodic config-register readback is the firmware backstop."
+    imu_c.info = "SPI mode: Vdd_IO pin 1 and Vdd pin 14 to 3V3, reserved pin 10 to GND, reserved pin 15 to Vdd, INT pins unused/NC. Datasheet gives typical 300uA normal-mode supply current but no maximum; rail budget is therefore not fully current-verified for IMUs. Axis intent: +X points toward pins 1-4 edge, +Y toward pins 5-8 edge. The H3LIS331DL has no I2C-disable bit, so whenever CS_C is high this part reverts to I2C and reads SPI_SCK as SCL and SPI_MOSI as SDA; the shared bus must run SPI Mode 0 (SCK idle-low) and SPI_SCK carries 100kΩ pulldown R22 so SCL is held low and a phantom I2C START can never form from foreign SPI traffic or during boot/reset. Periodic config-register readback is the firmware backstop."
     design_intent(imu_c, "IMU-C high-G accelerometer at nominal 210°, outer radius target 18mm; asymmetric placement breaks heading singularities.", group="IMU array", placement="Place centroid at r=18mm, angle 210°. Orient pin 1 for radial +X per the H3LIS331DL axis diagram.")
     v3v3 += imu_c[1], imu_c[14], imu_c[15]
     gnd += imu_c[5], imu_c[10], imu_c[12], imu_c[13], imu_c[16]
@@ -345,9 +359,16 @@ def build_circuit():
     j_head = Part("Connector_Generic", "Conn_01x02", ref="J2", value="Orange TinySLED", footprint="Connector_Wire:SolderWire-0.25sqmm_1x02_P4.2mm_D0.65mm_OD1.7mm")
     j_head.lcsc = "NONE"
     j_head.info = "External orange Tiny's LEDs 2-3S Micro LED heading marker: pin 1 switched 2S VBUS feed, pin 2 low-side switched return through Q1. Module is 2-3S capable with onboard current limiting; do not add series LED resistor unless the selected module variant requires it. 26AWG silicone fly-leads on compact non-relief pads; epoxy the wire insulation to the board after soldering."
-    design_intent(j_head, "Off-board orange 2-3S TinySLED heading LED mounted near the physical front/rim for phase-locked meltybrain strobing.", group="Heading LED", placement="Place on front (top) edge of 40x50mm board for heading LED alignment; route VBUS/HEAD_SW as a pulsed LED current loop away from IMU and analog sense nodes.")
+    design_intent(j_head, "Off-board orange 2-3S TinySLED heading LED connector, paralleled with J3 on the PCB-source-truth spin.", group="Heading LED", placement="Place on front/top edge of 40x50mm board for heading LED alignment; route VBUS/HEAD_SW as a pulsed LED current loop away from IMU and analog sense nodes.")
     vbus += j_head[1]
     head_sw += j_head[2]
+
+    j_head_aux = Part("Connector_Generic", "Conn_01x02", ref="J3", value="Orange TinySLED", footprint="Connector_Wire:SolderWire-0.25sqmm_1x02_P4.2mm_D0.65mm_OD1.7mm")
+    j_head_aux.lcsc = "NONE"
+    j_head_aux.info = "PCB-source-truth second paralleled Orange TinySLED solder-wire connector: pin 1 VBUS, pin 2 shared MOSFET-switched return through Q1. This mirrors J2 electrically."
+    design_intent(j_head_aux, "Second paralleled off-board orange 2-3S TinySLED heading LED connector present on the PCB-source-truth spin.", group="Heading LED", placement="Place/routing follows current PCB-source-truth layout; keep the shared pulsed VBUS/HEAD_SW loop away from IMU and analog sense nodes.")
+    vbus += j_head_aux[1]
+    head_sw += j_head_aux[2]
 
     q_head = Part("Library", "AO3402_C14385", ref="Q1", value="AO3402", footprint="Library:SOT-23_L2.9-W1.3-P1.90-LS2.4-BR")
     q_head.lcsc = "C14385"
@@ -463,8 +484,8 @@ def build_circuit():
 
     led = Part("Library", "SK9822-EC20", ref="U10", value="SK9822-EC20", footprint="Library:LED-SMD_6P-L2.0-W2.0-P0.80-TL")
     led.lcsc = "C2909059"
-    led.info = "2x2mm APA102-compatible two-wire addressable LED. First/top status LED in a two-LED chain. Powered from 5V; budget 61mA worst-case full white including control IC. Inputs are fed by 5V AHCT buffers because 5V CMOS VIH may exceed 3.3V. SDO/CKO feed U11 so firmware sends two SK9822 frames."
-    design_intent(led, "Top-visible status LED for boot, RC, spin, heading lock, drift, low battery, impact, and failsafe indications; first device in the two-LED SK9822 chain.", group="Status LED", placement="Place visible from the chassis top window, away from the buck inductor and high-G edge stress risers. Keep LED_DO/LED_CO route to U11 short and away from SW.")
+    led.info = "2x2mm APA102-compatible two-wire addressable LED. First/top status LED in a two-LED chain. Powered from 5V; budget 61mA worst-case full white including control IC. Inputs are fed by 5V AHCT buffers because 5V CMOS VIH may exceed 3.3V. SDO/CKO feed U12 so firmware sends two SK9822 frames."
+    design_intent(led, "Top-visible status LED for boot, RC, spin, heading lock, drift, low battery, impact, and failsafe indications; first device in the two-LED SK9822 chain.", group="Status LED", placement="Place visible from the chassis top window, away from the buck inductor and high-G edge stress risers. Keep LED_DO/LED_CO route to U12 short and away from SW.")
     led_do += led[1]
     gnd += led[2]
     led_di += led[3]
@@ -480,7 +501,7 @@ def build_circuit():
     v5 += c_led[1]
     gnd += c_led[2]
 
-    led_bottom = Part("Library", "SK9822-EC20", ref="U11", value="SK9822-EC20", footprint="Library:LED-SMD_6P-L2.0-W2.0-P0.80-TL")
+    led_bottom = Part("Library", "SK9822-EC20", ref="U12", value="SK9822-EC20", footprint="Library:LED-SMD_6P-L2.0-W2.0-P0.80-TL")
     led_bottom.lcsc = "C2909059"
     led_bottom.info = "2x2mm APA102-compatible two-wire addressable LED. Second/bottom status LED chained from U10 SDO/CKO. Powered from 5V; budget another 61mA worst-case full white including control IC, so the two-status-LED worst case is about 122mA. Firmware sends two SK9822 frames; duplicate frames if top and bottom should show the same status."
     design_intent(led_bottom, "Bottom-visible status LED chained after U10 for symmetric top/bottom robot indication without extra MCU pins or level shifters.", group="Status LED", placement="Place on the bottom side where visible through the chassis and clear of mounts/XIAO underside pads. Keep local bypass close and avoid placing under the buck switch node or ELRS antenna keepout.")
@@ -494,8 +515,8 @@ def build_circuit():
 
     c_led_bottom = Part("Device", "C_Small", ref="C17", value="100nF", footprint="Capacitor_SMD:C_0402_1005Metric")
     c_led_bottom.lcsc = "C169834"
-    c_led_bottom.info = "Use 6.3V or higher ceramic at U11 SK9822 5V VDD."
-    design_intent(c_led_bottom, "Local decoupling for the bottom SK9822 status LED.", group="Status LED", placement="Place directly at U11 VDD/GND pins, on the same side as U11 if possible.")
+    c_led_bottom.info = "Use 6.3V or higher ceramic at U12 SK9822 5V VDD."
+    design_intent(c_led_bottom, "Local decoupling for the bottom SK9822 status LED.", group="Status LED", placement="Place directly at U12 VDD/GND pins, on the same side as U12 if possible.")
     v5 += c_led_bottom[1]
     gnd += c_led_bottom[2]
 

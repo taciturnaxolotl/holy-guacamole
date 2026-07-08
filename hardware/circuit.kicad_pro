@@ -146,7 +146,7 @@
       },
       "rules": {
         "max_error": 0.005,
-        "min_clearance": 0.0,
+        "min_clearance": 0.15,
         "min_connection": 0.0,
         "min_copper_edge_clearance": 0.5,
         "min_groove_width": 0.0,
@@ -159,7 +159,7 @@
         "min_text_height": 0.8,
         "min_text_thickness": 0.08,
         "min_through_hole_diameter": 0.3,
-        "min_track_width": 0.1,
+        "min_track_width": 0.15,
         "min_via_annular_width": 0.1,
         "min_via_diameter": 0.5,
         "solder_mask_to_copper_clearance": 0.005,
@@ -543,7 +543,7 @@
         "via_drill": 0.3
       },
       {
-        "clearance": 0.1,
+        "clearance": 0.15,
         "name": "GND",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "priority": 0,
@@ -760,7 +760,7 @@
         "uuid": "5ff26309-9be7-4732-9683-b5a799424d79"
       }
     ],
-    "used_designators": "U11-12,#PWR16,#PWR19,#PWR27,#PWR29-30,#PWR34,#PWR37,#PWR39-41,#PWR54-56,#PWR69-70,#PWR75,#PWR89,#PWR93,#PWR96,#PWR100,Q1,C8-11,C13-17,R3-5,R9,R11,R15-22,J2-3",
+    "used_designators": "U11-12,#PWR16-19,#PWR27,#PWR29-30,#PWR34,#PWR37,#PWR39-41,#PWR54-56,#PWR69-70,#PWR75,#PWR89,#PWR93,#PWR96,#PWR100,Q1,C6,C8-11,C13-17,R3-5,R9,R11,R15-22,J2-3",
     "variants": []
   },
   "sheets": [
