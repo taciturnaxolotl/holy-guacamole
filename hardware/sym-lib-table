@@ -5,4 +5,5 @@
   (lib (name "Library")(type "KiCad")(uri "${KIPRJMOD}/libs/Library.kicad_sym")(options "")(descr ""))
   (lib (name "power")(type "KiCad")(uri "${KICAD8_SYMBOL_DIR}/power.kicad_sym")(options "")(descr "Global power symbols"))
   (lib (name "Connector")(type "KiCad")(uri "${KICAD8_SYMBOL_DIR}/Connector.kicad_sym")(options "")(descr "Global connector symbols"))
+  (lib (name "Jumper")(type "KiCad")(uri "${KICAD8_SYMBOL_DIR}/Jumper.kicad_sym")(options "")(descr "Global solder jumper symbols"))
 )

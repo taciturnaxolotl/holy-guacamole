@@ -9,4 +9,5 @@
   (lib (name "TestPoint")(type "KiCad")(uri "${KICAD8_FOOTPRINT_DIR}/TestPoint.pretty")(options "")(descr "Global test point footprints"))
   (lib (name "Connector_Wire")(type "KiCad")(uri "${KICAD8_FOOTPRINT_DIR}/Connector_Wire.pretty")(options "")(descr "Global wire connector footprints"))
   (lib (name "MountingHole")(type "KiCad")(uri "${KICAD8_FOOTPRINT_DIR}/MountingHole.pretty")(options "")(descr "Global mounting hole footprints"))
+  (lib (name "Jumper")(type "KiCad")(uri "${KICAD8_FOOTPRINT_DIR}/Jumper.pretty")(options "")(descr "Global solder jumper footprints"))
 )

@@ -9,6 +9,7 @@ from skidl import *
 @requirement("Dedicated orange 2-3S TinySLED meltybrain heading output uses XIAO edge pin D1/A1 and a low-side MOSFET so firmware can generate phase-locked 100-500us strobes at 4000rpm without underside GPIOs.")
 @requirement("Harness-exposed VBUS and DSHOT nets have local TVS/ESD clamp footprints; the permanently soldered ELRS receiver pads and internal SPI/IMU nets are not ESD-clamped.")
 @requirement("Expose only essential test pads for VBAT ADC calibration, SWD debug, and GND reference.")
+@requirement("AP63205 EN has a field-select solder jumper for UVLO: open leaves EN internally pulled up for UVLO bypass, 2S selects about 6.01V off / 6.66V on, and 3S selects about 8.94V off / 9.92V on.")
 @requirement("U5", "Deselected H3LIS331DL has no I2C-disable bit, so the shared SPI bus must run Mode 0 (SCK idle-low) and SPI_SCK carries pulldown R22 that holds SCL idle-low through boot/reset; a deselected U5 therefore never sees an I2C START (SDA falling while SCL high) on SPI_SCK/SPI_MOSI and cannot take a phantom config write.")
 @requirement("U6", "Deselected H3LIS331DL has no I2C-disable bit, so the shared SPI bus must run Mode 0 (SCK idle-low) and SPI_SCK carries pulldown R22 that holds SCL idle-low through boot/reset; a deselected U6 therefore never sees an I2C START (SDA falling while SCL high) on SPI_SCK/SPI_MOSI and cannot take a phantom config write.")
 def build_circuit():
@@ -44,6 +45,9 @@ def build_circuit():
     swdck = Net("SWDCK", voltage_domain=3.3)
     sw = Net("SW")
     bst = Net("BST")
+    buck_en = Net("BUCK_EN")
+    uvlo_2s = Net("UVLO_2S")
+    uvlo_3s = Net("UVLO_3S")
     miso_a = Net("MISO_A", voltage_domain=3.3)
     miso_b = Net("MISO_B", voltage_domain=3.3)
     miso_c = Net("MISO_C", voltage_domain=3.3)
@@ -96,13 +100,50 @@ def build_circuit():
 
     u_buck = Part("Library", "AP63205WU-7", ref="U2", value="AP63205WU-7", footprint="Library:TSOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL")
     u_buck.lcsc = "C2071056"
-    u_buck.info = "Fixed 5.0V AP63205, 2A output, 3.8-32V input. FB pin connects directly to 5V; no feedback divider. Datasheet recommends 4.7uH inductor, input ceramic close to VIN, and 100nF BST-SW bootstrap capacitor."
+    u_buck.info = "Fixed 5.0V AP63205, 2A output, 3.8-32V input. FB pin connects directly to 5V; no feedback divider. EN pin is fed by the JP1 field-select UVLO network: open = AP63205 internal EN pull-up / UVLO bypass, 2S = about 6.01V off and 6.66V on, 3S = about 8.94V off and 9.92V on. Datasheet recommends 4.7uH inductor, input ceramic close to VIN, and 100nF BST-SW bootstrap capacitor."
     design_intent(u_buck, "2S LiPo to 5.0V buck regulator feeding the XIAO 5V pad and 5V status LED rail.", group="5V buck", placement="Keep VIN capacitor at VIN/GND pins, keep BST cap at BST/SW pins, and keep SW copper compact and away from IMUs.")
     v5 += u_buck[1]
-    vbus += u_buck[2], u_buck[3]
+    buck_en += u_buck[2]
+    vbus += u_buck[3]
     gnd += u_buck[4]
     sw += u_buck[5]
     bst += u_buck[6]
+
+    jp_uvlo = Part("Connector", "Conn_01x03_Pin", ref="JP1", value="UVLO_SEL", footprint="Jumper:SolderJumper-3_P1.3mm_Open_Pad1.0x1.5mm")
+    jp_uvlo.lcsc = "NONE"
+    jp_uvlo.info = "Field-select solder jumper for AP63205 EN/UVLO. Leave open to bypass UVLO and let the AP63205 internal EN pull-up enable the buck. Bridge pin 1-2 for 2S last-resort cutoff (~6.01V off / ~6.66V on). Bridge pin 2-3 for 3S last-resort cutoff (~8.94V off / ~9.92V on). Do not bridge both sides."
+    design_intent(jp_uvlo, "Field-select UVLO mode jumper for the 5V buck regulator: open=OFF/bypass, 2S, or 3S.", group="5V buck UVLO", placement="Place near U2 EN with clear silkscreen labels: OFF=open, 2S on pad 1 side, 3S on pad 3 side. Keep BUCK_EN trace short and away from SW.")
+    uvlo_2s += jp_uvlo[1]
+    buck_en += jp_uvlo[2]
+    uvlo_3s += jp_uvlo[3]
+
+    r_uvlo_2s_hi = Part("Device", "R_Small", ref="R23", value="47kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
+    r_uvlo_2s_hi.lcsc = "C482184"
+    r_uvlo_2s_hi.info = "2S UVLO high-side resistor from VBUS to UVLO_2S. With R24=10kΩ and AP63205 EN hysteresis currents, thresholds are approximately 6.01V falling/off and 6.66V rising/on."
+    design_intent(r_uvlo_2s_hi, "High-side resistor for the 2S AP63205 EN UVLO divider selected by JP1.", group="5V buck UVLO", placement="Place near JP1/U2 EN; keep the UVLO_2S midpoint short and away from SW.")
+    vbus += r_uvlo_2s_hi[1]
+    uvlo_2s += r_uvlo_2s_hi[2]
+
+    r_uvlo_2s_lo = Part("Device", "R_Small", ref="R24", value="10kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
+    r_uvlo_2s_lo.lcsc = "C844715"
+    r_uvlo_2s_lo.info = "2S UVLO low-side resistor from UVLO_2S to GND. Paired with R23=47kΩ for approximately 6.01V falling/off and 6.66V rising/on AP63205 EN thresholds."
+    design_intent(r_uvlo_2s_lo, "Low-side resistor for the 2S AP63205 EN UVLO divider selected by JP1.", group="5V buck UVLO", placement="Place near JP1/U2 EN with a short ground return/via.")
+    uvlo_2s += r_uvlo_2s_lo[1]
+    gnd += r_uvlo_2s_lo[2]
+
+    r_uvlo_3s_hi = Part("Device", "R_Small", ref="R25", value="75kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
+    r_uvlo_3s_hi.lcsc = "C237746"
+    r_uvlo_3s_hi.info = "3S UVLO high-side resistor from VBUS to UVLO_3S. With R26=10kΩ and AP63205 EN hysteresis currents, thresholds are approximately 8.94V falling/off and 9.92V rising/on."
+    design_intent(r_uvlo_3s_hi, "High-side resistor for the 3S AP63205 EN UVLO divider selected by JP1.", group="5V buck UVLO", placement="Place near JP1/U2 EN; keep the UVLO_3S midpoint short and away from SW.")
+    vbus += r_uvlo_3s_hi[1]
+    uvlo_3s += r_uvlo_3s_hi[2]
+
+    r_uvlo_3s_lo = Part("Device", "R_Small", ref="R26", value="10kΩ", footprint="Resistor_SMD:R_0402_1005Metric")
+    r_uvlo_3s_lo.lcsc = "C844715"
+    r_uvlo_3s_lo.info = "3S UVLO low-side resistor from UVLO_3S to GND. Paired with R25=75kΩ for approximately 8.94V falling/off and 9.92V rising/on AP63205 EN thresholds."
+    design_intent(r_uvlo_3s_lo, "Low-side resistor for the 3S AP63205 EN UVLO divider selected by JP1.", group="5V buck UVLO", placement="Place near JP1/U2 EN with a short ground return/via.")
+    uvlo_3s += r_uvlo_3s_lo[1]
+    gnd += r_uvlo_3s_lo[2]
 
     l_buck = Part("Device", "L_Small", ref="L1", value="4.7uH", footprint="Inductor_SMD:L_Wuerth_MAPI-4020")
     l_buck.lcsc = "C2041623"
