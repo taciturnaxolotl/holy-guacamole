@@ -146,8 +146,8 @@ def build_circuit():
     gnd += r_uvlo_3s_lo[2]
 
     l_buck = Part("Device", "L_Small", ref="L1", value="4.7uH", footprint="Inductor_SMD:L_Wuerth_MAPI-4020")
-    l_buck.lcsc = "C2041623"
-    l_buck.info = "Bourns SRP4020TA-4R7M: 4.7uH, Isat 3.5A, Irms 2.6A, DCR 95mΩ, low-profile 4020-class inductor. AP63205 full 2A operation asks for about 2.7A current headroom; this is acceptable for the expected carrier load but review if the 5V rail will be loaded near 2A continuously."
+    l_buck.lcsc = "C2045367"
+    l_buck.info = "Wurth Elektronik 74438356047 / WE-MAPI-4020: 4.7uH, Irms 2.9A, Isat 4.7A, DCR 76mΩ, SMD 4.1x4.1mm package matching the KiCad Inductor_SMD:L_Wuerth_MAPI-4020 land pattern. AP63205 full 2A operation asks for about 2.7A current headroom; this is acceptable for the expected carrier load but review if the 5V rail will be loaded near 2A continuously."
     design_intent(l_buck, "Buck output inductor from AP63205 SW node to 5V rail.", group="5V buck", placement="Place adjacent to U2 SW pin; keep SW node short and away from SPI/IMU routes.")
     sw += l_buck[1]
     v5 += l_buck[2]
