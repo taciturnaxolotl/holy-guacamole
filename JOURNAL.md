@@ -138,3 +138,15 @@ I did a bunch more work on the firmware and now have full ekf working and the si
 I also redesigned the toothies (my offical name for them) to be wayyyy smaller and far more lightweight than last night. They should weight about 40g each now and hopefully be a bit stronger since they don't have massive parallograms in the middle anymore.
 
 I stayed up far too late working on this yet again and now i'm typing this up as I wait to see if i heard back from pcbway quickly and can get my design into motion. I also probably need to add a low battery cutoff to the buck convertor but thats annoying and may have to wait depending on how long everything takes and how fast pcbway gets back.
+
+### Day 19: June 8th [6h]
+
+I have now offically purchased the pcb! I found out a pretty big issue with the pcb initally where it extended into the wheel wells which would have prevented the wheels from turning. I extended the pcb and that also opened up some silkscreen room which is amazing. I also made a copper heatsink for the esc and tweaked the assembly model a ton to get the pcb properly mounted.
+
+I purchased the pcb and toothies which was immensely painful. JLC ended up being $524.56 which feels insane. Tarifs / Duties alone was $115 😭
+
+Send Cut Send was amazingly quick and also nicely cheap. The toothies cost about $4 each which wasn't bad and the copper heatsink was $7ish. Shipping was double the cost of parts hilariously. I definely want to order stuff from them again. Unfortunately the estimated shipping arrival dates on both JLC and SCS is the 16-17th right before I have to leave. It's going to be scarily close. I'm going to work a ton on the simulator and hopefully also make the wheels and assemble pretty much everything else accept for the electronics. My main worry is that it is going to be too hard to add the strain relief connections since that is liquid latex which won't transfer well on the plane. If worst comes to worst I can just solder the connections after I get there and take a small bottle of latex. We shall see.
+
+I'm also still shocked at how much time I keep etching out of the day for this. TBF I stayed up till 3am this morning and have been spending 2 hours before and after dinner each afternoon so it does really add up.
+
+![the pcb after extension](https://cdn.hackclub.com/019f449f-434b-725f-80b1-6ce91843d4cf/image.png)
