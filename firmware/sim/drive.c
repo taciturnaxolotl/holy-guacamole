@@ -42,6 +42,9 @@ int main(void) {
     SetTargetFPS(60);
 
     plant_t *plant = plant_create(0xBEEF);
+    /* Calibrated sensor: the real robot removes the H3LIS nonlinearity with
+     * accel_cal, which this SI path doesn't run. Left on it walks heading. */
+    plant_synth(plant)->enable_nonlinearity = false;
     ekf_t ekf;
     ekf_init(&ekf, 0.0f);
     app_config_t cfg;

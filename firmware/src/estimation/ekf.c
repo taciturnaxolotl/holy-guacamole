@@ -22,7 +22,13 @@ void ekf_init(ekf_t *e, float omega0) {
     e->q_alpha = 2.0f;
     e->r_accel = 1.0f;    /* (m/s^2)^2 */
     e->r_gyro  = 0.00001f; /* (rad/s)^2, matches ~0.02 rad/s sigma */
-    e->sat_inflation = 1e6f;
+    /* Saturation inflation must be large enough to truly drop a railed
+     * channel. r_gyro is tiny (1e-5), so a modest factor leaves the railed
+     * gyro (pinned at +/-4000 dps) still tugging omega below its true value
+     * by ~0.2 rad/s at combat RPM -- a constant bias that dead-reckons into
+     * rapid heading drift. 1e10 makes the effective sigma huge (~1e5) so the
+     * railed reading contributes nothing. */
+    e->sat_inflation = 1e10f;
 }
 
 void ekf_predict(ekf_t *e, float dt) {
