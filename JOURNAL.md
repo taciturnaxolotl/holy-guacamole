@@ -1,10 +1,10 @@
 # The great journey of the one and only Holy Guacamole 🥑
 
-**Running hour counter:** 74.75h
+**Running hour counter:** 78h
 
 Okay this is a wee bit out of order bc I didn't start writing all of this down into after I realized I could do this for Outpost but from screenshots and git time stamps and my memory this is the best recontruction of the process up till now.
 
-### Day numero uno: Saturday June 20th [5:15h]
+### Day numero uno: Saturday June 20th [5h15m]
 
 I saw this [amazing video](https://www.youtube.com/watch?v=c7CI6yBTKMc) by Maker's Muse about a technique in orcaslicer to print stronger solid prints and then got fascinated by antweight combat robotics. I ended up going down a whole rabbit hole for the rest of the day. I discovered ring spinners pretty quickly (huge spinning blade around the outside) which seemed fascinating but a ton of work to build (some people have even made their [own motors](https://www.youtube.com/watch?v=scGufLuW8Do)). I also discovered that there was a competition ([Buckeye Bash](https://www.robotcombatevents.com/events/7385)) less then 45 minutes from me that was happening in August.
 
@@ -152,3 +152,11 @@ Send Cut Send was amazingly quick and also nicely cheap. The toothies cost about
 I'm also still shocked at how much time I keep etching out of the day for this. TBF I stayed up till 3am this morning and have been spending 2 hours before and after dinner each afternoon so it does really add up.
 
 ![the pcb after extension](https://cdn.hackclub.com/019f449f-434b-725f-80b1-6ce91843d4cf/image.png)
+
+### Day 20: June 9th 15m
+
+Wasn't able to do much today just confirmed the replacement of my inductor bc I grabbed the wrong lcsc part # :facepalm: Thankfully JLC was nice about it and I could just replace the part with one that fit the correct footprint. Tried to do some onshape stuff and submit the outpost forms but slow internet made that extremely painful.
+
+### Day 21: June 10th 3h
+
+Today was mostly spent in the car so i worked on the firmware and got it reflecting the real world sensors much more closely. The physics model in the sim is now much more accurate and rebounds work correctly. Also was able to fix several things with the accelerometer code that was manifesting in the sim! I'm hoping that the sim will help catch all / most of the bugs if possible but who knows. I'm really hoping that the wrong part # didn't delay JLC too too long.
