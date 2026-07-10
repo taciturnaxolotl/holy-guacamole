@@ -7,6 +7,7 @@
 
 #define TWO_PI 6.28318530718f
 #define GRAVITY 9.80665f
+#define NUM_TABS 2       /* symmetric weapon tabs, 180 deg apart */
 
 struct plant {
     plant_params_t prm;
@@ -36,7 +37,7 @@ void plant_params_default(plant_params_t *p) {
     p->inertia_factor  = 0.55f;    /* mass distribution (solid disc = 0.5) */
 
     p->motor_offset_m  = 0.055f;   /* drive-wheel lever from centre */
-    p->omega_free      = 419.0f;   /* ~4000 rpm terminal at full throttle */
+    p->omega_free      = 644.0f;  /* ~6150 rpm full-throttle; 4000 rpm at ~0.65 */
     p->spin_tau_s      = 0.7f;     /* ~2s to near-terminal */
     p->esc_tau_s       = 0.003f;   /* ESC/motor response; must be << rev period
                                     * or per-rev drift modulation is filtered
@@ -109,14 +110,13 @@ static float motor_force(const plant_t *p, float u) {
     return f;
 }
 
-/* Handle all four arena walls. Circle centre at (x,y), radius tip_radius.
- * Each wall contributes an inward normal n and a penetration depth when the
- * disc overlaps it. For each: push out, apply normal restitution, then a
- * friction-cone tangential impulse that launches the disc along the wall
- * (skitter) and bleeds spin. */
-static void collide_walls(plant_t *p) {
+/* Resolve the disc BODY (radius body_radius) against the four walls: a
+ * continuous circle contact with normal restitution, tangential skitter
+ * from rim friction, and spin bleed. This is what a non-spinning body
+ * resting or shoved against a wall does. */
+static void collide_body(plant_t *p) {
     float a = p->prm.arena_half_m;
-    float R = p->prm.tip_radius_m;
+    float R = p->prm.body_radius_m;
     float e = p->prm.wall_restitution;
     float mu = p->prm.wall_mu;
     float m = p->prm.mass_kg;
@@ -131,45 +131,99 @@ static void collide_walls(plant_t *p) {
 
     for (int i = 0; i < nw; i++) {
         float nx = wnx[i], ny = wny[i], pen = wpen[i];
-
-        /* Push out of penetration along the inward normal. */
         p->x += (double)nx * pen;
         p->y += (double)ny * pen;
 
-        /* Normal velocity component (into wall is negative along n). */
         float vn = (float)p->vx * nx + (float)p->vy * ny;
         if (vn < 0.0f) {
-            /* Normal restitution impulse. */
-            float jn = -(1.0f + e) * vn * m;   /* >=0 */
+            float jn = -(1.0f + e) * vn * m;
             p->vx += (double)(jn / m) * nx;
             p->vy += (double)(jn / m) * ny;
 
-            /* Tangent direction (rotate normal +90 deg). */
             float tx = -ny, ty = nx;
-            /* Surface velocity at the contact point = translational tangential
-             * component + rim speed from spin. Contact point sits at -n*R from
-             * centre; its spin velocity is omega * (z x (-n*R)). */
             float vt = (float)p->vx * tx + (float)p->vy * ty;
-            float v_rim = (float)p->omega * R;   /* signed along +t for +omega */
+            float v_rim = (float)p->omega * R;
             float v_surf = vt + v_rim;
-
-            /* Friction impulse opposes surface tangential velocity, clamped
-             * to the Coulomb cone mu*jn. */
             float jt = -m * v_surf;
             float jt_max = mu * jn;
             if (jt >  jt_max) jt =  jt_max;
             if (jt < -jt_max) jt = -jt_max;
-
-            /* Skitter: apply tangential impulse to translation. */
             p->vx += (double)(jt / m) * tx;
             p->vy += (double)(jt / m) * ty;
-
-            /* Spin bleed: reaction torque of the friction impulse at radius R.
-             * The impulse acts along +t at the contact point -n*R; its moment
-             * about the centre is (-n*R) x (jt*t) = -jt*R (scalar, z). */
             p->omega += (double)(-jt * R / I);
         }
     }
+}
+
+/* Point-contact impulse for one weapon-tab tip at body-frame lever (rx,ry)
+ * striking a wall with inward normal (nx,ny) and penetration pen. Uses the
+ * full rigid-body contact impulse (translation + rotation coupled through
+ * the lever arm), so a fast-spinning tab reverses its into-wall tip
+ * velocity, throwing the whole robot off the wall and bleeding spin. */
+static void tab_impulse(plant_t *p, float rx, float ry, float nx, float ny,
+                        float pen) {
+    float e = p->prm.wall_restitution;
+    float mu = p->prm.wall_mu;
+    float m = p->prm.mass_kg;
+    float I = p->inertia;
+    float w = (float)p->omega;
+
+    /* Contact-point velocity = v_center + omega x r. */
+    float vcx = (float)p->vx - w * ry;
+    float vcy = (float)p->vy + w * rx;
+    float vn = vcx * nx + vcy * ny;
+
+    /* Always push the tip out of the wall so it can't nest inside. */
+    p->x += (double)nx * pen;
+    p->y += (double)ny * pen;
+
+    if (vn >= 0.0f) return;  /* tip already separating */
+
+    /* Normal impulse with rotational effective mass. */
+    float rxn = rx * ny - ry * nx;              /* r x n (z) */
+    float inv_eff = 1.0f / m + rxn * rxn / I;
+    float jn = -(1.0f + e) * vn / inv_eff;      /* >= 0 */
+    p->vx += (double)(jn * nx / m);
+    p->vy += (double)(jn * ny / m);
+    p->omega += (double)((rx * (jn * ny) - ry * (jn * nx)) / I);
+
+    /* Tangential friction impulse, clamped to the Coulomb cone. */
+    float tx = -ny, ty = nx;
+    float vt = vcx * tx + vcy * ty;
+    float rxt = rx * ty - ry * tx;
+    float inv_eff_t = 1.0f / m + rxt * rxt / I;
+    float jt = -vt / inv_eff_t;
+    float jmax = mu * jn;
+    if (jt >  jmax) jt =  jmax;
+    if (jt < -jmax) jt = -jmax;
+    p->vx += (double)(jt * tx / m);
+    p->vy += (double)(jt * ty / m);
+    p->omega += (double)((rx * (jt * ty) - ry * (jt * tx)) / I);
+}
+
+/* Two weapon tabs 180 deg apart reach out to tip_radius. Each strike of a
+ * tab against a wall kicks the robot off, so a spinning bot cannot sit
+ * against a wall the way a smooth disc would. */
+static void collide_tabs(plant_t *p) {
+    float a = p->prm.arena_half_m;
+    float Rt = p->prm.tip_radius_m;
+    float h = (float)p->heading;
+
+    for (int i = 0; i < NUM_TABS; i++) {
+        float ang = h + (float)i * (TWO_PI / NUM_TABS);
+        float rx = Rt * cosf(ang), ry = Rt * sinf(ang);
+        float tipx = (float)p->x + rx, tipy = (float)p->y + ry;
+
+        if (tipx > a)  tab_impulse(p, rx, ry, -1.0f, 0.0f, tipx - a);
+        if (tipx < -a) tab_impulse(p, rx, ry,  1.0f, 0.0f, -a - tipx);
+        if (tipy > a)  tab_impulse(p, rx, ry, 0.0f, -1.0f, tipy - a);
+        if (tipy < -a) tab_impulse(p, rx, ry, 0.0f,  1.0f, -a - tipy);
+    }
+}
+
+static void collide_walls(plant_t *p) {
+    collide_body(p);
+    collide_tabs(p);
 }
 
 void plant_step(plant_t *p, float throttle_a, float throttle_b, float dt) {

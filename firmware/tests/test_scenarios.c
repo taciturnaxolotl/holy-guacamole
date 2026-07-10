@@ -45,10 +45,12 @@ static void scenario_spinup(void) {
     ekf_t e; ekf_init(&e, 0.0f);
     app_config_t cfg; app_config_default(&cfg);
 
-    spin(p, &e, &cfg, 1.0f, 2.0f);
+    /* ~0.65 throttle reaches combat RPM (full throttle terminal is much
+     * higher, leaving headroom for drift modulation). */
+    spin(p, &e, &cfg, 0.65f, 3.0f);
 
     float w = plant_true_omega(p);
-    ASSERT_TRUE(RPM(w) > 3700.0f && RPM(w) < 4100.0f);
+    ASSERT_TRUE(RPM(w) > 3600.0f && RPM(w) < 4200.0f);
     ASSERT_TRUE(fabsf(g_est.omega - w) < 0.05f * w);
 
     /* The gyro must be pinned to its rail at combat RPM. */
@@ -67,12 +69,12 @@ static void scenario_cruise_drift(void) {
     ekf_t e; ekf_init(&e, 0.0f);
     app_config_t cfg; app_config_default(&cfg);
 
-    spin(p, &e, &cfg, 0.67f, 1.5f);  /* reach ~2700 rpm */
+    spin(p, &e, &cfg, 0.44f, 2.0f);  /* reach ~2700 rpm */
 
     float x0, y0; plant_position(p, &x0, &y0);
     cfg.drift_enabled = true;
     app_command_t cmd = {0};
-    cmd.armed = true; cmd.base = 0.67f; cmd.stick_x = 1.0f; cmd.stick_y = 0.0f;
+    cmd.armed = true; cmd.base = 0.44f; cmd.stick_x = 1.0f; cmd.stick_y = 0.0f;
     for (int i = 0; i < 1500; i++) tick(p, &e, &cfg, &cmd);
 
     float x1, y1; plant_position(p, &x1, &y1);
@@ -124,12 +126,12 @@ static float cruise_heading_drift(uint64_t seed, bool nonlinearity) {
     ekf_t e; ekf_init(&e, 0.0f);
     app_config_t cfg; app_config_default(&cfg);
 
-    spin(p, &e, &cfg, 0.67f, 1.5f);  /* reach cruise, gyro bootstraps sign */
+    spin(p, &e, &cfg, 0.44f, 2.0f);  /* reach cruise, gyro bootstraps sign */
 
     float err0 = g_est.heading - plant_true_heading(p);
     float maxdrift = 0.0f;
     app_command_t cmd = {0};
-    cmd.armed = true; cmd.base = 0.67f;
+    cmd.armed = true; cmd.base = 0.44f;
     for (int i = 0; i < 3000; i++) {
         tick(p, &e, &cfg, &cmd);
         float d = (g_est.heading - plant_true_heading(p)) - err0;

@@ -124,12 +124,11 @@ this table; change here and in the struct together.
 | Weapon-tip radius `R_tip` | 0.115 m | 230 mm tip-to-tip; **collision radius** |
 | Moment of inertia `I` | `k·m·R_body²`, k≈0.55 → ~1.8e-3 kg·m² | k tunable (mass distribution) |
 | Thrust lever `r_w` | ~0.055–0.06 m | effective drive-wheel lever from centre |
-| Normal RPM | 2600–2750 rpm (272–288 rad/s) | tracking mode |
-| Strike/burst RPM | 3750–4000 rpm (393–419 rad/s) | pre-attack punch |
-| Full-throttle terminal ω | ~419 rad/s | motor curve target |
-| Cruise throttle | ~0.67 | matches braindump "~65%" |
+| Normal RPM | 2600–2750 rpm (272–288 rad/s) | tracking mode, ~0.44 throttle |
+| Strike/burst RPM | 3750–4000 rpm (393–419 rad/s) | pre-attack punch, ~0.65 throttle |
+| Full-throttle terminal ω | ~644 rad/s (~6150 rpm) | headroom above combat RPM so drift modulation doesn't clip |
 | Battery | 2S 350 mAh | |
-| Arena | ~1.8 m square, ¼" polycarbonate walls | half-extent ~0.9 m |
+| Arena | ~1.8 m square (5.9 ft), ¼" polycarbonate walls | half-extent 0.9 m; matches braindump ~6 ft antweight arena |
 
 ### IMU array
 
@@ -219,26 +218,37 @@ place and the harness can sweep it.
 
 ### 7.3 Wall contact model (the headline fix)
 
-On penetration, resolve position, then apply one explicit friction-cone impulse
-capturing three coupled effects:
+The disc **body** (radius 85 mm) gets a continuous circle contact: normal
+bounce (restitution `e`), tangential **skitter** from rim friction, and **spin
+bleed**, all from one friction-cone impulse.
 
-- **Normal bounce:** `v_n' = -e·v_n` (restitution `e`, default 0.35).
-- **Skitter:** rim surface velocity `v_t + ω·R_tip` drives a tangential impulse
-  (bot shoots along the wall in the spin direction), clamped to `μ·|j_n|`.
-- **Spin bleed:** the same impulse applies `−j·R_tip` to `ω`, so hits cost RPM.
+On top of that, the two **weapon tabs** reach out to the 115 mm tip radius and
+are modelled as point contacts. A fast-spinning tab striking a wall applies the
+full rigid-body impulse (translation + rotation coupled through the lever arm),
+so the robot is thrown off the wall and bleeds spin. Consequence: a **spinning**
+bot driven into a wall gets flung clear (tabs bite, then it skitters away),
+while a **dead** bot just pins and rests — it can't sit against the wall while
+the weapon is live, matching the real robot. (A perfectly balanced bot placed
+exactly grazing at rest is the one idealized case that still sits; real driving
+never lands there.)
 
-All tunable, signed correctly (fast spin → launch along wall + RPM loss),
-deterministic. Defaults: `e_wall=0.35`, `μ_wall=0.5`.
+Defaults: `e_wall=0.35`, `μ_wall=0.5`, 2 tabs 180° apart.
 
 ### 7.4 Motor + drivetrain model
 
 - Torque-speed curve per drive wheel: `τ = throttle·τ_stall·(1 − ω·r_w/v_free)`
   (back-EMF rolloff), so terminal RPM is set by the motor, not by fudged drag.
-  Tuned so full throttle → ~419 rad/s (4000 rpm), ~0.67 throttle → ~283 rad/s
-  (2700 rpm), spin-up time constant ~0.7 s (≈2 s to near-terminal).
-- First-order **ESC lag** on commanded → applied throttle.
-- Floor friction becomes **Coulomb** (`μ·m·g` opposing translation) instead of
-  linear viscous, changing the drift accel/top-speed profile realistically.
+- **Full-throttle terminal ~6150 rpm**, deliberately well above combat speed.
+  Combat RPM is reached at partial throttle (~0.44 for 2700, ~0.65 for 4000),
+  which leaves headroom for the drift modulation. Setting the terminal at
+  4000 rpm (the earlier mistake) meant combat RPM needed ~full throttle, so the
+  modulation clipped and translation collapsed above ~3000 rpm. With headroom,
+  translation is strong and roughly flat across 1000–4000 rpm.
+- First-order **ESC lag** on commanded → applied throttle; spin-up time
+  constant ~0.7 s (~1 s to 3000 rpm).
+- Floor friction is **Coulomb** (`μ·m·g`), not linear viscous — this is why the
+  arrow-key response feels less springy than the old Box2D build, and is the
+  more realistic behaviour.
 
 **Validated (§7.2–7.4, host smoke test):**
 
