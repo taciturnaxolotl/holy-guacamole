@@ -46,17 +46,21 @@ void meas_jacobian(const mat_t *x, mat_t *H) {
 void meas_saturation_flags(const mat_t *z, bool saturated[MEAS_DIM]) {
     for (int i = 0; i < MEAS_DIM; i++) saturated[i] = false;
 
-    /* Flag any accelerometer channel whose reading is at the sensor
-     * rail (detected from the measurement itself, not a predicted omega,
-     * so it catches saturation regardless of estimator lag). A railed
-     * reading is clipped garbage; the EKF inflates its noise to ignore
-     * it and lean on the remaining sensors + gyro. Inner IMU-A is
-     * +/-320g; outer H3LIS are +/-400g. The gyro never rails here. */
+    /* Flag any sensor channel whose reading is at its rail (detected from
+     * the measurement itself, not a predicted state, so it catches
+     * saturation regardless of estimator lag). A railed reading is clipped
+     * garbage; the EKF inflates its noise to ignore it and lean on the
+     * remaining sensors. Inner IMU-A accel is +/-320g; outer H3LIS are
+     * +/-400g; the inner gyro rails at +/-4000 dps and is pinned during
+     * any combat spin, so it MUST be dropped above ~670 rpm or it drags
+     * omega toward its clamped value. */
     const float inner = SATURATION_FRAC * LSM6_FULL_SCALE_MS2;
     const float outer = SATURATION_FRAC * H3LIS_FULL_SCALE_MS2;
+    const float gyro  = SATURATION_FRAC * GYRO_FULL_SCALE_RADS;
 
     if (fabsf(mat_get(z, MEAS_A_RADIAL, 0))     >= inner) saturated[MEAS_A_RADIAL] = true;
     if (fabsf(mat_get(z, MEAS_A_TANGENTIAL, 0)) >= inner) saturated[MEAS_A_TANGENTIAL] = true;
+    if (fabsf(mat_get(z, MEAS_A_GYRO, 0))       >= gyro)  saturated[MEAS_A_GYRO] = true;
     if (fabsf(mat_get(z, MEAS_B_RADIAL, 0))     >= outer) saturated[MEAS_B_RADIAL] = true;
     if (fabsf(mat_get(z, MEAS_B_TANGENTIAL, 0)) >= outer) saturated[MEAS_B_TANGENTIAL] = true;
     if (fabsf(mat_get(z, MEAS_C_RADIAL, 0))     >= outer) saturated[MEAS_C_RADIAL] = true;

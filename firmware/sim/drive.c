@@ -95,7 +95,7 @@ int main(void) {
         mat_zero(&last_z, MEAS_DIM, 1);
         while (accumulator >= TICK_DT && guard++ < 100) {
             mat_t z;
-            plant_read_imu(plant, &z);
+            plant_read_imu(plant, &z, TICK_DT);
             last_z = z;
             est = app_sensor_tick_si(&ekf, &z, TICK_DT);
             motors = app_control_tick(&cfg, &cmd, &est, TICK_DT);
@@ -119,7 +119,10 @@ int main(void) {
         float rx, ry;
         plant_position(plant, &rx, &ry);
         float true_hdg = plant_true_heading(plant);
-        float disc_px = 0.075f * px_per_m;
+        float body_m = plant_body_radius(plant);
+        float tip_m = plant_tip_radius(plant);
+        float body_px = body_m * px_per_m;
+        float tip_px = tip_m * px_per_m;
 
         BeginDrawing();
         ClearBackground((Color){18, 18, 24, 255});
@@ -130,7 +133,10 @@ int main(void) {
                            (int)(2 * arena * px_per_m), (Color){80, 80, 100, 255});
 
         Vector2 c = world_to_screen(rx, ry, px_per_m);
-        DrawCircleV(c, disc_px, (Color){60, 140, 90, 255});
+        /* Weapon-tip envelope = the collision radius that touches the wall. */
+        DrawCircleLinesV(c, tip_px, (Color){110, 90, 70, 255});
+        /* Body disc (carries the mass). */
+        DrawCircleV(c, body_px, (Color){60, 140, 90, 255});
 
         /* Per-IMU saturation dots at each sensor's body position. Green =
          * live, red = railed (its radial accel is clipped and the filter
@@ -141,7 +147,7 @@ int main(void) {
         int imu_radial[3] = { MEAS_A_RADIAL, MEAS_B_RADIAL, MEAS_C_RADIAL };
         for (int i = 0; i < 3; i++) {
             float ang = true_hdg + imu_geom[i].angle_rad;
-            float r = (imu_geom[i].radius_m / 0.075f) * disc_px * 0.8f;
+            float r = (imu_geom[i].radius_m / body_m) * body_px;
             Vector2 ip = { c.x + cosf(ang) * r, c.y - sinf(ang) * r };
             Color col = sat[imu_radial[i]] ? (Color){240, 70, 70, 255}
                                            : (Color){90, 220, 120, 255};
@@ -150,15 +156,15 @@ int main(void) {
 
         /* Thin faint spoke at the true instantaneous heading: shows the
          * disc is physically spinning (it aliases at RPM, expected). */
-        Vector2 spoke = { c.x + cosf(true_hdg) * disc_px,
-                          c.y - sinf(true_hdg) * disc_px };
+        Vector2 spoke = { c.x + cosf(true_hdg) * tip_px,
+                          c.y - sinf(true_hdg) * tip_px };
         DrawLineEx(c, spoke, 1.5f, (Color){70, 90, 80, 255});
 
         /* Heading strobe (the "heading LED"): a beacon at the physical
          * angle where the estimate last crossed forward. Locked estimate
          * -> beacon sits still. Drifting estimate -> beacon walks. */
         strobe_flash *= 0.90f;  /* fade between flashes */
-        float beam = disc_px + 18.0f;
+        float beam = tip_px + 18.0f;
         Vector2 sdot = { c.x + cosf(strobe_true) * beam,
                          c.y - sinf(strobe_true) * beam };
         unsigned char b = (unsigned char)(120 + 135 * strobe_flash);

@@ -42,5 +42,6 @@ void sim_step(robot_sim_t *s, double alpha_cmd, double dt);
 void sim_kick_omega(robot_sim_t *s, double domega);
 
 /* Produce the MEAS_DIM measurement vector the IMU array would report
- * from the current true state, including noise and saturation. */
-void sim_read(robot_sim_t *s, mat_t *z);
+ * from the current true state, including noise and saturation. dt is the
+ * step period (drives gyro bias walk + vibration phase). */
+void sim_read(robot_sim_t *s, mat_t *z, double dt);

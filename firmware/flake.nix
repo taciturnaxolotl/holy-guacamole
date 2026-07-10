@@ -31,7 +31,6 @@
               pkgs.python3 # pico-sdk build scripts / pioasm
               # SITL simulator deps (host builds)
               pkgs.raylib
-              pkgs.box2d
             ];
 
             PICO_SDK_PATH = "${picoSdk}/lib/pico-sdk";

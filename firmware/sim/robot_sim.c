@@ -18,6 +18,6 @@ void sim_kick_omega(robot_sim_t *s, double domega) {
     s->omega += domega;
 }
 
-void sim_read(robot_sim_t *s, mat_t *z) {
-    imu_synth_read(&s->synth, (float)s->omega, (float)s->alpha, z);
+void sim_read(robot_sim_t *s, mat_t *z, double dt) {
+    imu_synth_read(&s->synth, (float)s->omega, (float)s->alpha, (float)dt, z);
 }

@@ -1,6 +1,6 @@
 # Native SITL simulator build. Links the EXACT estimation + control
-# modules against a Box2D plant and a raylib front-end so the real
-# firmware logic can be test-driven with no hardware.
+# modules against a hand-rolled 2D rigid-disc plant and a raylib front-end
+# so the real firmware logic can be test-driven with no hardware.
 
 cmake_minimum_required(VERSION 3.13)
 project(holy_guacamole_sim C)
@@ -12,7 +12,6 @@ set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../src)
 set(SIM_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 find_package(raylib REQUIRED)
-find_package(box2d REQUIRED)
 
 add_executable(drive
     ${SIM_DIR}/drive.c
@@ -29,4 +28,4 @@ add_executable(drive
 )
 
 target_include_directories(drive PRIVATE ${SRC_DIR} ${SIM_DIR})
-target_link_libraries(drive PRIVATE raylib box2d m)
+target_link_libraries(drive PRIVATE raylib m)

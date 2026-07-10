@@ -29,6 +29,14 @@
 #define LSM6_FULL_SCALE_G    320.0f
 #define LSM6_FULL_SCALE_MS2  (LSM6_FULL_SCALE_G * G_TO_MS2)
 
+/* LSM6DSV320X gyro full-scale ceiling (inner sensor, ONLY gyro in the
+ * array). At meltybrain RPM the spin far exceeds this, so the gyro is
+ * pinned to its rail during combat and is only linear below ~670 rpm
+ * (spin-up start / shutdown / impact recovery). Heading-rate at speed
+ * must come from the accelerometer centripetal channel, not the gyro. */
+#define GYRO_FULL_SCALE_DPS  4000.0f
+#define GYRO_FULL_SCALE_RADS (GYRO_FULL_SCALE_DPS * (float)M_PI / 180.0f)
+
 /* Saturation detection threshold as fraction of full scale. Readings at
  * or above this fraction are considered railed. Shared by EKF and sim
  * so both use the same boundary. */
