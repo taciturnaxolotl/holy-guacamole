@@ -4203,7 +4203,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/25cb89e2-7d49-4cc1-a847-5dc58e619f3b")
 		(sheetname "/")
-		(sheetfile "circuit.kicad_sch")
+		(sheetfile "guac.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -4978,7 +4978,7 @@
 		(property ki_fp_filters "TO-???* *_Diode_* *SingleDiode* D_*")
 		(path "/2f2b0063-2742-4f73-a39c-e51eaa47cce5")
 		(sheetname "/")
-		(sheetfile "circuit.kicad_sch")
+		(sheetfile "guac.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -5281,7 +5281,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/a3494677-15af-4120-ba98-a1dfc03ca5cb")
 		(sheetname "/")
-		(sheetfile "circuit.kicad_sch")
+		(sheetfile "guac.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -5878,7 +5878,7 @@
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/7dceb450-8747-40b0-8f36-a74057742cee")
 		(sheetname "/")
-		(sheetfile "circuit.kicad_sch")
+		(sheetfile "guac.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -6422,7 +6422,7 @@
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/c23f6c42-ac18-4b1f-8e0e-78e1e2dcc51e")
 		(sheetname "/")
-		(sheetfile "circuit.kicad_sch")
+		(sheetfile "guac.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -8364,7 +8364,7 @@
 		)
 		(path "/753016d0-e870-4cb2-b237-ecc4258e51a9")
 		(sheetname "/")
-		(sheetfile "circuit.kicad_sch")
+		(sheetfile "guac.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -10834,7 +10834,7 @@
 		(property ki_fp_filters "TO-???* *_Diode_* *SingleDiode* D_*")
 		(path "/5a2d9ef7-6921-4b72-8afe-cdec83dad5dc")
 		(sheetname "/")
-		(sheetfile "circuit.kicad_sch")
+		(sheetfile "guac.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -13348,7 +13348,7 @@
 		(property ki_fp_filters "Pin* Test*")
 		(path "/193b74f7-2b75-441d-b293-9892b6a58070")
 		(sheetname "/")
-		(sheetfile "circuit.kicad_sch")
+		(sheetfile "guac.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -15052,7 +15052,7 @@
 		(property ki_fp_filters "Pin* Test*")
 		(path "/43e568d9-f9e2-4705-91cd-ac8b631ce27f")
 		(sheetname "/")
-		(sheetfile "circuit.kicad_sch")
+		(sheetfile "guac.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -15182,7 +15182,7 @@
 		(property ki_fp_filters "Pin* Test*")
 		(path "/b83dfb8d-cb73-4989-aac2-633eb0f77cd1")
 		(sheetname "/")
-		(sheetfile "circuit.kicad_sch")
+		(sheetfile "guac.kicad_sch")
 		(units
 			(unit
 				(name "A")

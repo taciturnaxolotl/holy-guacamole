@@ -507,7 +507,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "circuit.kicad_pro",
+    "filename": "guac.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -755,8 +755,8 @@
     "subpart_id_separator": 0,
     "top_level_sheets": [
       {
-        "filename": "circuit.kicad_sch",
-        "name": "circuit",
+        "filename": "guac.kicad_sch",
+        "name": "guac",
         "uuid": "5ff26309-9be7-4732-9683-b5a799424d79"
       }
     ],
@@ -766,7 +766,7 @@
   "sheets": [
     [
       "5ff26309-9be7-4732-9683-b5a799424d79",
-      "circuit"
+      "guac"
     ],
     [
       "6d3b10cd-9256-4f74-9c47-bff4173e3a51",
