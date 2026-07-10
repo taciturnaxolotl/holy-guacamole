@@ -43,6 +43,7 @@ set(EKF_SRCS
 add_hg_test(test_ekf ${EKF_SRCS})
 add_hg_test(test_sim_convergence ${EKF_SRCS} ${SIM_DIR}/robot_sim.c ${SIM_DIR}/imu_synth.c)
 add_hg_test(test_drift ${SRC_DIR}/control/drift.c)
+add_hg_test(test_accel_cal ${EKF_SRCS} ${SRC_DIR}/estimation/accel_cal.c)
 
 # Closed-loop digital-twin scenarios: plant + the real app_ estimator and
 # controller, run headless with assertions on emergent behaviour.
@@ -51,6 +52,7 @@ add_hg_test(test_scenarios
     ${SIM_DIR}/plant.c
     ${SIM_DIR}/imu_synth.c
     ${SRC_DIR}/estimation/imu_convert.c
+    ${SRC_DIR}/estimation/accel_cal.c
     ${SRC_DIR}/control/drift.c
     ${SRC_DIR}/control/pid.c
     ${SRC_DIR}/app/control_loop.c

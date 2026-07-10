@@ -18,7 +18,8 @@ and the simulator fidelity model. For hardware see `spec.md` (carrier PCB) and
 | Area | State |
 |---|---|
 | Math (`linalg`) | implemented, unit-tested |
-| Estimation (`ekf`, `meas_model`, `imu_geom`, `imu_convert`, `accel_cal`) | implemented, tested; **reduced 3-state filter** (see §4) |
+| Estimation (`ekf`, `meas_model`, `imu_geom`, `imu_convert`) | implemented, tested; **reduced 3-state filter** (see §4) |
+| `accel_cal` | **wired** into the shared SI path (`app_sensor_tick_si` → `accel_cal_apply`, outer H3LIS channels); unit-tested + validated end-to-end. No-op until a table is loaded |
 | Control (`pid`, `drift`) | implemented; sinusoidal + square modulation |
 | Safety (`watchdog`, `rc_health`, `battery`) | implemented; dual-core spinlock watchdog |
 | App glue (`control_loop`) | implemented; shared by firmware and sim |
@@ -80,7 +81,10 @@ firmware/sim/
   imu_synth.{c,h}        truth-state -> noisy/saturated measurement vector
   robot_sim.{c,h}        headless pure-angular kinematic sim
   drive.c                interactive raylib test-drive harness
-  scenario.c             (planned) scriptable assert-based scenarios
+
+firmware/tests/
+  test_scenarios.c       closed-loop assert-based scenarios (wired to CTest;
+                         there is no sim/scenario.c — it lives here)
 ```
 
 **Key architectural rule:** the estimator + controller live in
@@ -201,7 +205,7 @@ and a synthetic IMU. Two front-ends share one plant + one sensor model:
 
 - `robot_sim.c` — headless pure-angular kinematics (deterministic filter tests).
 - `drive.c` — interactive raylib top-down view (hand-driving, watch heading lock).
-- `scenario.c` — (planned) scripted assert-based regression scenarios → CTest.
+- `tests/test_scenarios.c` — scripted assert-based regression scenarios → CTest.
 
 ### 7.2 Decision: hand-rolled plant (Box2D dropped)
 
@@ -332,11 +336,56 @@ FIFO) and `accel_cal` correction inside the SI estimation path.
       **out of date**. Current build: 170 mm body diameter (85 mm radius,
       carries mass), 230 mm tip-to-tip (115 mm weapon-tip collision radius).
       Refresh braindump G-load / tip-speed calcs to match.
-- [ ] Runtime toggle for drift modulation mode (square vs sinusoidal) via RC
-      channel or UART debug command (carried over from prior work).
+- [x] Drift modulation mode is a **build-time flag** (`DRIFT_DEFAULT_MODE` in
+      `control_loop.h`): flip the line or pass `-DDRIFT_DEFAULT_MODE=DRIFT_MOD_SQUARE`.
+      No runtime toggle, by request.
+- [x] `accel_cal` wired into the SI estimation path and validated end-to-end
+      (loading the inverse curve recovers heading with nonlinearity on).
+      Remaining: per-sensor curves (B and C share one today) and a bench
+      routine to fill the table from a spin-up sweep.
+- [x] Core 1 PID now uses the **measured** loop period, not the constant
+      `CONTROL_DT` (that core also runs CRSF/DSHOT/telemetry, so the true
+      period is longer). Matters when RPM PID is bench-tuned.
 - [ ] Sim ODR fidelity: per-sensor sample-and-hold + dropped samples for the
       1 kHz, FIFO-less H3LIS outer accels (deferred from §7.5).
-- [ ] Run `accel_cal` inside the SI estimation path so the nonlinearity
-      correction is exercised end-to-end, not just contrasted in a scenario.
 - [x] Box2D removed from `sim/CMakeLists.txt` and `flake.nix` (hand-rolled
       plant landed).
+
+### Dead / unused code (flagged during code review)
+
+These are compiled or defined but do nothing today. Each is either
+scaffolding for a planned feature or leftover that should be pruned. Left
+as-is they cost build size, reader confusion, and (for the `-Werror` host
+build) latent warnings. Decide per item: **wire it or delete it.**
+
+- **`latch_shadow` + `latch_get_image()` are dead.** `latch_load` caches the
+  shadow byte but the only reader (`latch_get_image`, `static`) is never
+  called, so the cache buys nothing. It exists for the braindump §11.2
+  optimization (a single latch write that de-asserts the previous CS and
+  asserts the next simultaneously), but `latch_select` instead does
+  disable → load → enable every transaction, blanking outputs between reads.
+  That is safe and simple; if we keep it, delete the unused shadow machinery.
+- **`hardware_dma` + `hardware_irq` are linked but unused.** There is no DMA
+  or IRQ code anywhere; core 0 captures IMUs with **blocking** SPI in a
+  `busy_wait`-paced 1 kHz loop. Braindump §11.2's "DMA-driven burst reads →
+  interrupt → process batch" is aspirational, not as-built. Drop the link
+  deps until DMA lands, and note in the braindump that capture is currently
+  polled.
+- **CRSF `link_quality` / `rssi_dbm` are parsed but never read.** Arming uses
+  only link-alive timeout + `rc_health` + battery. Fine to keep for future
+  telemetry/LED use, but nothing consumes them yet.
+- **eRPM telemetry is decoded but not fused.** `dshot_read_telemetry` runs and
+  `rpm` is printed in the status line, but the EKF has no eRPM measurement row
+  (consistent with the 3-state filter). This is expected today; listed so the
+  gap is explicit when the 7-state / eRPM-fusion work starts.
+
+### Firmware not yet started (braindump requires, no code exists)
+
+Called out so the braindump's "firmware requirement" language isn't mistaken
+for as-built:
+
+- **Heading LED strobe** (braindump §11.3b). `PIN_HEAD_LED` is defined in
+  `hw_pins.h` but nothing drives it. The mandated PIO hard pulse-width cap
+  (fire-safety) is unimplemented.
+- **SK9822 status LED + `LED_OE_N` gating** (braindump §11.2). `LATCH_BIT_LED_OE_N`
+  is defined but never asserted; no LED frame is ever clocked.

@@ -22,6 +22,13 @@
 /* Control loop timestep in seconds. Must match the sleep in core 1. */
 #define CONTROL_DT 0.0005f
 
+/* Drift modulation mode selected at BUILD time (there is no runtime toggle
+ * by design). Flip this line to DRIFT_MOD_SQUARE, or configure the build
+ * with -DDRIFT_DEFAULT_MODE=DRIFT_MOD_SQUARE, to ship a square-wave robot. */
+#ifndef DRIFT_DEFAULT_MODE
+#define DRIFT_DEFAULT_MODE DRIFT_MOD_SINUSOIDAL
+#endif
+
 /* Estimator output, published sensor-side to control-side. */
 typedef struct {
     float heading;   /* wrapped heading, rad */

@@ -59,6 +59,8 @@ static void core1_control_loop(void) {
 
     printf("Core 1 ready. Waiting for RC link...\n");
 
+    uint32_t c1_last_us = time_us_32();
+
     while (1) {
         crsf_poll(&rc);
         rc_health_update(rc.channels);
@@ -85,7 +87,13 @@ static void core1_control_loop(void) {
         }
 
         app_estimate_t est = { imu.heading, imu.omega, imu.alpha };
-        app_motors_t m = app_control_tick(&app_cfg, &cmd, &est, CONTROL_DT);
+        /* Measure the real loop period: this core also runs crsf_poll,
+         * DSHOT, and telemetry, so the true dt is longer than the sleep.
+         * The PID integral/derivative need the actual elapsed time. */
+        uint32_t c1_now_us = time_us_32();
+        float c1_dt = (float)(c1_now_us - c1_last_us) * 1e-6f;
+        c1_last_us = c1_now_us;
+        app_motors_t m = app_control_tick(&app_cfg, &cmd, &est, c1_dt);
 
         dshot_set_throttle(&esc1, m.throttle_a);
         dshot_set_throttle(&esc2, m.throttle_b);

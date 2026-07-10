@@ -2,6 +2,7 @@
 
 #include "math/linalg.h"
 #include "estimation/imu_convert.h"
+#include "estimation/accel_cal.h"
 #include "control/pid.h"
 
 /* PID state is module-level runtime state, not config. This keeps the
@@ -23,8 +24,15 @@ app_estimate_t app_sensor_tick(ekf_t *ekf, const imu_sample_t samples[IMU_COUNT]
 app_estimate_t app_sensor_tick_si(ekf_t *ekf, const mat_t *z, float dt) {
     if (dt <= DT_MIN || dt > DT_MAX) dt = CONTROL_DT;
 
+    /* Apply the accelerometer nonlinearity correction before the filter
+     * sees the measurement. No-op until a cal table is loaded; on hardware
+     * this is the H3LIS near-saturation correction that keeps heading from
+     * dead-reckoning off during translation. */
+    mat_t zc = *z;
+    accel_cal_apply(&zc);
+
     ekf_predict(ekf, dt);
-    ekf_update(ekf, z);
+    ekf_update(ekf, &zc);
 
     app_estimate_t est;
     est.heading = ekf_heading_wrapped(ekf);
@@ -36,6 +44,9 @@ app_estimate_t app_sensor_tick_si(ekf_t *ekf, const mat_t *z, float dt) {
 app_motors_t app_control_tick(app_config_t *cfg, const app_command_t *cmd,
                               const app_estimate_t *est, float dt) {
     app_motors_t out;
+
+    /* Guard against a bad measured period (first tick, scheduler hiccup). */
+    if (dt <= DT_MIN || dt > DT_MAX) dt = CONTROL_DT;
 
     if (!cmd->armed) {
         pid_reset(&rpm_pid);
@@ -80,7 +91,7 @@ void app_config_default(app_config_t *cfg) {
     cfg->drift_phase = -0.225f;
     cfg->pid_enabled = false;
     cfg->target_rpm_max = 3000.0f;
-    cfg->mod_mode = DRIFT_MOD_SINUSOIDAL;
+    cfg->mod_mode = DRIFT_DEFAULT_MODE;
     /* Initialize module-level PID with conservative gains. */
     pid_init(&rpm_pid, 0.002f, 0.001f, 0.0f, 0.0f, 1.0f);
 }

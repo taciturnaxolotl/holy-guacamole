@@ -3,6 +3,7 @@
 #include "estimation/ekf.h"
 #include "estimation/meas_model.h"
 #include "estimation/imu_geom.h"
+#include "estimation/accel_cal.h"
 #include "app/control_loop.h"
 #include "plant.h"
 
@@ -144,10 +145,36 @@ static float cruise_heading_drift(uint64_t seed, bool nonlinearity) {
 }
 
 static void scenario_nonlinearity_matters(void) {
+    accel_cal_clear();
     float calibrated = cruise_heading_drift(0xCA11B, false);
     float raw        = cruise_heading_drift(0xCA11B, true);
     ASSERT_TRUE(calibrated < 1.0f);        /* calibrated holds (<~57 deg/3s) */
     ASSERT_TRUE(raw > calibrated + 0.5f);  /* uncorrected is markedly worse */
+}
+
+/* Scenario 4b: wiring accel_cal into the estimation path recovers heading.
+ * With the H3LIS nonlinearity ON, loading the inverse correction curve
+ * (what a bench spin-up sweep would produce) brings heading drift back down
+ * toward the calibrated case -- the whole point of the module. */
+static void scenario_accel_cal_recovers_heading(void) {
+    accel_cal_clear();
+    float uncorrected = cruise_heading_drift(0xACCE1, true);  /* nonlin, no cal */
+
+    /* Inverse of the sim's model: reading *= (1 - k*(g/FS)^2), k=0.05,
+     * FS=400g, so the correction factor is 1/(1 - k*(g/FS)^2). Load it into
+     * both outer H3LIS (IMU-B and IMU-C, which carry the nonlinearity). */
+    for (int i = 0; i <= 4; i++) {
+        float g = (float)i * 100.0f;          /* 0,100,200,300,400 g */
+        float x = g / 400.0f;
+        float f = 1.0f / (1.0f - 0.05f * x * x);
+        accel_cal_add(ACCEL_CAL_IMU_B, g, f);
+        accel_cal_add(ACCEL_CAL_IMU_C, g, f);
+    }
+    float corrected = cruise_heading_drift(0xACCE1, true);   /* nonlin + cal */
+    accel_cal_clear();
+
+    ASSERT_TRUE(corrected < uncorrected);          /* the correction helps */
+    ASSERT_TRUE(corrected < 0.5f * uncorrected);   /* and helps a lot */
 }
 
 /* Scenario 5: at burst overspeed the gyro AND both outer H3LIS radial
@@ -174,6 +201,7 @@ int main(void) {
     RUN_TEST(scenario_cruise_drift);
     RUN_TEST(scenario_wall_skitter);
     RUN_TEST(scenario_nonlinearity_matters);
+    RUN_TEST(scenario_accel_cal_recovers_heading);
     RUN_TEST(scenario_burst_saturation);
     return test_report();
 }
