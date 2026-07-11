@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "jsx": "preserve",
+    "jsxImportSource": "@motion-canvas/2d/lib",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "strict": true,
+    "noImplicitAny": false,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "types": ["vite/client"]
+  },
+  "include": ["src"]
+}
