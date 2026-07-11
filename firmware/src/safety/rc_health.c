@@ -8,7 +8,7 @@ static bool initialized = false;
 
 /* Weighted checksum of channel values. Different weights per channel
  * so that a change in any single channel is detectable even if others
- * are static. From PotatoMelt's approach. */
+ * are static. Taken from PotatoMelt. */
 static uint32_t compute_checksum(const uint16_t channels[16]) {
     return (uint32_t)channels[0] * 64
          + (uint32_t)channels[1] * 16

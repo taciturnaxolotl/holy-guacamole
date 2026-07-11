@@ -17,34 +17,33 @@
 #include "safety/battery.h"
 #include "safety/rc_health.h"
 
-/* rad → degrees for status display. */
+/* rad to degrees for status display. */
 #define RAD_TO_DEG 57.2958f
 
-/* CRSF link timeout in ms (receiver-level failsafe). */
+/* CRSF link timeout. */
 #define CRSF_LINK_TIMEOUT_MS 500
 
-/* Status print interval in ms. */
+/* Status print interval. */
 #define STATUS_PRINT_INTERVAL_MS 100
 
 /* Core 1 control loop sleep in microseconds. Must match CONTROL_DT. */
 #define CONTROL_LOOP_SLEEP_US 500
 
-/* ---- Shared sensor data (core 0 → core 1) ---- */
+/* ---- Shared sensor data (core 0 <-> core 1) ---- */
 
 static imu_packet_t shared_imu;
 static spin_lock_t *imu_lock;
 static app_config_t app_cfg;
 
-/* Unified safety check: all conditions that must be true before motors
- * are allowed to run. Centralizes the arming policy so it can't drift
- * across multiple call sites. */
+/* Kill check: controller must be connected and armed as well as having a
+* healthy battery to run */
 static bool is_safe_to_arm(const crsf_state_t *rc) {
     return crsf_link_alive(rc, CRSF_LINK_TIMEOUT_MS)
         && rc_health_ok()
         && battery_ok();
 }
 
-/* ---- Core 1: Control (owns DSHOT + CRSF) ---- */
+/* ---- Core 1: Control (DSHOT + CRSF) ---- */
 
 static void core1_control_loop(void) {
     if (!dshot_load_program(pio0)) printf("DSHOT PIO program load failed\n");
@@ -120,7 +119,7 @@ static void core1_control_loop(void) {
     }
 }
 
-/* ---- Core 0: Sensor acquisition + EKF (main, owns SPI0 + latch) ---- */
+/* ---- Core 0: Sensor acquisition + EKF (main) ---- */
 
 int main(void) {
     stdio_init_all();
