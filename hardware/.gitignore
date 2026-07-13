@@ -59,7 +59,6 @@ fp-info-cache
 
 # Exported BOM files
 *.xml
-*.csv
 
 # Archived Backups (KiCad 6.0)
 **/*-backups/*.zip
@@ -71,3 +70,5 @@ fp-info-cache
 *.kicad_prl
 
 production
+
+circuit.kicad*
