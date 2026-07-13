@@ -77,11 +77,11 @@ export function* integration(s: Stage) {
     thLine.opacity(1, 0.4), thTag.opacity(1, 0.4), thDot.opacity(1, 0.4),
   );
   yield* all(
-    t(1, 5, linear),
-    robot.rotation(robot.rotation() + 360 * 4, 5, linear),
+    t(1, 8, linear),
+    robot.rotation(robot.rotation() + 360 * 4, 8, linear),
     eq.ref().opacity(1, 1),
   );
-  yield* waitFor(1.4);
+  yield* waitFor(2.5);
 
   // clear the graph, recenter the bot
   yield* all(

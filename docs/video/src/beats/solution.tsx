@@ -129,66 +129,43 @@ export function* solution(s: Stage) {
     yield* all(
       measFill().opacity(0.16, 0.6),
       measLine().opacity(1, 0.6),
-      ampM(AMP, 0.7, easeOutCubic),
+      ampM(AMP, 0.63, easeOutCubic),
     );
-    yield* waitFor(0.9);
+    yield* waitFor(0.8);
 
     // UPDATE: believe both -> sharper belief that sits between them
     yield* all(
       postFill().opacity(0.22, 0.7),
       postLine().opacity(1, 0.7),
-      ampPost(AMP, 0.7, easeOutCubic),
-      ampP(AMP * 0.42, 0.7), predFill().opacity(0.06, 0.7), predLine().opacity(0.3, 0.7),
-      ampM(AMP * 0.42, 0.7), measFill().opacity(0.06, 0.7), measLine().opacity(0.3, 0.7),
-      est.rotation(truth + postMu(), 0.7, easeInOutCubic),
+      ampPost(AMP, 0.63, easeOutCubic),
+      ampP(AMP * 0.42, 0.63), predFill().opacity(0.06, 0.63), predLine().opacity(0.3, 0.63),
+      ampM(AMP * 0.42, 0.63), measFill().opacity(0.06, 0.63), measLine().opacity(0.3, 0.63),
+      est.rotation(truth + postMu(), 0.63, easeInOutCubic),
     );
-    yield* waitFor(1.1);
+    yield* waitFor(1);
 
     // the teal product *becomes* the new blue belief (morph, don't cut)
     const pMu = postMu(), pSig = postSig();
     yield* all(
-      muP(pMu, 0.6, easeInOutCubic),
-      sigP(pSig, 0.6, easeInOutCubic),
-      ampP(AMP, 0.6),
-      predFill().opacity(0.16, 0.6),
-      predLine().opacity(1, 0.6),
-      postFill().opacity(0, 0.5), postLine().opacity(0, 0.5),
-      measFill().opacity(0, 0.5), measLine().opacity(0, 0.5),
-      ampM(0, 0.5),
+      muP(pMu, 0.54, easeInOutCubic),
+      sigP(pSig, 0.54, easeInOutCubic),
+      ampP(AMP, 0.54),
+      predFill().opacity(0.16, 0.54),
+      predLine().opacity(1, 0.54),
+      postFill().opacity(0, 0.45), postLine().opacity(0, 0.45),
+      measFill().opacity(0, 0.45), measLine().opacity(0, 0.45),
+      ampM(0, 0.45),
     );
     ampPost(0);
 
     // PREDICT: time passes and the robot drifts, so the belief spreads again
-    yield* sigP(Math.min(pSig * 1.9, 34), 0.9, easeInOutCubic);
-    yield* waitFor(0.8);
+    yield* sigP(Math.min(pSig * 1.9, 34), 0.8, easeInOutCubic);
+    yield* waitFor(0.7);
   }
 
-  yield* waitFor(2);
+  yield* waitFor(0.3);
 
-  // bring the robot back and let the now-locked estimate track a real spin
-  yield* all(
-    robot.position(0, 1, easeInOutCubic),
-    robot.scale(1, 1, easeInOutCubic),
-    est.position(0, 1, easeInOutCubic),
-    est.scale(1, 1, easeInOutCubic),
-    est.rotation(truth, 0.8, easeInOutCubic),
-    predFill().opacity(0, 0.6),
-    predLine().opacity(0, 0.6),
-    axis().opacity(0, 0.6),
-    truthLine().opacity(0, 0.6),
-    truthTag.ref().opacity(0, 0.6),
-  );
-  yield* all(
-    robot.rotation(robot.rotation() + 360 * 2, 2.4, linear),
-    est.rotation(est.rotation() + 360 * 2, 2.4, linear),
-  );
-
-  // tidy up for the sign-off, keep the robot + heading
-  yield* all(
-    robot.rotation(settleRotation(robot.rotation()), 1, easeInOutCubic),
-    est.rotation(settleRotation(est.rotation()), 1, easeInOutCubic),
-    readout ? readout.opacity(0, 0.8) : waitFor(0),
-  );
+  // end here — no settle, no recenter
   [predFill(), predLine(), measFill(), measLine(), postFill(), postLine(),
     axis(), truthLine(), truthTag.node, readout].forEach(n => n?.remove());
   est.remove();

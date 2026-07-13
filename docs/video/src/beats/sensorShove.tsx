@@ -40,7 +40,7 @@ export function* sensorShove(s: Stage) {
   });
   s.shared.sensors = dots;
   yield* all(...dots.map(d => d.opacity(1, 0.5)));
-  yield* waitFor(0.6);
+  yield* waitFor(5);
 
   // a shove comes in and knocks the whole bot sideways a touch
   const shoveIn = vector([-460, 0], [-190, 0], theme.red, 12);

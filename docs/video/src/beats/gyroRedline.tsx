@@ -1,88 +1,81 @@
-import {Rect, Txt, Line} from '@motion-canvas/2d';
-import {createRef, createSignal, all, waitFor, linear, easeOutCubic} from '@motion-canvas/core';
+import {Circle, Line, Txt} from '@motion-canvas/2d';
+import {createSignal, all, waitFor, linear, easeInOutCubic} from '@motion-canvas/core';
 import {Stage} from '../lib';
 import {theme, fonts} from '../theme';
 
 /**
  * BEAT (script 3) — the gyro redline.
- * As the bot spins up, a gyro's reading races up a meter and slams into its
- * ceiling (~4000 °/s ≈ 660 rpm) while the true spin keeps climbing far past.
- * The gyro is pinned and useless at combat RPM — motivation for using
- * accelerometers instead.
+ * Bot spins on the left; on the right we plot what a gyro *reads* vs the true
+ * spin rate. It tracks the ideal line only until its ceiling (~4000 °/s ≈ 660
+ * rpm), then flatlines while the true spin races on. Pinned and useless at
+ * combat RPM — so we reach for accelerometers instead.
  */
 export function* gyroRedline(s: Stage) {
   const {view, robot} = s;
 
-  // meter geometry (screen space)
-  const W = 940, x0 = -470, y = 300;
-  const gyroFrac = 0.166; // gyro ceiling (~660 rpm) as a fraction of the ~4000 rpm range
+  // plot on the right, matching the other graph beats
+  const x0 = -40, x1 = 780, W = x1 - x0, yb = 300, Htop = 560;
+  const maxRate = 4500, ceiling = 660; // rpm; 660 rpm ≈ 4000 °/s
+  const X = (r: number) => x0 + (r / maxRate) * W;
+  const Y = (r: number) => yb - (Math.min(r, maxRate) / maxRate) * Htop;
+  const p = createSignal(0);
 
-  const rate = createSignal(0); // 0..1 of the displayed spin range
+  const xAxis = (<Line points={[[x0, yb], [x1 + 20, yb]]} stroke={theme.gridLine} lineWidth={3} endArrow arrowSize={12} opacity={0} />) as Line;
+  const yAxis = (<Line points={[[x0, yb], [x0, yb - Htop - 40]]} stroke={theme.gridLine} lineWidth={3} endArrow arrowSize={12} opacity={0} />) as Line;
+  const xLab = (<Txt text={'true spin rate'} fill={theme.grey} fontFamily={fonts.sans} fontSize={30} position={[x1 - 90, yb + 44]} opacity={0} />) as Txt;
+  const yLab = (<Txt text={'gyro reads'} fill={theme.grey} fontFamily={fonts.sans} fontSize={30} position={[x0 + 90, yb - Htop - 50]} opacity={0} />) as Txt;
 
-  const track = (
-    <Rect x={x0} y={y} offset={[-1, 0]} width={W} height={40} radius={20}
-      fill={theme.gridLine} stroke={theme.gridLine} lineWidth={2} opacity={0} />
-  ) as Rect;
-  const trueBar = (
-    <Rect x={x0} y={y} offset={[-1, 0]} width={() => rate() * W} height={40} radius={20}
-      fill={theme.blue} opacity={0} />
-  ) as Rect;
-  const gyroBar = (
-    <Rect x={x0} y={y} offset={[-1, 0]} width={() => Math.min(rate(), gyroFrac) * W} height={40} radius={20}
-      fill={theme.red} opacity={0} />
-  ) as Rect;
-  const redline = (
-    <Line points={[[x0 + gyroFrac * W, y - 44], [x0 + gyroFrac * W, y + 44]]}
-      stroke={theme.red} lineWidth={4} lineDash={[8, 8]} opacity={0} />
-  ) as Line;
+  // faint ideal line (what a perfect sensor would report)
+  const ideal = (<Line points={[[x0, yb], [X(maxRate), Y(maxRate)]]} stroke={theme.gridLine} lineWidth={3} lineDash={[10, 10]} opacity={0} />) as Line;
+  const idealTag = (<Txt text={'ideal'} fill={theme.grey} fontFamily={fonts.sans} fontSize={24} position={[X(maxRate) - 70, Y(maxRate) - 26]} opacity={0} />) as Txt;
 
-  const trueTag = (
-    <Txt text={'true spin rate'} fill={theme.blue} fontFamily={fonts.sans} fontSize={30}
-      x={x0} y={y + 78} offset={[-1, 0]} opacity={0} />
+  // gyro ceiling
+  const ceil = (<Line points={[[x0, Y(ceiling)], [x1, Y(ceiling)]]} stroke={theme.red} lineWidth={3} lineDash={[8, 8]} opacity={0} />) as Line;
+  const ceilTag = (<Txt text={'gyro ceiling  ~4000 °/s'} fill={theme.red} fontFamily={fonts.sans} fontSize={26} position={[x1 - 200, Y(ceiling) - 26]} opacity={0} />) as Txt;
+
+  // gyro reading curve: tracks the ideal, then clips flat at the ceiling
+  const gyroPts = () => {
+    const maxR = p() * maxRate;
+    const pts: [number, number][] = [];
+    for (let r = 0; r <= maxR; r += 40) pts.push([X(r), Y(Math.min(r, ceiling))]);
+    pts.push([X(maxR), Y(Math.min(maxR, ceiling))]);
+    return pts;
+  };
+  const gyro = (<Line points={gyroPts} stroke={theme.blue} lineWidth={6} opacity={0} />) as Line;
+  const dot = (<Circle size={20} fill={theme.yellow} position={() => [X(p() * maxRate), Y(Math.min(p() * maxRate, ceiling))]} opacity={0} />) as Circle;
+  const readout = (
+    <Txt text={() => `${Math.round(p() * maxRate)} rpm   ·   gyro ${Math.round(Math.min(p() * maxRate, ceiling) * 6)} °/s`}
+      fill={theme.white} fontFamily={fonts.sans} fontSize={34} position={[(x0 + x1) / 2, yb - Htop - 90]} opacity={0} />
   ) as Txt;
-  const gyroTag = (
-    <Txt text={'gyro maxes out'} fill={theme.red} fontFamily={fonts.sans} fontSize={30}
-      x={x0 + gyroFrac * W} y={y - 74} opacity={0} />
-  ) as Txt;
-  const rpm = (
-    <Txt text={() => `${Math.round(rate() * 4000)} rpm`} fill={theme.white} fontFamily={fonts.sans}
-      fontSize={44} y={y - 150} opacity={0} />
-  ) as Txt;
 
-  view.add(track); view.add(trueBar); view.add(gyroBar);
-  view.add(redline); view.add(trueTag); view.add(gyroTag); view.add(rpm);
+  const items = [xAxis, yAxis, xLab, yLab, ideal, idealTag, ceil, ceilTag, gyro, dot, readout];
+  items.forEach(n => view.add(n));
 
-  // bring the meter up
+  // bot left, axes + reference lines up
   yield* all(
-    robot.position([0, -180], 0.8, easeOutCubic),
-    track.opacity(1, 0.5),
-    trueBar.opacity(1, 0.5),
-    gyroBar.opacity(1, 0.5),
-    redline.opacity(1, 0.5),
-    rpm.opacity(1, 0.5),
+    robot.position([-640, 0], 0.9, easeInOutCubic),
+    robot.scale(0.85, 0.9, easeInOutCubic),
+    xAxis.opacity(1, 0.5), yAxis.opacity(1, 0.5),
+    xLab.opacity(1, 0.5), yLab.opacity(1, 0.5),
+  );
+  yield* all(
+    ideal.opacity(0.9, 0.5), idealTag.opacity(1, 0.5),
+    ceil.opacity(1, 0.5), ceilTag.opacity(1, 0.5),
   );
 
-  // spin up: the bar climbs, the gyro pins at the redline while true keeps going
+  // sweep the spin up: gyro tracks, then pins at the ceiling as true races on
+  yield* all(gyro.opacity(1, 0.4), dot.opacity(1, 0.4), readout.opacity(1, 0.4));
   yield* all(
-    rate(gyroFrac, 1, linear),
-    robot.rotation(robot.rotation() + 360 * 2, 1, linear),
-    gyroTag.opacity(1, 0.5),
+    p(1, 4.5, linear),
+    robot.rotation(robot.rotation() + 360 * 9, 4.5, linear),
   );
-  // gyro is now clipped — flash the redline as the true rate races ahead
-  yield* all(
-    rate(1, 2.5, linear),
-    robot.rotation(robot.rotation() + 360 * 10, 2.5, linear),
-    trueTag.opacity(1, 0.5),
-    redline.lineWidth(7, 0.25).to(4, 0.25).to(7, 0.25).to(4, 0.25),
-  );
-  yield* waitFor(1.2);
+  yield* waitFor(1.4);
 
-  // clear the meter, settle the bot for the accelerometer explanation
+  // clear the graph and recenter the bot for the accelerometer beat
   yield* all(
-    robot.position(0, 1, easeOutCubic),
-    track.opacity(0, 0.6), trueBar.opacity(0, 0.6), gyroBar.opacity(0, 0.6),
-    redline.opacity(0, 0.6), trueTag.opacity(0, 0.6), gyroTag.opacity(0, 0.6),
-    rpm.opacity(0, 0.6),
+    robot.position(0, 0.9, easeInOutCubic),
+    robot.scale(1, 0.9, easeInOutCubic),
+    ...items.map(n => n.opacity(0, 0.6)),
   );
-  [track, trueBar, gyroBar, redline, trueTag, gyroTag, rpm].forEach(n => n.remove());
+  items.forEach(n => n.remove());
 }

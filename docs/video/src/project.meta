@@ -1,7 +1,7 @@
 {
   "version": 0,
   "shared": {
-    "background": null,
+    "background": "rgba(0,0,0,0)",
     "range": [
       0,
       null
@@ -13,11 +13,11 @@
     "audioOffset": 0
   },
   "preview": {
-    "fps": 30,
+    "fps": 24,
     "resolutionScale": 1
   },
   "rendering": {
-    "fps": 60,
+    "fps": 24,
     "resolutionScale": 1,
     "colorSpace": "srgb",
     "exporter": {

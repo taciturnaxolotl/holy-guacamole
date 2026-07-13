@@ -36,15 +36,15 @@ export function* translation(s: Stage) {
 		world.add(pulse.node);
 
 		// first the kick arrow extends...
-		yield* pulse.ref().end(1, 0.25);
-		yield* waitFor(0.3);
-		// ...then the spin and the drift happen together, over its length
+		yield* pulse.ref().end(1, 0.3);
+		yield* waitFor(0.4);
+		// ...then drift first, then spin — so the nudge reads clearly before the turn
 		yield* all(
-			robot.rotation(robot.rotation() + 360, 0.7, linear),
-			robot.position.x(at.x + step, 0.7, easeInOutCubic),
+			robot.position.x(at.x + step, 0.5, easeInOutCubic),
 			dot.opacity(0.75, 0.2),
-			pulse.ref().opacity(0, 0.5),
+			pulse.ref().opacity(0, 0.4),
 		);
+		yield* robot.rotation(robot.rotation() + 360, 0.8, linear);
 		pulse.node.remove();
 	}
 

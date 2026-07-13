@@ -19,9 +19,8 @@ export function* problem(s: Stage) {
 
 	yield* head.ref().end(1, 0.8);
 
-	// let the front sweep around to sell the ambiguity (one more, faster rev)
-	yield* robot.rotation(robot.rotation() + 360 * 3, 2.6, easeInOutSine);
-	yield* waitFor(0.3);
+	// let the front sweep around to sell the ambiguity (faster)
+	yield* robot.rotation(robot.rotation() + 360 * 3, 1.6, easeInOutSine);
 
-	yield* robot.rotation(settleRotation(robot.rotation()), 1, easeInOutCubic);
+	yield* robot.rotation(settleRotation(robot.rotation()), 0.5, easeInOutCubic);
 }

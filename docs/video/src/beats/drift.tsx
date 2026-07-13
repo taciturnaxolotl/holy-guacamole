@@ -51,5 +51,9 @@ export function* drift(s: Stage) {
 
   // settle spin, keep the gap on screen for the fix
   yield* robot.rotation(settleRotation(robot.rotation()), 1, easeInOutCubic);
+
+  // hold on the drifted bot before introducing the sensor dots
+  yield* waitFor(7.5);
+
   s.shared.readout = readout;
 }
