@@ -1,6 +1,6 @@
 # The great journey of the one and only Holy Guacamole 🥑
 
-**Running hour counter:** 78h
+**Running hour counter:** 83h
 
 Okay this is a wee bit out of order bc I didn't start writing all of this down into after I realized I could do this for Outpost but from screenshots and git time stamps and my memory this is the best recontruction of the process up till now.
 
@@ -153,10 +153,20 @@ I'm also still shocked at how much time I keep etching out of the day for this. 
 
 ![the pcb after extension](https://cdn.hackclub.com/019f449f-434b-725f-80b1-6ce91843d4cf/image.png)
 
-### Day 20: June 9th 15m
+### Day 20: June 9th [15m]
 
 Wasn't able to do much today just confirmed the replacement of my inductor bc I grabbed the wrong lcsc part # :facepalm: Thankfully JLC was nice about it and I could just replace the part with one that fit the correct footprint. Tried to do some onshape stuff and submit the outpost forms but slow internet made that extremely painful.
 
-### Day 21: June 10th 3h
+### Day 21: June 10th [3h]
 
 Today was mostly spent in the car so i worked on the firmware and got it reflecting the real world sensors much more closely. The physics model in the sim is now much more accurate and rebounds work correctly. Also was able to fix several things with the accelerometer code that was manifesting in the sim! I'm hoping that the sim will help catch all / most of the bugs if possible but who knows. I'm really hoping that the wrong part # didn't delay JLC too too long.
+
+### Day 22: June 11th [5h]
+
+Today was mostly a ton of work on the explainer video in motion canvas. I got the video and script most of the way to where I wanted it and also started some editing in davinci after filming the intro sequences. Recorded the voiceovers and worked on the script for absolutely ages.
+
+![motion canvas](https://cdn.hackclub.com/019f590a-be14-717e-9a3a-1c10f228226e/image.png)
+
+### Day 23: June 12th [10h]
+
+Worked on finishing out the voiceovers for the first few hours and then finished editing the explainer bit of the video and started working on refining the last bits of the mounting cad. Was able to finish that and start printing the body of the bot after agonizing on how to cut down on weight in the slicer. I also was able to figure out a way to possibly get the pcb in time. I'm going to order the pcb from oshpark and get a stencil from oshcut and then assemble the parts myself. Hopefully it will be a tiny bit faster and everything should arrive in time.
