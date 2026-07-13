@@ -19,14 +19,15 @@ $8.89,Mini power switch 40a,palm beach bots,yes
 $1.50,Power Distribution Board,palm beach bots,yes
 $8.99,ELRS Lite Receiver,betafpv,yes
 $9.74,Toothies AR550 steel,sendcutsend,yes
+$141.80,pcb,oshpark,yes
+$73.51,stencil + solder paste,oshstencils,yes
+,,,
+,,,
+$481.59,,,
+,,,
 ,,,
 extra parts (not in bom cost),,,
-$14.99,1kg Inland green PLA+ (not included in bom costs),microcenter,yes
-$549.00,PCB (double sided assembly + quick shipping) (not included in bom costs),jlc,yes
-,,,
-$266.28,,,
-,,,
-,,,
-alternative parts,,,
 price,link,seller,purchased
+$14.99,1kg Inland green PLA+ (not included in bom costs),microcenter,yes
+$549.00,PCB (double sided assembly + quick shipping) (refunded) ,jlc,refund
 $25.98,2 pcs 20a esc blheli_s,palm beach bots,yes
