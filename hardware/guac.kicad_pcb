@@ -7,6 +7,12 @@
 		(legacy_teardrops no)
 	)
 	(paper "A4")
+	(title_block
+		(title "Holy Guacamole")
+		(date "2026-07-12")
+		(rev "1.4b")
+		(company "Kieran Klukas")
+	)
 	(layers
 		(0 "F.Cu" signal)
 		(4 "In1.Cu" signal)
@@ -104749,8 +104755,21 @@
 			(justify left bottom)
 		)
 	)
+	(gr_text "v1.4b"
+		(at 116.25 130.25 0)
+		(layer "F.SilkS")
+		(uuid "8ec27ff7-3f83-4c5b-98ee-5482a7d8b3c5")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.25)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+	)
 	(gr_text "Holy Guacamole"
-		(at 104.75 128.5 0)
+		(at 104.5 128 0)
 		(layer "F.SilkS")
 		(uuid "5d62b60c-b2b5-49fc-8c62-b1f3c945e135")
 		(effects
@@ -104796,18 +104815,6 @@
 			)
 			(justify left bottom mirror)
 		)
-	)
-	(barcode
-		(at 112.927175 116.177175 0)
-		(layer "B.SilkS")
-		(size 15.85435 15.85435)
-		(text "https://dunkirk.sh")
-		(text_height 1)
-		(type qr)
-		(ecc_level L)
-		(hide yes)
-		(knockout no)
-		(uuid "619d36a7-c642-4c0d-8519-b18c0d0ca7de")
 	)
 	(segment
 		(start 104.268898 115.88)

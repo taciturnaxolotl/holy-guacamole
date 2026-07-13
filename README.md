@@ -1,6 +1,6 @@
 # Holy Guacamole 🥑
 
-![the assembled cad](https://cdn.hackclub.com/019f449d-78e3-78e4-af4e-bd14387be11f/edited-image__2_.png)
+![the assembled cad](https://cdn.hackclub.com/019f58d4-a10e-7756-9e08-dc0abd3956e4/edited-image.png)
 
 This is a meltybrain style combat robot that's main weapon is simply its own spinning kinect energy. The BOM is on a google sheet [here](https://docs.google.com/spreadsheets/d/1paAJ0Wakvn5M726pM15FUGLVGKdC47_Wt41PN1yA9PQ/edit?gid=0#gid=0) and the CAD is done in onshape and available [here](https://cad.onshape.com/documents/a046eeb92ff2319e557090a2/w/6774deed54414bae93c63cc1/e/4d0675cbf797ff5c6c8f60bb?renderMode=0&uiState=6a4b13893c4a31ee1cf2e4f3)
 
