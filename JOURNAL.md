@@ -1,6 +1,6 @@
 # The great journey of the one and only Holy Guacamole 🥑
 
-**Running hour counter:** 83h
+**Running hour counter:** 93h
 
 Okay this is a wee bit out of order bc I didn't start writing all of this down into after I realized I could do this for Outpost but from screenshots and git time stamps and my memory this is the best recontruction of the process up till now.
 
