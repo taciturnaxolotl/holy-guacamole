@@ -7,36 +7,32 @@
 #include "hardware/pio.h"
 
 #include "hw_pins.h"
-#include "imu_packet.h"
+#include "estimation/heading_estimate.h"
 #include "dshot/dshot.h"
-#include "imu/imu_spi.h"
 #include "crsf/crsf.h"
-#include "estimation/ekf.h"
+#include "sensor/sensor_dispatch.h"
 #include "app/control_loop.h"
 #include "safety/watchdog.h"
 #include "safety/battery.h"
 #include "safety/rc_health.h"
 
-/* rad to degrees for status display. */
 #define RAD_TO_DEG 57.2958f
-
-/* CRSF link timeout. */
 #define CRSF_LINK_TIMEOUT_MS 500
-
-/* Status print interval. */
 #define STATUS_PRINT_INTERVAL_MS 100
-
-/* Core 1 control loop sleep in microseconds. Must match CONTROL_DT. */
 #define CONTROL_LOOP_SLEEP_US 500
 
-/* ---- Shared sensor data (core 0 <-> core 1) ---- */
+/* ---- Shared estimate (core 0 → core 1) ---- */
 
-static imu_packet_t shared_imu;
-static spin_lock_t *imu_lock;
+typedef struct {
+    heading_estimate_t est;
+    uint32_t timestamp_us;
+    volatile bool ready;
+} shared_estimate_t;
+
+static shared_estimate_t shared_est;
+static spin_lock_t *est_lock;
 static app_config_t app_cfg;
 
-/* Kill check: controller must be connected and armed as well as having a
-* healthy battery to run */
 static bool is_safe_to_arm(const crsf_state_t *rc) {
     return crsf_link_alive(rc, CRSF_LINK_TIMEOUT_MS)
         && rc_health_ok()
@@ -56,7 +52,7 @@ static void core1_control_loop(void) {
     rc_health_init();
     crsf_state_t rc = {0};
 
-    printf("Core 1 ready. Waiting for RC link...\n");
+    printf("Core 1 ready [%s]. Waiting for RC link...\n", sensor_primary.name);
 
     uint32_t c1_last_us = time_us_32();
 
@@ -64,11 +60,14 @@ static void core1_control_loop(void) {
         crsf_poll(&rc);
         rc_health_update(rc.channels);
 
-        imu_packet_t imu;
-        uint32_t irq = spin_lock_blocking(imu_lock);
-        imu = shared_imu;
-        shared_imu.ready = false;
-        spin_unlock(imu_lock, irq);
+        /* Read latest estimate from core 0. */
+        heading_estimate_t est = {0};
+        uint32_t irq = spin_lock_blocking(est_lock);
+        if (shared_est.ready) {
+            est = shared_est.est;
+            shared_est.ready = false;
+        }
+        spin_unlock(est_lock, irq);
 
         app_command_t cmd = {0};
         cmd.armed = is_safe_to_arm(&rc);
@@ -85,10 +84,6 @@ static void core1_control_loop(void) {
                           (float)(CRSF_CH_MAX - CRSF_CH_MID);
         }
 
-        app_estimate_t est = { imu.heading, imu.omega, imu.alpha };
-        /* Measure the real loop period: this core also runs crsf_poll,
-         * DSHOT, and telemetry, so the true dt is longer than the sleep.
-         * The PID integral/derivative need the actual elapsed time. */
         uint32_t c1_now_us = time_us_32();
         float c1_dt = (float)(c1_now_us - c1_last_us) * 1e-6f;
         c1_last_us = c1_now_us;
@@ -105,7 +100,7 @@ static void core1_control_loop(void) {
         if (now - last_print > STATUS_PRINT_INTERVAL_MS) {
             last_print = now;
             printf("hdg=%6.1f° w=%7.1f RPM=%lu/%lu a/b=%.2f/%.2f %s%s%s\n",
-                   (double)(imu.heading * RAD_TO_DEG), (double)imu.omega,
+                   (double)(est.heading * RAD_TO_DEG), (double)est.omega,
                    (unsigned long)esc1.telemetry.rpm,
                    (unsigned long)esc2.telemetry.rpm,
                    (double)m.throttle_a, (double)m.throttle_b,
@@ -119,53 +114,50 @@ static void core1_control_loop(void) {
     }
 }
 
-/* ---- Core 0: Sensor acquisition + EKF (main) ---- */
+/* ---- Core 0: Sensor acquisition (main) ---- */
 
 int main(void) {
     stdio_init_all();
-    printf("Holy Guacamole firmware starting...\n");
+    printf("Holy Guacamole firmware starting [%s]...\n", sensor_primary.name);
 
     app_config_default(&app_cfg);
 
     int lock_num = spin_lock_claim_unused(true);
-    imu_lock = spin_lock_instance(lock_num);
+    est_lock = spin_lock_instance(lock_num);
 
     battery_init();
 
-    if (!imu_init()) {
-        printf("IMU init failed\n");
+    /* Primary sensor must init first (owns EKF in fusion mode). */
+    if (!sensor_primary.init()) {
+        printf("%s init failed\n", sensor_primary.name);
         while (1) tight_loop_contents();
     }
 
-    ekf_t ekf;
-    ekf_init(&ekf, 0.0f);
+    /* Auxiliary sensor (e.g., RSSI fusion into IMU EKF). */
+    if (sensor_aux) {
+        if (!sensor_aux->init())
+            printf("%s aux init failed (continuing without)\n", sensor_aux->name);
+        else
+            printf("Aux sensor: %s\n", sensor_aux->name);
+    }
 
-    /* 2-second watchdog: either core hanging triggers a reset. */
     watchdog_start(2000);
-
     multicore_launch_core1(core1_control_loop);
 
-    imu_sample_t samples[IMU_COUNT];
     uint32_t last_us = time_us_32();
 
     while (1) {
         uint32_t t = time_us_32();
+        float dt = (float)(t - last_us) * 1e-6f;
+        last_us = t;
 
-        if (imu_read_all(samples)) {
-            float dt = (float)(t - last_us) * 1e-6f;
-            last_us = t;
+        heading_estimate_t est = sensor_primary.tick(dt);
 
-            app_estimate_t est = app_sensor_tick(&ekf, samples, dt);
-
-            uint32_t irq = spin_lock_blocking(imu_lock);
-            memcpy(shared_imu.samples, samples, sizeof(samples));
-            shared_imu.heading = est.heading;
-            shared_imu.omega = est.omega;
-            shared_imu.alpha = est.alpha;
-            shared_imu.timestamp_us = t;
-            shared_imu.ready = true;
-            spin_unlock(imu_lock, irq);
-        }
+        uint32_t irq = spin_lock_blocking(est_lock);
+        shared_est.est = est;
+        shared_est.timestamp_us = t;
+        shared_est.ready = true;
+        spin_unlock(est_lock, irq);
 
         battery_sample();
         watchdog_feed();

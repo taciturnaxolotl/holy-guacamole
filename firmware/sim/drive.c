@@ -54,7 +54,7 @@ int main(void) {
 
     float base = 0.0f;
     double accumulator = 0.0;
-    app_estimate_t est = {0};
+    heading_estimate_t est = {0};
     app_motors_t motors = {0};
 
     /* Heading-strobe state: emulates the real robot's heading LED, which

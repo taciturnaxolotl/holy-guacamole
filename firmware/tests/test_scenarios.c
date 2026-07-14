@@ -21,7 +21,7 @@
 #define RPM(w) ((w) * 60.0f / (2.0f * (float)M_PI))
 
 /* One closed-loop tick: sense -> estimate -> control -> actuate. */
-static app_estimate_t g_est;
+static heading_estimate_t g_est;
 static void tick(plant_t *p, ekf_t *e, app_config_t *cfg, app_command_t *cmd) {
     mat_t z;
     plant_read_imu(p, &z, DT);

@@ -12,9 +12,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "estimation/heading_estimate.h"
+#include "control/drift.h"
+
+#if defined(SENSOR_SOURCE_IMU_EKF)
 #include "imu/imu_spi.h"
 #include "estimation/ekf.h"
-#include "control/drift.h"
+#endif
 
 /* rad/s → RPM conversion factor. */
 #define RAD_S_TO_RPM 9.5493f
@@ -28,13 +32,6 @@
 #ifndef DRIFT_DEFAULT_MODE
 #define DRIFT_DEFAULT_MODE DRIFT_MOD_SINUSOIDAL
 #endif
-
-/* Estimator output, published sensor-side to control-side. */
-typedef struct {
-    float heading;   /* wrapped heading, rad */
-    float omega;     /* rad/s */
-    float alpha;     /* rad/s^2 */
-} app_estimate_t;
 
 /* RC command inputs, normalized. */
 typedef struct {
@@ -67,21 +64,23 @@ typedef struct {
     drift_mod_t mod_mode;     /* DRIFT_MOD_SINUSOIDAL or DRIFT_MOD_SQUARE */
 } app_config_t;
 
+#if defined(SENSOR_SOURCE_IMU_EKF)
 /* Sensor-side tick: run the EKF on one IMU sample set over dt seconds
  * and return the current estimate. */
-app_estimate_t app_sensor_tick(ekf_t *ekf, const imu_sample_t samples[IMU_COUNT],
+heading_estimate_t app_sensor_tick(ekf_t *ekf, const imu_sample_t samples[IMU_COUNT],
                                float dt);
 
 /* Sensor-side core operating directly on an SI measurement vector
  * (m/s^2, rad/s). app_sensor_tick calls this after raw-count conversion;
  * the SITL sim calls it directly, so both run the identical EKF path. */
-app_estimate_t app_sensor_tick_si(ekf_t *ekf, const mat_t *z, float dt);
+heading_estimate_t app_sensor_tick_si(ekf_t *ekf, const mat_t *z, float dt);
+#endif
 
 /* Control-side tick: turn RC command + latest estimate into motor
  * throttles using the drift controller. dt is the time since last call
  * (for PID integration). */
 app_motors_t app_control_tick(app_config_t *cfg, const app_command_t *cmd,
-                              const app_estimate_t *est, float dt);
+                              const heading_estimate_t *est, float dt);
 
 /* Reset PID state (e.g., on disarm or mode change). */
 void app_pid_reset(void);

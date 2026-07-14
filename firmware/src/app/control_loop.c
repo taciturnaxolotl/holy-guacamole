@@ -1,9 +1,12 @@
 #include "control_loop.h"
 
 #include "math/linalg.h"
+#include "control/pid.h"
+
+#if defined(SENSOR_SOURCE_IMU_EKF)
 #include "estimation/imu_convert.h"
 #include "estimation/accel_cal.h"
-#include "control/pid.h"
+#endif
 
 /* PID state is module-level runtime state, not config. This keeps the
  * shared config struct clean (serializable, no mutable state) and
@@ -14,35 +17,33 @@ static pid_t rpm_pid;
 #define DT_MIN 0.0f
 #define DT_MAX 0.1f
 
-app_estimate_t app_sensor_tick(ekf_t *ekf, const imu_sample_t samples[IMU_COUNT],
+#if defined(SENSOR_SOURCE_IMU_EKF)
+heading_estimate_t app_sensor_tick(ekf_t *ekf, const imu_sample_t samples[IMU_COUNT],
                                float dt) {
     mat_t z;
     imu_samples_to_meas(samples, &z);
     return app_sensor_tick_si(ekf, &z, dt);
 }
 
-app_estimate_t app_sensor_tick_si(ekf_t *ekf, const mat_t *z, float dt) {
+heading_estimate_t app_sensor_tick_si(ekf_t *ekf, const mat_t *z, float dt) {
     if (dt <= DT_MIN || dt > DT_MAX) dt = CONTROL_DT;
 
-    /* Apply the accelerometer nonlinearity correction before the filter
-     * sees the measurement. No-op until a cal table is loaded; on hardware
-     * this is the H3LIS near-saturation correction that keeps heading from
-     * dead-reckoning off during translation. */
     mat_t zc = *z;
     accel_cal_apply(&zc);
 
     ekf_predict(ekf, dt);
     ekf_update(ekf, &zc);
 
-    app_estimate_t est;
+    heading_estimate_t est;
     est.heading = ekf_heading_wrapped(ekf);
     est.omega = ekf_omega(ekf);
     est.alpha = ekf_alpha(ekf);
     return est;
 }
+#endif
 
 app_motors_t app_control_tick(app_config_t *cfg, const app_command_t *cmd,
-                              const app_estimate_t *est, float dt) {
+                              const heading_estimate_t *est, float dt) {
     app_motors_t out;
 
     /* Guard against a bad measured period (first tick, scheduler hiccup). */

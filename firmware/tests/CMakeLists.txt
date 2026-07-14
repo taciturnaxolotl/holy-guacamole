@@ -56,6 +56,7 @@ add_hg_test(test_rssi_pipeline ${RSSI_SRCS} ${EKF_SRCS})
 
 # Closed-loop digital-twin scenarios: plant + the real app_ estimator and
 # controller, run headless with assertions on emergent behaviour.
+# These tests exercise the IMU+EKF path, so define SENSOR_SOURCE_IMU_EKF.
 add_hg_test(test_scenarios
     ${EKF_SRCS}
     ${RSSI_SRCS}
@@ -67,3 +68,4 @@ add_hg_test(test_scenarios
     ${SRC_DIR}/control/pid.c
     ${SRC_DIR}/app/control_loop.c
 )
+target_compile_definitions(test_scenarios PRIVATE SENSOR_SOURCE_IMU_EKF)
