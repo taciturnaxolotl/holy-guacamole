@@ -92,6 +92,5 @@ void app_config_default(app_config_t *cfg) {
     cfg->pid_enabled = false;
     cfg->target_rpm_max = 3000.0f;
     cfg->mod_mode = DRIFT_DEFAULT_MODE;
-    /* Initialize module-level PID with conservative gains. */
     pid_init(&rpm_pid, 0.002f, 0.001f, 0.0f, 0.0f, 1.0f);
 }

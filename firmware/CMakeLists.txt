@@ -24,6 +24,10 @@ add_executable(holy_guacamole
     src/estimation/ekf.c
     src/estimation/imu_convert.c
     src/estimation/accel_cal.c
+    src/estimation/edge_pll.c
+    src/estimation/rssi_interp.c
+    src/estimation/autocorr.c
+    src/estimation/rssi_heading.c
     src/control/drift.c
     src/control/pid.c
     src/app/control_loop.c

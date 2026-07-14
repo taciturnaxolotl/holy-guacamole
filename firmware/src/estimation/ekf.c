@@ -136,3 +136,56 @@ float ekf_alpha(const ekf_t *e) { return mat_get(&e->x, ST_ALPHA, 0); }
 float ekf_heading_wrapped(const ekf_t *e) {
     return wrap_0_2pi(ekf_theta(e));
 }
+
+void ekf_update_heading(ekf_t *e, float theta_meas, float r_theta) {
+    /* Scalar measurement: z = theta_meas, h(x) = x[ST_THETA].
+     * H = [1, 0, 0], so this simplifies to a 1D Kalman update
+     * on the theta state. We still use Joseph form for robustness. */
+    float theta = mat_get(&e->x, ST_THETA, 0);
+
+    /* Innovation with angle wrapping. */
+    float y = theta_meas - theta;
+    float two_pi = 2.0f * (float)M_PI;
+    while (y > (float)M_PI)  y -= two_pi;
+    while (y < -(float)M_PI) y += two_pi;
+
+    /* S = P[0,0] + R */
+    float p_tt = mat_get(&e->P, ST_THETA, ST_THETA);
+    float s = p_tt + r_theta;
+    if (s < 1e-12f) return;
+
+    /* K = P[:,0] / S (column vector). */
+    float k[ST_DIM];
+    for (int i = 0; i < ST_DIM; i++)
+        k[i] = mat_get(&e->P, i, ST_THETA) / s;
+
+    /* x += K * y */
+    for (int i = 0; i < ST_DIM; i++)
+        mat_set(&e->x, i, 0, mat_get(&e->x, i, 0) + k[i] * y);
+
+    /* Wrap theta back into [0, 2*pi). */
+    mat_set(&e->x, ST_THETA, 0,
+            wrap_0_2pi(mat_get(&e->x, ST_THETA, 0)));
+
+    /* Joseph form: P = (I - KH) P (I - KH)^T + K R K^T
+     * With H = [1,0,0], (I-KH) is identity minus first column scaled by k. */
+    mat_t ImKH;
+    mat_identity(&ImKH, ST_DIM);
+    for (int i = 0; i < ST_DIM; i++)
+        mat_set(&ImKH, i, ST_THETA,
+                mat_get(&ImKH, i, ST_THETA) - k[i]);
+
+    mat_t tmp, term1;
+    mat_mul(&tmp, &ImKH, &e->P);
+    mat_mul_transpose(&term1, &tmp, &ImKH);
+
+    /* K R K^T */
+    mat_t term2;
+    mat_zero(&term2, ST_DIM, ST_DIM);
+    for (int i = 0; i < ST_DIM; i++)
+        for (int j = 0; j < ST_DIM; j++)
+            mat_set(&term2, i, j, k[i] * r_theta * k[j]);
+
+    mat_add(&e->P, &term1, &term2);
+    mat_symmetrize(&e->P);
+}

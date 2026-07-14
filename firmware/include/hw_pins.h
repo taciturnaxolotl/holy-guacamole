@@ -41,6 +41,7 @@
 /* Heading LED MOSFET gate */
 #define PIN_HEAD_LED  41  /* XIAO A1/D1/GPIO41 */
 
-/* SWD debug */
-#define PIN_SWDIO     23
-#define PIN_SWDCK     24
+/* SWD debug (repurposed for ESP32 UART in first-rev bodge;
+ * SWD not used in production. Heading LED GPIO41 is DNP.) */
+#define PIN_SWDIO     23   /* ESP32 TX -> RP2350 RX */
+#define PIN_SWDCK     24   /* ESP32 RX -> RP2350 TX */
