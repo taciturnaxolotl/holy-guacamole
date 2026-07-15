@@ -170,3 +170,15 @@ Today was mostly a ton of work on the explainer video in motion canvas. I got th
 ### Day 23: June 12th [10h]
 
 Worked on finishing out the voiceovers for the first few hours and then finished editing the explainer bit of the video and started working on refining the last bits of the mounting cad. Was able to finish that and start printing the body of the bot after agonizing on how to cut down on weight in the slicer. I also was able to figure out a way to possibly get the pcb in time. I'm going to order the pcb from oshpark and get a stencil from oshcut and then assemble the parts myself. Hopefully it will be a tiny bit faster and everything should arrive in time.
+
+### Day 24: June 13th [4h]
+
+After waking up I had a bad feeling about the parts available so I double checked the availability and the LSM accelerometer and my buck convertor were out of stock as well as my inductor. I had already submitted the order to oshpark last night so I made a mad dash to get all the parts changed over and update the pcb. Thankfully oshpark is lovely and you can update your design files as long as it stays the same boundary size. I had a ton of issues with mouser just flat out not letting me check out but after letting it sit for a few hours it worked and I was able to get a new buck convertor and the accelerometer from them and the rest of the parts from digikey!
+
+### Day 25: June 14th [6h]
+
+Today was mostly just wheels wheels wheels. I worked on the hub design which went through at least 8 different prints. Turns out cutting eva foam is a nightmare but I eventually settled on just using a hole saw and then drilling out the center with the largest drill bit I had. I had a ton of trouble fitting my hubs on but eventually decided on a design that runs 3 m2 screw directly through the hubs into the motors which hopefully should be pretty strong. I need to coat the wheel tomorrow after my screws arrive.
+
+I also did a bunch of looking into a concept for detecting rotation using the antenna deadzone on an esp32 from [Trevor](https://github.com/TGower/rotation_sensing). It's a brilliant idea that blast esp now packets at a esp on the bot and when the bot spins there is a drop in rssi right as it passes the antenna deadzone. You can fit a little PLL to it and you have rotation! It's a brilliant idea and one I definetly want to steel for my full bot and even more importantly in the case that my pcb doesn't arrive in time it would still let me drive my bot.
+
+![wheels in the hole saw](https://cdn.hackclub.com/019f6703-8899-7a2d-946f-a3681dfe5261/image.png)
