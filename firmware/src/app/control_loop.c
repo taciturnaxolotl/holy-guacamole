@@ -46,24 +46,51 @@ app_motors_t app_control_tick(app_config_t *cfg, const app_command_t *cmd,
                               const heading_estimate_t *est, float dt) {
     app_motors_t out;
 
-    /* Guard against a bad measured period (first tick, scheduler hiccup). */
     if (dt <= DT_MIN || dt > DT_MAX) dt = CONTROL_DT;
 
-    if (!cmd->armed) {
+    /* Mode gate: STOP = all motors off regardless of anything else. */
+    if (!cmd->armed || cmd->mode == DRIVE_MODE_STOP) {
         pid_reset(&rpm_pid);
         out.throttle_a = 0.0f;
         out.throttle_b = 0.0f;
         return out;
     }
 
-    /* Compute base throttle: either PID-regulated or direct from stick. */
-    float base = cmd->base;
-    if (cfg->pid_enabled) {
-        float target_rpm = cmd->base * cfg->target_rpm_max;
-        float current_rpm = est->omega * RAD_S_TO_RPM;
-        base = pid_compute(&rpm_pid, target_rpm, current_rpm, dt);
+    /* Determine target RPM from discrete speed level or attack button. */
+    float target_rpm = 0.0f;
+    if (cmd->attack) {
+        target_rpm = cfg->rpm_attack;
+    } else {
+        switch (cmd->speed) {
+            case SPEED_LOW:  target_rpm = cfg->rpm_low;  break;
+            case SPEED_MED:  target_rpm = cfg->rpm_med;  break;
+            case SPEED_HIGH: target_rpm = cfg->rpm_high; break;
+            case SPEED_OFF:
+            default:         target_rpm = 0.0f;          break;
+        }
     }
 
+    /* If no speed target, fall back to analog base throttle. */
+    float base;
+    if (target_rpm > 0.0f && cfg->pid_enabled) {
+        float current_rpm = est->omega * RAD_S_TO_RPM;
+        base = pid_compute(&rpm_pid, target_rpm, current_rpm, dt);
+    } else if (target_rpm > 0.0f) {
+        /* PID disabled but speed level set: map level to fixed throttle. */
+        base = target_rpm / cfg->target_rpm_max;
+        if (base > 1.0f) base = 1.0f;
+    } else {
+        base = cmd->base;
+    }
+
+    /* Spin-only mode: equal throttle, no drift. */
+    if (cmd->mode == DRIVE_MODE_SPIN) {
+        out.throttle_a = base;
+        out.throttle_b = base;
+        return out;
+    }
+
+    /* Drift mode. */
     if (!cfg->drift_enabled) {
         out.throttle_a = base;
         out.throttle_b = base;
@@ -91,7 +118,11 @@ void app_config_default(app_config_t *cfg) {
     cfg->heading_trim = 0.0f;
     cfg->drift_phase = -0.225f;
     cfg->pid_enabled = false;
-    cfg->target_rpm_max = 3000.0f;
+    cfg->target_rpm_max = 4250.0f;
     cfg->mod_mode = DRIFT_DEFAULT_MODE;
+    cfg->rpm_low = 1000.0f;
+    cfg->rpm_med = 2000.0f;
+    cfg->rpm_high = 2750.0f;
+    cfg->rpm_attack = 4250.0f;
     pid_init(&rpm_pid, 0.002f, 0.001f, 0.0f, 0.0f, 1.0f);
 }

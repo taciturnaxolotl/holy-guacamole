@@ -33,12 +33,31 @@
 #define DRIFT_DEFAULT_MODE DRIFT_MOD_SINUSOIDAL
 #endif
 
+/* Drive mode selected by the safety/mode switch. */
+typedef enum {
+    DRIVE_MODE_STOP = 0,     /* all stop, motors disabled */
+    DRIVE_MODE_SPIN = 1,     /* spin only, no drift translation */
+    DRIVE_MODE_DRIFT = 2,    /* full meltybrain drift */
+} drive_mode_t;
+
+/* Discrete speed levels (Liftoff-style). */
+typedef enum {
+    SPEED_OFF   = 0,
+    SPEED_LOW   = 1,
+    SPEED_MED   = 2,
+    SPEED_HIGH  = 3,
+} speed_level_t;
+
 /* RC command inputs, normalized. */
 typedef struct {
-    float base;      /* symmetric throttle [0,1] */
-    float stick_x;   /* drift vector x [-1,1] */
-    float stick_y;   /* drift vector y [-1,1] */
-    bool  armed;     /* link alive and safe to drive */
+    float base;          /* symmetric throttle [0,1] (analog fallback) */
+    float stick_x;       /* drift vector x [-1,1] */
+    float stick_y;       /* drift vector y [-1,1] */
+    bool  armed;         /* link alive and safe to drive */
+    drive_mode_t mode;   /* STOP / SPIN / DRIFT */
+    speed_level_t speed; /* OFF / LOW / MED / HIGH */
+    bool  attack;        /* momentary attack RPM button held */
+    bool  spin_cw;       /* true=CW, false=CCW */
 } app_command_t;
 
 /* Motor outputs. */
@@ -62,6 +81,12 @@ typedef struct {
     bool  pid_enabled;        /* true = PID regulates RPM from stick; false = direct throttle */
     float target_rpm_max;     /* RPM at full stick deflection when PID enabled */
     drift_mod_t mod_mode;     /* DRIFT_MOD_SINUSOIDAL or DRIFT_MOD_SQUARE */
+
+    /* Discrete speed levels (RPM targets). */
+    float rpm_low;            /* SPEED_LOW target RPM */
+    float rpm_med;            /* SPEED_MED target RPM */
+    float rpm_high;           /* SPEED_HIGH target RPM */
+    float rpm_attack;         /* attack button override RPM */
 } app_config_t;
 
 #if defined(SENSOR_SOURCE_IMU_EKF)

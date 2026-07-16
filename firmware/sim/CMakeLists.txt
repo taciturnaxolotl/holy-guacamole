@@ -15,6 +15,7 @@ find_package(raylib REQUIRED)
 
 add_executable(drive
     ${SIM_DIR}/drive.c
+    ${SIM_DIR}/zorro_input.c
     ${SIM_DIR}/plant.c
     ${SIM_DIR}/imu_synth.c
     ${SRC_DIR}/math/linalg.c
@@ -29,4 +30,23 @@ add_executable(drive
 )
 
 target_include_directories(drive PRIVATE ${SRC_DIR} ${SIM_DIR})
-target_link_libraries(drive PRIVATE raylib m)
+target_compile_definitions(drive PRIVATE SENSOR_SOURCE_IMU_EKF)
+if(APPLE)
+    target_link_libraries(drive PRIVATE raylib m "-framework IOKit" "-framework CoreFoundation")
+else()
+    target_link_libraries(drive PRIVATE raylib m)
+endif()
+
+# Gamepad test harness (standalone, no firmware deps)
+add_executable(pad_test ${SIM_DIR}/pad_test.c)
+target_link_libraries(pad_test PRIVATE raylib m)
+
+# Zorro visual mapper (IOKit + raylib)
+if(APPLE)
+    add_executable(zorro_mapper ${SIM_DIR}/zorro_mapper.c)
+    target_link_libraries(zorro_mapper PRIVATE raylib m "-framework IOKit" "-framework CoreFoundation")
+
+    # Automated Zorro HID detector (terminal-only, no raylib)
+    add_executable(zorro_detect ${SIM_DIR}/zorro_detect.c)
+    target_link_libraries(zorro_detect PRIVATE "-framework IOKit" "-framework CoreFoundation")
+endif()

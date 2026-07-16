@@ -25,8 +25,11 @@ float pid_compute(pid_t *p, float setpoint, float measurement, float dt) {
     /* Proportional */
     float p_term = p->kp * error;
 
-    /* Integral with anti-windup: only integrate when output isn't saturated */
+    /* Integral with anti-windup: clamp integrator to output range / ki
+     * so it can't accumulate beyond what the output can express. */
     p->integral += error * dt;
+    float i_max = (p->ki > 0.0f) ? (p->out_max / p->ki) : 1.0f;
+    p->integral = clamp(p->integral, -i_max, i_max);
     float i_term = p->ki * p->integral;
 
     /* Derivative on error */
@@ -34,11 +37,6 @@ float pid_compute(pid_t *p, float setpoint, float measurement, float dt) {
     p->prev_error = error;
 
     float output = p_term + i_term + d_term;
-
-    /* Anti-windup: clamp integrator when output saturates */
-    if (output > p->out_max || output < p->out_min) {
-        p->integral -= error * dt;  /* undo this step's integration */
-    }
 
     return clamp(output, p->out_min, p->out_max);
 }

@@ -36,6 +36,16 @@ void ekf_predict(ekf_t *e, float dt) {
     float omega = mat_get(&e->x, ST_OMEGA, 0);
     float alpha = mat_get(&e->x, ST_ALPHA, 0);
 
+    /* Rate-limit alpha to reject gyro spikes from wall impacts.
+     * Derivation: max motor torque produces ~300 rad/s^2 during spin-up.
+     * Wall bounces produce 5000+ rad/s^2 transients that are physically
+     * impossible from motors alone. 500 rad/s^2 passes all legitimate
+     * dynamics while rejecting impact artifacts. */
+    const float alpha_max = 500.0f;
+    if (alpha > alpha_max) alpha = alpha_max;
+    if (alpha < -alpha_max) alpha = -alpha_max;
+    mat_set(&e->x, ST_ALPHA, 0, alpha);
+
     /* State transition (constant-alpha kinematics). Wrap theta into
      * [0, 2*pi) so the stored angle never grows large: at high RPM an
      * unbounded float32 heading loses precision (tens of degrees of

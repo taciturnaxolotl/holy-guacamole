@@ -34,6 +34,7 @@ static void tick(plant_t *p, ekf_t *e, app_config_t *cfg, app_command_t *cmd) {
 static void spin(plant_t *p, ekf_t *e, app_config_t *cfg, float base, float secs) {
     app_command_t cmd = {0};
     cmd.armed = true;
+    cmd.mode = DRIVE_MODE_SPIN;
     cmd.base = base;
     int n = (int)(secs / DT);
     for (int i = 0; i < n; i++) tick(p, e, cfg, &cmd);
@@ -75,7 +76,7 @@ static void scenario_cruise_drift(void) {
     float x0, y0; plant_position(p, &x0, &y0);
     cfg.drift_enabled = true;
     app_command_t cmd = {0};
-    cmd.armed = true; cmd.base = 0.44f; cmd.stick_x = 1.0f; cmd.stick_y = 0.0f;
+    cmd.armed = true; cmd.mode = DRIVE_MODE_DRIFT; cmd.base = 0.44f; cmd.stick_x = 1.0f; cmd.stick_y = 0.0f;
     for (int i = 0; i < 1500; i++) tick(p, &e, &cfg, &cmd);
 
     float x1, y1; plant_position(p, &x1, &y1);
@@ -132,7 +133,7 @@ static float cruise_heading_drift(uint64_t seed, bool nonlinearity) {
     float err0 = g_est.heading - plant_true_heading(p);
     float maxdrift = 0.0f;
     app_command_t cmd = {0};
-    cmd.armed = true; cmd.base = 0.44f;
+    cmd.armed = true; cmd.mode = DRIVE_MODE_SPIN; cmd.base = 0.44f;
     for (int i = 0; i < 3000; i++) {
         tick(p, &e, &cfg, &cmd);
         float d = (g_est.heading - plant_true_heading(p)) - err0;

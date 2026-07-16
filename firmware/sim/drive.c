@@ -6,13 +6,13 @@
  * renders a top-down view so you can drive the robot and watch how the
  * EKF heading estimate tracks (or lags) the true heading.
  *
- * Controls:
- *   W / S        spin up / down (base throttle)
- *   Arrow keys   drift direction (world frame)
- *   SPACE        toggle closed-loop drift vs open-loop spin
- *   T            trim heading (align "forward" to current true heading)
- *   R            reset
- *   ESC          quit
+ * Zorro controller mapping:
+ *   SE switch      arm: up (1) = armed, else disarmed
+ *   SC switch      mode: -1 = OFF, 0 = sit-and-spin, 1 = drift
+ *   SA button      attack: hold for attack RPM
+ *   Right stick Y  forward / back
+ *   Right stick X  left / right
+ *   ESC            quit
  */
 
 #include <math.h>
@@ -25,6 +25,7 @@
 #include "estimation/meas_model.h"
 #include "estimation/imu_geom.h"
 #include "app/control_loop.h"
+#include "zorro_input.h"
 #include "plant.h"
 
 #define SCREEN   820
@@ -49,6 +50,7 @@ int main(void) {
     ekf_init(&ekf, 0.0f);
     app_config_t cfg;
     app_config_default(&cfg);
+    cfg.pid_enabled = true;
     printf("drift_phase=%.3f rad (%.1f deg) — if this says -1.571 the binary is stale\n",
            (double)cfg.drift_phase, (double)(cfg.drift_phase * 57.2958));
 
@@ -56,6 +58,9 @@ int main(void) {
     double accumulator = 0.0;
     heading_estimate_t est = {0};
     app_motors_t motors = {0};
+
+    /* Control state. */
+    drive_mode_t mode = DRIVE_MODE_STOP;
 
     /* Heading-strobe state: emulates the real robot's heading LED, which
      * flashes once per revolution when the ESTIMATED heading passes a
@@ -67,29 +72,45 @@ int main(void) {
     float strobe_flash = 0.0f;  /* brightness envelope [0,1] */
 
     while (!WindowShouldClose()) {
-        /* ---- input ---- */
-        if (IsKeyDown(KEY_W)) base += 0.4f * GetFrameTime();
-        if (IsKeyDown(KEY_S)) base -= 0.4f * GetFrameTime();
-        if (base < 0.0f) base = 0.0f;
-        if (base > 1.0f) base = 1.0f;
-        /* A/D nudge the heading trim so you can rotate "forward" to taste. */
-        if (IsKeyDown(KEY_A)) cfg.heading_trim += 1.5f * GetFrameTime();
-        if (IsKeyDown(KEY_D)) cfg.heading_trim -= 1.5f * GetFrameTime();
-        if (IsKeyPressed(KEY_SPACE)) cfg.drift_enabled = !cfg.drift_enabled;
-        if (IsKeyPressed(KEY_T)) {
-            /* Align "forward": trim so control heading matches true heading.
-             * On the real robot the operator does this by eye against the
-             * heading LED; here we use the sim's ground truth as the eye. */
-            float e = est.heading - plant_true_heading(plant);
-            cfg.heading_trim = e;
+        /* ---- input: Zorro controller ---- */
+        zorro_input_t z = zorro_read();
+
+        /* SE switch: up (1) = armed, anything else = disarmed. */
+        bool armed = z.se_switch > 0.5f;
+
+        /* SC switch: -1 = OFF/STOP, 0 = sit-and-spin, 1 = drift. */
+        if (z.sc_switch < -0.5f) {
+            mode = DRIVE_MODE_STOP;
+        } else if (z.sc_switch > 0.5f) {
+            cfg.drift_enabled = true;
+            mode = DRIVE_MODE_DRIFT;
+        } else {
+            cfg.drift_enabled = false;
+            mode = DRIVE_MODE_SPIN;
         }
-        if (IsKeyPressed(KEY_R)) { plant_reset(plant); ekf_init(&ekf, 0.0f); base = 0.0f; cfg.heading_trim = 0.0f; }
+
+        /* SA button (left top): hold for attack RPM.
+         * TODO: confirm physical button mapping with Zorro monitor app.
+         * Byte 0 bit 0 = SA per EdgeTX channel order (CH8). */
+        bool attack = z.sa_pressed;
+
+        /* Left stick X: heading trim. */
+        if (fabsf(z.lstick_x) > 0.15f)
+            cfg.heading_trim -= z.lstick_x * 2.0f * GetFrameTime();
+
+        /* Right stick: Y = forward/back, X = left/right. */
+        float stick_x = z.rstick_x;
+        float stick_y = z.rstick_y;
 
         app_command_t cmd = {0};
-        cmd.armed = true;
+        cmd.armed = armed;
+        cmd.mode = mode;
+        cmd.speed = SPEED_HIGH;   /* always max when armed */
+        cmd.attack = attack;
+        cmd.spin_cw = true;       /* default CW */
         cmd.base = base;
-        cmd.stick_x = (float)(IsKeyDown(KEY_RIGHT) - IsKeyDown(KEY_LEFT));
-        cmd.stick_y = (float)(IsKeyDown(KEY_UP) - IsKeyDown(KEY_DOWN));
+        cmd.stick_x = stick_x;
+        cmd.stick_y = stick_y;
 
         /* ---- fixed-step physics + the real control code ---- */
         accumulator += GetFrameTime();
@@ -189,15 +210,51 @@ int main(void) {
         if (ctl_err > TWO_PI - ctl_err) ctl_err = TWO_PI - ctl_err;
         DrawText(TextFormat("RPM %.0f   w %.0f rad/s", (double)rpm,
                             (double)plant_true_omega(plant)), 20, 20, 20, RAYWHITE);
-        DrawText(TextFormat("base %.2f   drift %s", (double)base,
-                            cfg.drift_enabled ? "ON" : "OFF"), 20, 46, 20,
-                 cfg.drift_enabled ? (Color){120, 240, 140, 255} : GRAY);
-        DrawText(TextFormat("lock err %.1f deg   trim %.0f deg  (T set, A/D nudge)",
+
+        const char *mode_str = mode == DRIVE_MODE_STOP ? "OFF" :
+                               mode == DRIVE_MODE_SPIN ? "SPIN" : "DRIFT";
+        Color mode_col = mode == DRIVE_MODE_STOP ? RED :
+                         cfg.drift_enabled ? (Color){120, 240, 140, 255} : YELLOW;
+        DrawText(TextFormat("%s   %s%s   armed=%d",
+                            mode_str,
+                            attack ? "[ATTACK] " : "",
+                            z.gamepad_present ? "ZORRO" : "NO PAD",
+                            armed),
+                 20, 46, 20, mode_col);
+
+        DrawText(TextFormat("lock err %.1f deg   trim %.0f deg   phase %.0f deg",
                             (double)(ctl_err * 57.2958f),
-                            (double)(cfg.heading_trim * 57.2958f)), 20, 72, 20,
+                            (double)(cfg.heading_trim * 57.2958f),
+                            (double)(cfg.drift_phase * 57.2958f)),
+                 20, 72, 20,
                  ctl_err < 0.17f ? (Color){120, 240, 140, 255} : RAYWHITE);
-        DrawText("W/S spin  A/D trim  arrows drift  SPACE mode  T lock  R reset",
-                 20, SCREEN - 58, 16, (Color){140, 140, 160, 255});
+        DrawText("Zorro: SE=arm  SC=mode(-1=off/0=spin/1=drift)  SA=attack(hold)  R-stick=drive",
+                 20, SCREEN - 74, 13, (Color){120, 120, 140, 255});
+        DrawText("ESC to quit",
+                 20, SCREEN - 58, 13, (Color){140, 140, 160, 255});
+
+        /* Zorro debug overlay. */
+        if (z.gamepad_present) {
+            int dy = SCREEN - 156;
+            Color dbg = (Color){180, 180, 200, 255};
+            Color active = (Color){120, 240, 140, 255};
+            DrawText(TextFormat("R-stick X=%.2f Y=%.2f   L-stick X=%.2f",
+                                (double)z.rstick_x, (double)z.rstick_y,
+                                (double)z.lstick_x),
+                     20, dy, 13, dbg);
+            dy += 16;
+            DrawText(TextFormat("SE=%.2f SC=%.2f  SA=%d SD=%d SG=%d SH=%d S1=%d S2=%d",
+                                (double)z.se_switch, (double)z.sc_switch,
+                                z.sa_pressed, z.sd_pressed,
+                                z.sg_pressed, z.sh_pressed,
+                                z.s1_pressed, z.s2_pressed),
+                     20, dy, 13, dbg);
+            dy += 16;
+            DrawText(TextFormat("cmd: armed=%d mode=%s attack=%d stick=(%.2f,%.2f)",
+                                armed, mode_str, attack,
+                                (double)stick_x, (double)stick_y),
+                     20, dy, 13, active);
+        }
 
         /* Translation direction arrow: shows where the robot actually moved
          * over the last frame, so you can verify stick -> movement mapping. */
