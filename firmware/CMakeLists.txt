@@ -20,6 +20,9 @@ endif()
 
 message(STATUS "Sensor source: ${SENSOR_SOURCE}")
 
+# CMake lists are semicolon-separated; convert the comma-separated option.
+string(REPLACE "," ";" SENSOR_LIST "${SENSOR_SOURCE}")
+
 add_executable(holy_guacamole
     src/main.c
     src/dshot/dshot.c
@@ -54,7 +57,10 @@ foreach(src IN LISTS SENSOR_LIST)
         )
         target_compile_definitions(holy_guacamole PRIVATE SENSOR_SOURCE_IMU_EKF)
     elseif(src STREQUAL "rssi")
-        target_sources(holy_guacamole PRIVATE src/sensor/sensor_rssi.c)
+        target_sources(holy_guacamole PRIVATE
+            src/sensor/sensor_rssi.c
+            src/sensor/rssi_uart.c
+        )
         target_compile_definitions(holy_guacamole PRIVATE SENSOR_SOURCE_RSSI)
     else()
         message(FATAL_ERROR "Unknown sensor source '${src}'. Valid: ${_valid_sources}")

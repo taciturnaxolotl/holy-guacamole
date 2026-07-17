@@ -13,6 +13,62 @@ and the simulator fidelity model. For hardware see `spec.md` (carrier PCB) and
 
 ---
 
+## 0. System layout (three MCUs + the ELRS link)
+
+The robot is not one microcontroller. Three processors and one RC receiver
+each own a distinct job; getting the wiring picture right matters because it
+determines where things like ELRS configuration actually happen.
+
+```
+                          RF (2.4 GHz ELRS)
+   pilot's radio  )))  ------------------------->  ELRS receiver
+                                                      |  CRSF @ 420000, full duplex
+                                                      |  ELRS TX -> XIAO D7/RX (GPIO1)
+                                                      |  ELRS RX -> XIAO D6/TX (GPIO0)
+                                                      v
+   [ basestation ]                            [ RP2350  (XIAO RP2350) ]
+   ESP32-C3, stationary                        main flight controller
+       |                                        - estimation + control + safety
+       | ESP-NOW broadcast                      - DSHOT to ESCs
+       | (RF beacon, ch 1)                      - reads ELRS CRSF (uart0)
+       v                                        ^
+   [ robot ESP32-C3 (esp-rssi) ] --------------/
+   measures RSSI of each beacon packet       UART @ 115200 (uart1, pins 23/24)
+   as the robot spins, runs the heading      RSSI heading stats -> RP2350
+   pipeline, streams stats to the RP2350
+```
+
+**Who does what:**
+
+| Unit | Board | Job | Wiring |
+|---|---|---|---|
+| Basestation | ESP32-C3 (off-board) | Dumb RF beacon; broadcasts ESP-NOW packets as fast as the radio drains | Power + antenna only |
+| RSSI sensor | ESP32-C3 (`esp-rssi/`) | Receives beacon, measures per-packet RSSI, runs autocorr+PLL heading pipeline, sends stats to RP2350 | UART → RP2350 uart1 (115200) |
+| Flight controller | RP2350 (`firmware/`) | EKF + drift control + safety + DSHOT; consumes ELRS control input and the ESP32-C3 RSSI stats | ELRS on uart0 (GPIO0/1), ESP32-C3 on uart1 |
+| RC receiver | ELRS RX | Pilot control link (throttle/sticks) via CRSF | uart0 @ 420000 (see `hw_pins.h`) |
+
+The **ELRS receiver is wired to the RP2350's uart0**, not to either ESP32. The
+basestation has no receiver and no UART — it only transmits. The two ESP32-C3s
+are different roles on different boards (one off-robot beacon, one on-robot
+RSSI sensor).
+
+### Configuring / flashing the ELRS receiver
+
+Because the ELRS RX sits on the RP2350's UART, the RP2350 is where a Betaflight
+"serial passthrough" bridge would have to live if you wanted to flash over the
+wire. **You don't need that.** Use the receiver's built-in WiFi instead:
+
+1. Power the receiver and leave it ~60 s with no bound TX active.
+2. It self-hosts an access point (`ExpressLRS RX`).
+3. Connect and browse to `10.0.0.1`.
+4. The web UI covers binding phrase, packet rate, TX power, telemetry ratio,
+   **and** OTA firmware updates.
+
+That covers every setting a meltybrain build touches, with zero firmware work
+on the RP2350.
+
+---
+
 ## 1. Status snapshot
 
 | Area | State |
@@ -45,6 +101,28 @@ nix develop --command bash -c \
 nix develop --command bash -c \
   'cmake -B build-sim -S sim && cmake --build build-sim'
 ```
+
+### ESP32-C3 boards (basestation + esp-rssi)
+
+These are **Arduino sketches** under `firmware/sketches/`, not part of the
+Nix/CMake build. Flash them with the Arduino IDE or `arduino-cli` using the
+ESP32 boards package (run from the repo root):
+
+```bash
+# basestation (any recent ESP32 core)
+arduino-cli compile --fqbn esp32:esp32:esp32c3 firmware/sketches/basestation
+arduino-cli upload  --fqbn esp32:esp32:esp32c3 -p <PORT> firmware/sketches/basestation
+
+# esp-rssi (needs ESP32 Arduino core 3.0+ for per-packet RSSI)
+arduino-cli compile --fqbn esp32:esp32:esp32c3 firmware/sketches/esp-rssi
+arduino-cli upload  --fqbn esp32:esp32:esp32c3 -p <PORT> firmware/sketches/esp-rssi
+```
+
+`firmware/sketches/esp-rssi/` keeps the ported RSSI pipeline
+(`rssi_heading.c`, `edge_pll.c`, `rssi_interp.c`) in the sketch folder so
+Arduino compiles them automatically.
+
+
 
 Tests live in `firmware/tests/`: `test_linalg`, `test_ekf`, `test_drift`,
 `test_sim_convergence`, and `test_scenarios` (closed-loop digital-twin
@@ -85,6 +163,10 @@ firmware/sim/
 firmware/tests/
   test_scenarios.c       closed-loop assert-based scenarios (wired to CTest;
                          there is no sim/scenario.c — it lives here)
+
+firmware/sketches/         ESP32-C3 Arduino sketches (flashed separately)
+  basestation/           RF beacon (ESP-NOW broadcast)
+  esp-rssi/              robot RSSI receiver + heading pipeline -> UART to RP2350
 ```
 
 **Key architectural rule:** the estimator + controller live in

@@ -1,62 +1,55 @@
 /*
- * Sensor source: ESP-NOW RSSI edge PLL.
- * Protoboard / no-IMU mode, or auxiliary fusion with IMU+EKF.
- * Based on Trevor Gower's rotation_sensing project:
- *   https://github.com/TGower/rotation_sensing
+ * RSSI heading sensor source (UART from ESP32-C3).
+ *
+ * Receives binary frames from the ESP32-C3 over UART, parses them
+ * into heading_estimate_t, and feeds them into the sensor dispatch.
  */
 
-#include "sensor/sensor_source.h"
+#include "sensor_source.h"
+#include "rssi_uart.h"
+#include "hardware/uart.h"
+#include "hardware/gpio.h"
+#include "pico/time.h"
+#include <string.h>
 
-#include <stddef.h>
-#include "estimation/rssi_heading.h"
-#include "estimation/ekf.h"
+#define UART_ID       uart1
+#define UART_BAUD     115200
+#define UART_TX_PIN   23  /* SWDIO on XIAO RP2350 carrier */
+#define UART_RX_PIN   24  /* SWDCK on XIAO RP2350 carrier */
 
-static rssi_heading_t s_rssi;
-
-/* In standalone mode, RSSI owns its own EKF. In fusion mode, this
- * points to the IMU source's EKF via sensor_imu_ekf_get_ekf(). */
-static ekf_t s_standalone_ekf;
-static ekf_t *s_ekf = &s_standalone_ekf;
-
-#define R_THETA_PLL 0.03f
+static rssi_uart_t ru;
+static heading_estimate_t last_est;
+static bool initialized;
 
 static bool rssi_init(void) {
-    rssi_heading_init(&s_rssi);
+    uart_init(UART_ID, UART_BAUD);
+    gpio_set_function(UART_TX_PIN, GPIO_FUNC_UART);
+    gpio_set_function(UART_RX_PIN, GPIO_FUNC_UART);
 
-#if defined(SENSOR_SOURCE_IMU_EKF)
-    /* Fusion mode: get EKF from IMU source. It must be initialized first. */
-    extern ekf_t *sensor_imu_ekf_get_ekf(void);
-    s_ekf = sensor_imu_ekf_get_ekf();
-#else
-    /* Standalone mode: own EKF. */
-    ekf_init(&s_standalone_ekf, 0.0f);
-#endif
-
+    rssi_uart_init(&ru);
+    memset(&last_est, 0, sizeof(last_est));
+    initialized = true;
     return true;
 }
 
 static heading_estimate_t rssi_tick(float dt) {
-    rssi_estimate_t est = rssi_heading_estimate(&s_rssi);
+    if (!initialized) return last_est;
 
-    if (est.locked)
-        ekf_update_heading(s_ekf, est.theta, R_THETA_PLL);
+    /* Drain UART RX buffer. */
+    while (uart_is_readable(UART_ID)) {
+        uint8_t byte = uart_getc(UART_ID);
+        heading_estimate_t tmp;
+        if (rssi_uart_feed(&ru, byte, &tmp)) {
+            last_est = tmp;
+        }
+    }
 
-    ekf_predict(s_ekf, dt);
-
-    heading_estimate_t out;
-    out.heading = ekf_heading_wrapped(s_ekf);
-    out.omega = ekf_omega(s_ekf);
-    out.alpha = ekf_alpha(s_ekf);
-    return out;
-}
-
-static void rssi_feed(int8_t rssi, int64_t ts_us) {
-    rssi_heading_push(&s_rssi, rssi, ts_us);
+    return last_est;
 }
 
 const sensor_source_t sensor_rssi = {
-    .name = "RSSI+PLL",
-    .init = rssi_init,
-    .tick = rssi_tick,
-    .feed = rssi_feed,
+    .name  = "RSSI-UART",
+    .init  = rssi_init,
+    .tick  = rssi_tick,
+    .feed  = NULL,
 };
