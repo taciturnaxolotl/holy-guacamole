@@ -36,6 +36,7 @@ add_executable(holy_guacamole
     src/control/drift.c
     src/control/pid.c
     src/app/control_loop.c
+    src/led/head_led.c
     src/safety/watchdog.c
     src/safety/battery.c
     src/safety/rc_health.c

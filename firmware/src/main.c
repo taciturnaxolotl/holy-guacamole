@@ -15,6 +15,7 @@
 #include "safety/watchdog.h"
 #include "safety/battery.h"
 #include "safety/rc_health.h"
+#include "led/head_led.h"
 
 #define RAD_TO_DEG 57.2958f
 #define CRSF_LINK_TIMEOUT_MS 500
@@ -50,6 +51,7 @@ static void core1_control_loop(void) {
 
     crsf_init();
     rc_health_init();
+    head_led_init();
     crsf_state_t rc = {0};
 
     printf("Core 1 ready [%s]. Waiting for RC link...\n", sensor_primary.name);
@@ -66,6 +68,7 @@ static void core1_control_loop(void) {
         if (shared_est.ready) {
             est = shared_est.est;
             shared_est.ready = false;
+            head_led_on_estimate(&est, time_us_32());
         }
         spin_unlock(est_lock, irq);
 
@@ -108,6 +111,8 @@ static void core1_control_loop(void) {
                    battery_low() ? " LOW-BAT" : "",
                    !rc_health_ok() ? " STALE-RC" : "");
         }
+
+        head_led_tick(time_us_32());
 
         watchdog_feed_core1();
         sleep_us(CONTROL_LOOP_SLEEP_US);
