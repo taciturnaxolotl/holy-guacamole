@@ -1,5 +1,5 @@
 /*
- * Basestation RF beacon (Arduino / ESP32-C3).
+ * Basestation RF beacon (Arduino / XIAO ESP32-C6).
  *
  * The basestation is a dumb, stationary transmitter. Its only job is to
  * blast ESP-NOW broadcast packets as fast as the radio allows. It does not
@@ -10,7 +10,10 @@
  * and falls once per revolution, and the robot derives its heading from the
  * phase of that signal. None of that happens here.
  *
- * Board: ESP32-C3 (Seeed XIAO ESP32-C3 or similar). Antenna + power only.
+ * The onboard user LED heartbeats (~1 Hz) while beaconing, so you can tell at
+ * a glance that the basestation is powered and running.
+ *
+ * Board: Seeed XIAO ESP32-C6. Antenna + power only.
  * Requires the ESP32 Arduino core (any recent version).
  *
  * Protocol: ESP-NOW broadcast on a fixed channel, no encryption, no ACK.
@@ -26,6 +29,11 @@
 #define ESPNOW_CHANNEL  1
 #define BEACON_MAGIC    0xB6
 
+// XIAO ESP32-C6 user LED: GPIO15, active-low (LOW = on).
+#define LED_PIN         LED_BUILTIN
+#define LED_ON          LOW
+#define LED_OFF         HIGH
+
 static const uint8_t broadcast_mac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
 typedef struct __attribute__((packed)) {
@@ -37,6 +45,8 @@ static beacon_pkt_t pkt = { BEACON_MAGIC, 0 };
 
 void setup() {
   Serial.begin(115200);
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LED_ON);   // solid during bring-up
   delay(100);
   Serial.println("Basestation RF beacon starting");
 
@@ -76,5 +86,15 @@ void loop() {
     pkt.seq++;
   } else {
     delayMicroseconds(200);
+  }
+
+  // Heartbeat: toggle the LED ~1 Hz so "blinking" means alive and beaconing.
+  static uint32_t last_blink = 0;
+  static bool lit = true;
+  uint32_t now = millis();
+  if (now - last_blink >= 500) {
+    last_blink = now;
+    lit = !lit;
+    digitalWrite(LED_PIN, lit ? LED_ON : LED_OFF);
   }
 }

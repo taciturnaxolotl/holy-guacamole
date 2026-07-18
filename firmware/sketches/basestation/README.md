@@ -13,7 +13,10 @@ robot can measure their RSSI and derive heading from the phase.
 
 ## Hardware
 
-- **Board:** ESP32-C3 (Seeed XIAO ESP32-C3 or any ESP32-C3)
+- **Board:** Seeed XIAO ESP32-C6
+- Just needs power and its antenna. No other wiring.
+- The onboard user LED (GPIO15) heartbeats ~1 Hz while running, so a blinking
+  LED means the basestation is powered and beaconing.
 - Just needs power and its antenna. No other wiring.
 
 ## Protocol

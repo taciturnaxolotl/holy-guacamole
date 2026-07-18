@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 #include "pico/stdlib.h"
 #include "pico/multicore.h"
@@ -16,6 +17,7 @@
 #include "safety/battery.h"
 #include "safety/rc_health.h"
 #include "led/head_led.h"
+#include "rc_map.h"
 
 #define RAD_TO_DEG 57.2958f
 #define CRSF_LINK_TIMEOUT_MS 500
@@ -37,7 +39,8 @@ static app_config_t app_cfg;
 static bool is_safe_to_arm(const crsf_state_t *rc) {
     return crsf_link_alive(rc, CRSF_LINK_TIMEOUT_MS)
         && rc_health_ok()
-        && battery_ok();
+        && battery_ok()
+        && rc_switch_high(rc->channels[RC_CH_ARM]);
 }
 
 /* ---- Core 1: Control (DSHOT + CRSF) ---- */
@@ -74,22 +77,30 @@ static void core1_control_loop(void) {
 
         app_command_t cmd = {0};
         cmd.armed = is_safe_to_arm(&rc);
+        cmd.mode = rc_mode(rc.channels[RC_CH_MODE]);
+        cmd.attack = rc_switch_high(rc.channels[RC_CH_ATTACK]);
+        cmd.speed = RC_SPEED_ARMED;   /* no throttle stick: preset spin power */
+        /* DRIFT mode actually translates; STOP/SPIN do not. */
+        app_cfg.drift_enabled = (cmd.mode == DRIVE_MODE_DRIFT);
         if (cmd.armed) {
-            int16_t thr = (int16_t)rc.channels[2];
-            if (thr > CRSF_CH_MIN) {
-                cmd.base = (float)(thr - CRSF_CH_MIN) /
-                           (float)(CRSF_CH_MAX - CRSF_CH_MIN);
-                if (cmd.base > 1.0f) cmd.base = 1.0f;
-            }
-            cmd.stick_x = (float)((int16_t)rc.channels[0] - CRSF_CH_MID) /
+            /* Translation is the right stick (X=left/right, Y=fwd/back). */
+            cmd.stick_x = (float)((int16_t)rc.channels[RC_CH_STICK_X] - CRSF_CH_MID) /
                           (float)(CRSF_CH_MAX - CRSF_CH_MID);
-            cmd.stick_y = (float)((int16_t)rc.channels[1] - CRSF_CH_MID) /
+            cmd.stick_y = (float)((int16_t)rc.channels[RC_CH_STICK_Y] - CRSF_CH_MID) /
                           (float)(CRSF_CH_MAX - CRSF_CH_MID);
         }
 
         uint32_t c1_now_us = time_us_32();
         float c1_dt = (float)(c1_now_us - c1_last_us) * 1e-6f;
         c1_last_us = c1_now_us;
+
+        /* Left stick X nudges the heading reference ("front"), matching the
+         * sim. Heading isn't absolutely observable, so this is a live trim. */
+        float trim_in = (float)((int16_t)rc.channels[RC_CH_TRIM] - CRSF_CH_MID) /
+                        (float)(CRSF_CH_MAX - CRSF_CH_MID);
+        if (fabsf(trim_in) > 0.15f)
+            app_cfg.heading_trim -= trim_in * 2.0f * c1_dt;
+
         app_motors_t m = app_control_tick(&app_cfg, &cmd, &est, c1_dt);
 
         dshot_set_throttle(&esc1, m.throttle_a);
