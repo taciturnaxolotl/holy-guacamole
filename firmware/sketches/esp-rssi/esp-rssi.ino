@@ -60,6 +60,8 @@ static rssi_sample_t rssi_ring[RSSI_RING_SIZE];
 static volatile uint32_t ring_head = 0;
 static volatile uint32_t ring_tail = 0;
 static volatile uint32_t dropped_beacons = 0;
+static volatile uint32_t rx_count = 0;       // total beacon packets accepted
+static volatile int8_t   last_rssi = 0;      // most recent packet RSSI (dBm)
 
 // UART frame packing.
 typedef struct __attribute__((packed)) {
@@ -83,6 +85,8 @@ static void on_recv(const esp_now_recv_info_t *recv_info,
   // measured by the radio - not anything in the payload.
   int8_t rssi = recv_info->rx_ctrl->rssi;
   int64_t ts = esp_timer_get_time();
+  rx_count++;
+  last_rssi = rssi;
 
   // Track dropped beacons for diagnostics. Only count forward gaps so a
   // basestation reboot (seq resets to 0) doesn't explode the counter.
@@ -174,7 +178,12 @@ void loop() {
 
   // 1 Hz diagnostics on the USB serial.
   if (now - last_stat_ms >= 1000) {
-    Serial.printf("locked=%d omega=%.1f rad/s dropped=%lu\n",
+    static uint32_t prev_rx = 0;
+    uint32_t rx = rx_count;
+    uint32_t rate = rx - prev_rx;   // packets in the last ~second
+    prev_rx = rx;
+    Serial.printf("rx=%lu pkt/s  rssi=%d dBm  locked=%d  omega=%.1f rad/s  dropped=%lu\n",
+                  (unsigned long)rate, (int)last_rssi,
                   est.locked,
                   (double)(est.omega * 6000.0f * 2.0f * 3.14159f),
                   (unsigned long)dropped_beacons);

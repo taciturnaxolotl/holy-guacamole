@@ -6,6 +6,7 @@
  */
 
 #include "sensor_source.h"
+#include "sensor_dispatch.h"
 #include "rssi_uart.h"
 #include "hardware/uart.h"
 #include "hardware/gpio.h"
@@ -20,6 +21,10 @@
 static rssi_uart_t ru;
 static heading_estimate_t last_est;
 static bool initialized;
+
+/* ESP32 link liveness: when did the last valid frame land, and how many. */
+static volatile uint32_t last_frame_ms;
+static volatile uint32_t frame_count;
 
 static bool rssi_init(void) {
     uart_init(UART_ID, UART_BAUD);
@@ -41,10 +46,21 @@ static heading_estimate_t rssi_tick(float dt) {
         heading_estimate_t tmp;
         if (rssi_uart_feed(&ru, byte, &tmp)) {
             last_est = tmp;
+            last_frame_ms = to_ms_since_boot(get_absolute_time());
+            frame_count++;
         }
     }
 
     return last_est;
+}
+
+bool rssi_link_alive(uint32_t timeout_ms) {
+    if (frame_count == 0) return false;
+    return (to_ms_since_boot(get_absolute_time()) - last_frame_ms) < timeout_ms;
+}
+
+uint32_t rssi_link_frames(void) {
+    return frame_count;
 }
 
 const sensor_source_t sensor_rssi = {

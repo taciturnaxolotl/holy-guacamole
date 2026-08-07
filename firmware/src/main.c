@@ -113,14 +113,20 @@ static void core1_control_loop(void) {
         uint32_t now = to_ms_since_boot(get_absolute_time());
         if (now - last_print > STATUS_PRINT_INTERVAL_MS) {
             last_print = now;
-            printf("hdg=%6.1f° w=%7.1f RPM=%lu/%lu a/b=%.2f/%.2f %s%s%s\n",
+#if defined(SENSOR_SOURCE_RSSI)
+            const char *esp = rssi_link_alive(300) ? " ESP-OK" : " ESP-STALE";
+#else
+            const char *esp = "";
+#endif
+            printf("hdg=%6.1f° w=%7.1f RPM=%lu/%lu a/b=%.2f/%.2f %s%s%s%s\n",
                    (double)(est.heading * RAD_TO_DEG), (double)est.omega,
                    (unsigned long)esc1.telemetry.rpm,
                    (unsigned long)esc2.telemetry.rpm,
                    (double)m.throttle_a, (double)m.throttle_b,
                    cmd.armed ? "LINK" : "NO-LINK",
                    battery_low() ? " LOW-BAT" : "",
-                   !rc_health_ok() ? " STALE-RC" : "");
+                   !rc_health_ok() ? " STALE-RC" : "",
+                   esp);
         }
 
         head_led_tick(time_us_32());

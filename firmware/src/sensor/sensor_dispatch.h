@@ -34,3 +34,12 @@ extern const sensor_source_t sensor_rssi;
 #else
 #define sensor_aux ((const sensor_source_t *)0)
 #endif
+
+/* ── RSSI (ESP32) UART link diagnostics ───────────────────────────── */
+
+#if defined(SENSOR_SOURCE_RSSI)
+/* True if a valid heading frame arrived from the ESP32 within timeout_ms. */
+bool rssi_link_alive(uint32_t timeout_ms);
+/* Total valid frames parsed from the ESP32 since boot. */
+uint32_t rssi_link_frames(void);
+#endif
