@@ -10,4 +10,6 @@
   (lib (name "Connector_Wire")(type "KiCad")(uri "${KICAD8_FOOTPRINT_DIR}/Connector_Wire.pretty")(options "")(descr "Global wire connector footprints"))
   (lib (name "MountingHole")(type "KiCad")(uri "${KICAD8_FOOTPRINT_DIR}/MountingHole.pretty")(options "")(descr "Global mounting hole footprints"))
   (lib (name "Jumper")(type "KiCad")(uri "${KICAD8_FOOTPRINT_DIR}/Jumper.pretty")(options "")(descr "Global solder jumper footprints"))
+  (lib (name "Connector_JST")(type "KiCad")(uri "${KICAD8_FOOTPRINT_DIR}/Connector_JST.pretty")(options "")(descr "Global JST connector footprints"))
+  (lib (name "Connector_AMASS")(type "KiCad")(uri "${KICAD8_FOOTPRINT_DIR}/Connector_AMASS.pretty")(options "")(descr "Global AMASS XT/MR connector footprints"))
 )

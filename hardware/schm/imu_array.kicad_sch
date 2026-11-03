@@ -7,7 +7,7 @@
 	(title_block
 		(title "Holy Guacamole")
 		(date "2026-06-29")
-		(rev "1.14a")
+		(rev "2.0-draft")
 		(company "Kieran Klukas")
 	)
 	(lib_symbols
@@ -1870,12 +1870,6 @@
 		(uuid "9f280e12-99bb-4a7b-aced-f302a6bf23ab")
 	)
 	(junction
-		(at 96.52 50.8)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "0759cfbc-45b1-4bf7-961e-cbdd25b1e0e0")
-	)
-	(junction
 		(at 170.18 48.26)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -1906,12 +1900,6 @@
 		(uuid "3d72c14c-6cd1-49fc-bbf8-b68867943f8b")
 	)
 	(junction
-		(at 43.18 110.49)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "400699d2-5ea9-40de-84d2-45094c801948")
-	)
-	(junction
 		(at 151.13 48.26)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -1934,18 +1922,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "565ddee1-76a6-4214-92a2-544b81f21aac")
-	)
-	(junction
-		(at 34.29 113.03)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "591c0e4c-6efb-40af-a8e0-6d35dcd259bc")
-	)
-	(junction
-		(at 52.07 99.06)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "5a8a239b-cefd-4662-950d-b6a3728a9797")
 	)
 	(junction
 		(at 227.33 53.34)
@@ -1972,12 +1948,6 @@
 		(uuid "7d5ddb5a-e4c2-4ad7-bfa0-d8f1c98e0e4e")
 	)
 	(junction
-		(at 172.72 50.8)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "80059869-be82-4cfe-81df-ab208d3ffbed")
-	)
-	(junction
 		(at 151.13 53.34)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -1988,12 +1958,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "8a58cfb6-4f16-4af6-92cb-8dda6dd2d083")
-	)
-	(junction
-		(at 43.18 99.06)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "922341ed-1305-463e-a9d1-239a5a162168")
 	)
 	(junction
 		(at 91.44 118.11)
@@ -2012,12 +1976,6 @@
 		(diameter 0.635)
 		(color 0 0 0 0)
 		(uuid "9b991497-38fe-4b0b-b98b-e4ada4851d82")
-	)
-	(junction
-		(at 82.55 99.06)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "9ce63a32-c864-4c72-918d-018ba523eb00")
 	)
 	(junction
 		(at 20.32 49.53)
@@ -2056,12 +2014,6 @@
 		(uuid "d28f242a-4935-4876-9b50-54d39188c046")
 	)
 	(junction
-		(at 52.07 107.95)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "d37cef1e-6a81-4424-a121-e8bef741140c")
-	)
-	(junction
 		(at 102.87 31.75)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -2084,12 +2036,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "f3ef1e43-7d3b-4bc5-a4aa-7dffedeaa275")
-	)
-	(junction
-		(at 64.77 38.1)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "f84d9cbf-ee03-4a0d-8043-c3cecbb0b43a")
 	)
 	(junction
 		(at 30.48 52.07)
@@ -2197,16 +2143,6 @@
 	)
 	(wire
 		(pts
-			(xy 64.77 35.56) (xy 64.77 38.1)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0221aada-5bf8-497c-8ac8-ee76958c0bc7")
-	)
-	(wire
-		(pts
 			(xy 91.44 118.11) (xy 93.98 118.11)
 		)
 		(stroke
@@ -2224,16 +2160,6 @@
 			(type default)
 		)
 		(uuid "04660ef2-4169-46dc-b311-d0eec3b1c3c0")
-	)
-	(wire
-		(pts
-			(xy 34.29 105.41) (xy 34.29 113.03)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "04c4260d-b321-44bd-9a10-95b71306b33b")
 	)
 	(wire
 		(pts
@@ -2527,16 +2453,6 @@
 	)
 	(wire
 		(pts
-			(xy 52.07 99.06) (xy 52.07 100.33)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "3b0fa7ea-d4fb-43c9-a5f5-14e43fe9ee79")
-	)
-	(wire
-		(pts
 			(xy 224.79 40.64) (xy 222.25 40.64)
 		)
 		(stroke
@@ -2624,16 +2540,6 @@
 			(type default)
 		)
 		(uuid "47cf4297-00b3-4e25-a3c3-3a25083877db")
-	)
-	(wire
-		(pts
-			(xy 31.75 113.03) (xy 34.29 113.03)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "497c78be-8a48-4e0a-a5ee-87ea8ad6db9e")
 	)
 	(wire
 		(pts
@@ -2727,26 +2633,6 @@
 	)
 	(wire
 		(pts
-			(xy 43.18 100.33) (xy 43.18 99.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6a41f6a5-a362-4189-a75f-6543e0d1f535")
-	)
-	(wire
-		(pts
-			(xy 34.29 113.03) (xy 55.88 113.03)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6c9edd69-470f-4c69-81d0-39299d621152")
-	)
-	(wire
-		(pts
 			(xy 170.18 44.45) (xy 170.18 48.26)
 		)
 		(stroke
@@ -2824,16 +2710,6 @@
 			(type default)
 		)
 		(uuid "7616ba22-07f6-4486-983e-853c6e76e523")
-	)
-	(wire
-		(pts
-			(xy 52.07 99.06) (xy 82.55 99.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "77b3d621-82af-45d3-821d-0d380d737621")
 	)
 	(wire
 		(pts
@@ -2927,16 +2803,6 @@
 	)
 	(wire
 		(pts
-			(xy 172.72 50.8) (xy 172.72 58.42)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "8b8b3396-f784-4006-9efa-21dc4ac3dd4e")
-	)
-	(wire
-		(pts
 			(xy 227.33 53.34) (xy 222.25 53.34)
 		)
 		(stroke
@@ -2997,16 +2863,6 @@
 	)
 	(wire
 		(pts
-			(xy 34.29 100.33) (xy 34.29 99.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "93ce2276-0a0f-416e-ad72-565214d2c62f")
-	)
-	(wire
-		(pts
 			(xy 222.25 38.1) (xy 227.33 38.1)
 		)
 		(stroke
@@ -3024,26 +2880,6 @@
 			(type default)
 		)
 		(uuid "99aed1f0-b7b6-47b8-a1bf-0723e286c178")
-	)
-	(wire
-		(pts
-			(xy 43.18 105.41) (xy 43.18 110.49)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "9b93af28-d6e9-4672-b473-151473b26865")
-	)
-	(wire
-		(pts
-			(xy 43.18 99.06) (xy 52.07 99.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "9e1036b3-7603-4136-96db-6f25a06f49d7")
 	)
 	(wire
 		(pts
@@ -3197,16 +3033,6 @@
 	)
 	(wire
 		(pts
-			(xy 34.29 99.06) (xy 43.18 99.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ba073da6-7d33-44c8-92c8-4eefd7db552c")
-	)
-	(wire
-		(pts
 			(xy 151.13 38.1) (xy 146.05 38.1)
 		)
 		(stroke
@@ -3254,16 +3080,6 @@
 			(type default)
 		)
 		(uuid "c8b9ecd6-5997-4b9a-abdc-51c89f9d2594")
-	)
-	(wire
-		(pts
-			(xy 52.07 105.41) (xy 52.07 107.95)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c8d4f5b7-061e-44ff-85e6-746decdf5afe")
 	)
 	(wire
 		(pts
@@ -3384,16 +3200,6 @@
 			(type default)
 		)
 		(uuid "e9d9c6b4-af80-43cc-b43a-aeaa5294ae54")
-	)
-	(wire
-		(pts
-			(xy 96.52 50.8) (xy 96.52 58.42)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "eb25a6b0-742b-4aaa-9534-e9dfff47c9bb")
 	)
 	(wire
 		(pts
@@ -3647,17 +3453,6 @@
 			(justify right)
 		)
 		(uuid "502bbe54-833e-4d69-ad73-5f78e7b8ee23")
-	)
-	(hierarchical_label "LED_OE_N"
-		(shape output)
-		(at 31.75 113.03 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "58dadb57-f84e-4469-ade2-04ca32d42184")
 	)
 	(hierarchical_label "SPI_SCK"
 		(shape input)
@@ -3989,98 +3784,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
-		(at 52.07 102.87 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "1830e413-8e1b-4b2b-b3e1-86f741125fed")
-		(property "Reference" "R20"
-			(at 53.34 101.6 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "10kΩ"
-			(at 53.34 104.14 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 52.07 102.87 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 52.07 102.87 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 52.07 102.87 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "LCSC Part" "C844715"
-			(at -233.68 54.61 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "30ecf318-054c-4539-878e-9b9d8c68962c")
-		)
-		(pin "2"
-			(uuid "d49351b6-2b1a-4421-9930-54bd5657655d")
-		)
-		(instances
-			(project "guac"
-				(path "/5ff26309-9be7-4732-9683-b5a799424d79/9e7afb3e-f6d0-4714-a3a9-7f1e1c051738"
-					(reference "R20")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:+3V3")
 		(at 224.79 36.83 0)
 		(unit 1)
@@ -4243,98 +3946,6 @@
 			(project "guac"
 				(path "/5ff26309-9be7-4732-9683-b5a799424d79/9e7afb3e-f6d0-4714-a3a9-7f1e1c051738"
 					(reference "R4")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R_Small")
-		(at 34.29 102.87 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "3770481a-dbbe-4b3f-b3ec-f0a5145bef18")
-		(property "Reference" "R21"
-			(at 35.56 101.6 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "10kΩ"
-			(at 35.56 104.14 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 34.29 102.87 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 34.29 102.87 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 34.29 102.87 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "LCSC Part" "C844715"
-			(at -251.46 54.61 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "d4b62ce3-4fe7-4717-8b95-ae596534cfca")
-		)
-		(pin "2"
-			(uuid "de130309-aea8-4774-bbe1-d686096e78a8")
-		)
-		(instances
-			(project "guac"
-				(path "/5ff26309-9be7-4732-9683-b5a799424d79/9e7afb3e-f6d0-4714-a3a9-7f1e1c051738"
-					(reference "R21")
 					(unit 1)
 				)
 			)
@@ -5258,98 +4869,6 @@
 			(project "guac"
 				(path "/5ff26309-9be7-4732-9683-b5a799424d79/9e7afb3e-f6d0-4714-a3a9-7f1e1c051738"
 					(reference "C10")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R_Small")
-		(at 43.18 102.87 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "6cd6fbb3-4e57-4aa6-a2eb-d062596be757")
-		(property "Reference" "R19"
-			(at 44.45 101.6 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "10kΩ"
-			(at 44.45 104.14 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 43.18 102.87 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 43.18 102.87 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 43.18 102.87 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "LCSC Part" "C844715"
-			(at -242.57 54.61 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "6d2b6611-ba72-41bc-ab25-e707613bcc86")
-		)
-		(pin "2"
-			(uuid "5432d159-0876-47ea-8131-382b24603fe9")
-		)
-		(instances
-			(project "guac"
-				(path "/5ff26309-9be7-4732-9683-b5a799424d79/9e7afb3e-f6d0-4714-a3a9-7f1e1c051738"
-					(reference "R19")
 					(unit 1)
 				)
 			)
@@ -7290,5 +6809,42 @@
 				)
 			)
 		)
+	)
+	(no_connect
+		(at 55.88 113.03)
+		(uuid "a56cc1de-6eca-4283-a7ea-b838e5069ce8")
+	)
+	(hierarchical_label "SPI_MISO"
+		(shape output)
+		(at 64.77 35.56 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "b8f9eace-6dd3-4d82-b925-b34bad8ab021")
+	)
+	(hierarchical_label "SPI_MISO"
+		(shape output)
+		(at 96.52 58.42 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "d57a0f2b-fc1b-466c-8a37-109a0c687dfd")
+	)
+	(hierarchical_label "SPI_MISO"
+		(shape output)
+		(at 172.72 58.42 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "24cea88f-d6d2-4549-ab79-5a84e3ae4f2a")
 	)
 )

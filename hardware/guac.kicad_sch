@@ -7,7 +7,7 @@
 	(title_block
 		(title "Holy Guacamole")
 		(date "2026-06-28")
-		(rev "1.4a")
+		(rev "2.0-draft")
 		(company "Kieran Klukas")
 		(comment 1 "SPDX-License-Identifier: CERN-OHL-S-2.0")
 	)
@@ -1868,16 +1868,6 @@
 	)
 	(wire
 		(pts
-			(xy 29.21 128.27) (xy 29.21 129.54)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "00d52d99-2d1b-4f73-b4cf-1649ae0cd879")
-	)
-	(wire
-		(pts
 			(xy 133.35 33.02) (xy 125.73 33.02)
 		)
 		(stroke
@@ -1895,16 +1885,6 @@
 			(type default)
 		)
 		(uuid "120a2e1d-6560-42e3-8a1b-eb5c371f7358")
-	)
-	(wire
-		(pts
-			(xy 53.34 60.96) (xy 52.07 60.96)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "14a78fb5-569a-4aa4-bf84-365ccc79a2a1")
 	)
 	(wire
 		(pts
@@ -1955,16 +1935,6 @@
 			(type default)
 		)
 		(uuid "31b06e54-cf63-49e2-8c73-66b5b715f5df")
-	)
-	(wire
-		(pts
-			(xy 26.67 123.19) (xy 33.02 123.19)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "3357086f-bea2-463b-9663-b0897f0c6213")
 	)
 	(wire
 		(pts
@@ -2058,16 +2028,6 @@
 	)
 	(wire
 		(pts
-			(xy 29.21 125.73) (xy 33.02 125.73)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6f965e49-5bb0-4f64-a5cc-b400ffdaad1d")
-	)
-	(wire
-		(pts
 			(xy 95.25 86.36) (xy 101.6 86.36)
 		)
 		(stroke
@@ -2108,36 +2068,6 @@
 	)
 	(wire
 		(pts
-			(xy 29.21 118.11) (xy 29.21 125.73)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "8ea82a94-cb7a-4f8e-80ab-f495b04eb716")
-	)
-	(wire
-		(pts
-			(xy 33.02 128.27) (xy 29.21 128.27)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "906ba0f3-7887-4211-9572-6f878a6d9733")
-	)
-	(wire
-		(pts
-			(xy 52.07 90.17) (xy 53.34 90.17)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "933042e0-3147-4b07-bb3f-1e18ddfc58ea")
-	)
-	(wire
-		(pts
 			(xy 120.65 91.44) (xy 120.65 88.9)
 		)
 		(stroke
@@ -2158,16 +2088,6 @@
 	)
 	(wire
 		(pts
-			(xy 26.67 59.055) (xy 27.94 59.055)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c30b40cd-7e18-4157-aae4-b97d6ba2b50f")
-	)
-	(wire
-		(pts
 			(xy 90.17 90.17) (xy 95.25 90.17)
 		)
 		(stroke
@@ -2175,16 +2095,6 @@
 			(type default)
 		)
 		(uuid "c3df1d9a-9a96-45c5-a699-233ff39aab3d")
-	)
-	(wire
-		(pts
-			(xy 52.07 92.71) (xy 53.34 92.71)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c59670c3-f987-4b90-9c7f-f58271d75ab5")
 	)
 	(wire
 		(pts
@@ -2288,16 +2198,6 @@
 	)
 	(wire
 		(pts
-			(xy 26.67 120.65) (xy 33.02 120.65)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f741e9cc-a989-446c-a748-2ba18c193d92")
-	)
-	(wire
-		(pts
 			(xy 142.24 93.98) (xy 142.24 91.44)
 		)
 		(stroke
@@ -2305,16 +2205,6 @@
 			(type default)
 		)
 		(uuid "fb496e45-1002-4e59-affe-2f4fb5b516a4")
-	)
-	(wire
-		(pts
-			(xy 52.07 87.63) (xy 53.34 87.63)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "fc6429b3-7b00-452e-bf78-eafd84ebd431")
 	)
 	(label "SPI_MISO"
 		(at 85.09 50.8 180)
@@ -2345,16 +2235,6 @@
 			(justify right bottom)
 		)
 		(uuid "2c67a4d6-e31c-4c0e-91b0-4bddcf0a2ad9")
-	)
-	(label "CRSF_TX"
-		(at 26.67 120.65 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "2f7c0974-dcd7-4d01-858d-6a6d8c02cb75")
 	)
 	(label "SPI_MOSI"
 		(at 53.34 55.88 0)
@@ -2416,16 +2296,6 @@
 		)
 		(uuid "514cfec1-8339-4081-8116-dae5e27bd4a5")
 	)
-	(label "SPI_MOSI"
-		(at 53.34 90.17 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "523732f5-81ac-40dc-a89f-9f090544a62c")
-	)
 	(label "SEL_LAT"
 		(at 53.34 63.5 0)
 		(effects
@@ -2445,26 +2315,6 @@
 			(justify right bottom)
 		)
 		(uuid "5d46d0a0-c55b-4bf0-967e-1f5ac289a191")
-	)
-	(label "LED_OE_N"
-		(at 26.67 59.055 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "6fe9e908-b5b6-4d8e-b205-5723c7eb59cb")
-	)
-	(label "EXP_CS_N"
-		(at 53.34 60.96 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "71211315-001b-468c-a944-6bffc8755daf")
 	)
 	(label "HEAD_LED"
 		(at 53.34 95.25 0)
@@ -2506,16 +2356,6 @@
 		)
 		(uuid "854d63ac-fa67-46fc-ab77-f2dce887ad01")
 	)
-	(label "LED_OE_N"
-		(at 53.34 87.63 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "8bfc2a74-ef9b-4d2b-9d0d-4442afd7f5bb")
-	)
 	(label "SPI_SCK"
 		(at 85.09 48.26 180)
 		(effects
@@ -2536,16 +2376,6 @@
 		)
 		(uuid "ac13da71-438a-4dd8-bf66-67f3c3a6b2d2")
 	)
-	(label "SPI_SCK"
-		(at 53.34 92.71 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "bb20ab6f-3e57-40bd-bc27-7c2e3325150d")
-	)
 	(label "DS2_IO"
 		(at 83.82 97.79 180)
 		(effects
@@ -2565,16 +2395,6 @@
 			(justify right bottom)
 		)
 		(uuid "d6bdb5fb-1274-4350-a1f4-f07bc08d2c38")
-	)
-	(label "CRSF_RX"
-		(at 26.67 123.19 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "defa79a6-b73f-4ee8-9212-167376458803")
 	)
 	(label "SWDIO"
 		(at 149.86 27.94 0)
@@ -2772,82 +2592,6 @@
 			(project "guac"
 				(path "/5ff26309-9be7-4732-9683-b5a799424d79"
 					(reference "#PWR26")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 29.21 129.54 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "183079ad-43bb-4ba5-8e13-f8112682ea26")
-		(property "Reference" "#PWR83"
-			(at 29.21 132.08 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 29.21 133.35 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 29.21 129.54 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 29.21 129.54 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 29.21 129.54 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "dd297541-2d9f-4257-8cc1-959aead7aeb0")
-		)
-		(instances
-			(project "guac"
-				(path "/5ff26309-9be7-4732-9683-b5a799424d79"
-					(reference "#PWR83")
 					(unit 1)
 				)
 			)
@@ -3177,81 +2921,6 @@
 			(project "guac"
 				(path "/5ff26309-9be7-4732-9683-b5a799424d79"
 					(reference "#PWR082")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 29.21 118.11 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "2cb1dd07-c96f-4728-bc7a-73bc64854bd4")
-		(property "Reference" "#PWR095"
-			(at 29.21 114.3 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "5V"
-			(at 29.21 114.554 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 29.21 118.11 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 29.21 118.11 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 29.21 118.11 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "2f34ff01-9943-431f-ae92-bddda28d7a0c")
-		)
-		(instances
-			(project "guac"
-				(path "/5ff26309-9be7-4732-9683-b5a799424d79"
-					(reference "#PWR095")
 					(unit 1)
 				)
 			)
@@ -3778,103 +3447,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x04")
-		(at 38.1 123.19 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board yes)
-		(in_pos_files no)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "7dceb450-8747-40b0-8f36-a74057742cee")
-		(property "Reference" "U7"
-			(at 40.64 121.92 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "BetaFPV ELRS Lite"
-			(at 40.64 124.46 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Library:BetaFPV_ELRS_Lite"
-			(at 38.1 123.19 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 38.1 123.19 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 38.1 123.19 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "LCSC Part" "NONE"
-			(at -4.84 -187.08 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "3fb62001-db5a-4de5-8fb4-17b783a27bf6")
-		)
-		(pin "2"
-			(uuid "53606fa5-5486-46ba-ab63-87ada9e9968c")
-		)
-		(pin "3"
-			(uuid "36a574b8-be87-4b58-b8e3-35ef11159043")
-		)
-		(pin "4"
-			(uuid "3db1aa48-cdb4-4666-82fd-41205b9186f1")
-		)
-		(instances
-			(project "guac"
-				(path "/5ff26309-9be7-4732-9683-b5a799424d79"
-					(reference "U7")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
 		(at 101.6 100.33 0)
 		(unit 1)
@@ -4151,7 +3723,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "AM32 dual ESC"
+		(property "Value" "AM32 ESC signal (JST-GH 4p)"
 			(at 152.4 87.63 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4162,7 +3734,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Connector_Wire:SolderWire-0.25sqmm_1x04_P4.2mm_D0.65mm_OD1.7mm"
+		(property "Footprint" "Connector_JST:JST_GH_SM04B-GHS-TB_1x04-1MP_P1.25mm_Horizontal"
 			(at 149.86 86.36 0)
 			(hide yes)
 			(show_name no)
@@ -4567,36 +4139,6 @@
 				(justify left top)
 			)
 		)
-		(pin "LED_OE_N" input
-			(at 52.07 87.63 0)
-			(uuid "487040eb-3ec3-4fbe-9c9e-8fef5c46e465")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(pin "SPI_MOSI" input
-			(at 52.07 90.17 0)
-			(uuid "4a38b904-69ab-4e26-8f01-07849b123301")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(pin "SPI_SCK" input
-			(at 52.07 92.71 0)
-			(uuid "0fcdd05f-77d6-41ea-bc10-24ae5b1549e9")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
 		(pin "HEAD_LED" input
 			(at 52.07 95.25 0)
 			(uuid "661312f9-1d7c-40c7-9aa6-78eaf5167e10")
@@ -4729,29 +4271,9 @@
 				(justify right)
 			)
 		)
-		(pin "EXP_CS_N" input
-			(at 52.07 60.96 0)
-			(uuid "3a0783e0-c6a0-43cb-8934-e397faf6d565")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
 		(pin "SPI_MISO" bidirectional
 			(at 27.94 55.88 180)
 			(uuid "d92b45cd-e634-4a03-9244-f10202f5e981")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(pin "LED_OE_N" output
-			(at 27.94 59.055 180)
-			(uuid "00fcee22-a33a-42de-952c-e21fcc993bc2")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4793,4 +4315,627 @@
 		)
 	)
 	(embedded_fonts no)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x04")
+		(at 38.1 123.19 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(in_pos_files no)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "f5dabc91-9878-455c-a6a3-e73a8f061c41")
+		(property "Reference" "J5"
+			(at 40.64 121.92 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "ELRS RX harness (JST-GH 4p)"
+			(at 40.64 124.46 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Connector_JST:JST_GH_SM04B-GHS-TB_1x04-1MP_P1.25mm_Horizontal"
+			(at 38.1 123.19 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 38.1 123.19 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 38.1 123.19 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC Part" "NONE"
+			(at -100.33 -67.31 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "655a9169-ae3c-4df8-8a83-b7d96f3f2fd5")
+		)
+		(pin "2"
+			(uuid "830e9b9d-7c06-4743-a10d-4db33e80b49b")
+		)
+		(pin "3"
+			(uuid "93091a86-bab3-4fe6-b01f-9a06444554af")
+		)
+		(pin "4"
+			(uuid "f731e16a-1f34-4d12-8432-47eac2c3e061")
+		)
+		(instances
+			(project "guac"
+				(path "/5ff26309-9be7-4732-9683-b5a799424d79"
+					(reference "J5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 33.02 120.65 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "2385dc96-4f43-415b-8ef3-65071ffce94b")
+		(property "Reference" "#PWR0201"
+			(at 33.02 123.19 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 33.02 124.46 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 120.65 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 33.02 120.65 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 120.65 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "6b4898bb-60f3-4643-a114-28718c1d9ff2")
+		)
+		(instances
+			(project "guac"
+				(path "/5ff26309-9be7-4732-9683-b5a799424d79"
+					(reference "#PWR0201")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(label "CRSF_RX"
+		(at 33.02 125.73 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "76e80ea7-98f0-47a3-91ed-f5e63756a423")
+	)
+	(label "CRSF_TX"
+		(at 33.02 128.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "4f2226f0-938a-4e9e-9261-7307e636bac2")
+	)
+	(symbol
+		(lib_id "Device:D_TVS")
+		(at 63.5 123.19 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "e5814c03-3920-47a8-8537-5d62fbd874a7")
+		(property "Reference" "D5"
+			(at 66.04 121.9199 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "PESD5V0V1BB"
+			(at 66.04 124.4599 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Diode_SMD:D_SOD-523"
+			(at 63.5 123.19 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 63.5 123.19 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 63.5 123.19 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC Part" "C477993"
+			(at 358.77 80.25 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "f832a78a-c808-4335-95d8-1a2794c98e8e")
+		)
+		(pin "2"
+			(uuid "9ebfb144-a2b7-47b4-af6d-13c45f574429")
+		)
+		(instances
+			(project "guac"
+				(path "/5ff26309-9be7-4732-9683-b5a799424d79"
+					(reference "D5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(label "CRSF_RX"
+		(at 63.5 119.38 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "0549e68a-ebcb-4141-b585-f5a4c2e7735e")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 63.5 127 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "ec008ce1-8202-4701-854f-2567028a9219")
+		(property "Reference" "#PWR0202"
+			(at 63.5 129.54 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 63.5 130.81 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 63.5 127 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 63.5 127 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 63.5 127 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "19732c35-6984-43af-899c-384daa1a364e")
+		)
+		(instances
+			(project "guac"
+				(path "/5ff26309-9be7-4732-9683-b5a799424d79"
+					(reference "#PWR0202")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:D_TVS")
+		(at 73.66 123.19 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "1d7f9df2-fc8c-4473-8753-a2463615610e")
+		(property "Reference" "D6"
+			(at 76.2 121.9199 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "PESD5V0V1BB"
+			(at 76.2 124.4599 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Diode_SMD:D_SOD-523"
+			(at 73.66 123.19 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 73.66 123.19 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 73.66 123.19 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC Part" "C477993"
+			(at 368.93 80.25 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "6bcfa478-4ee6-4aed-9408-e154d91329af")
+		)
+		(pin "2"
+			(uuid "1e02f13e-12fd-424c-9aa8-3b6564edd851")
+		)
+		(instances
+			(project "guac"
+				(path "/5ff26309-9be7-4732-9683-b5a799424d79"
+					(reference "D6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(label "CRSF_TX"
+		(at 73.66 119.38 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "1f99d77d-a58e-4edf-9aca-607996c9151e")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 73.66 127 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "0a2646f1-5d01-4ae3-8c25-db2452a2d77d")
+		(property "Reference" "#PWR0203"
+			(at 73.66 129.54 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 73.66 130.81 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 73.66 127 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 73.66 127 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 73.66 127 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "2fd494ff-a4c7-410c-b0ac-81969304d250")
+		)
+		(instances
+			(project "guac"
+				(path "/5ff26309-9be7-4732-9683-b5a799424d79"
+					(reference "#PWR0203")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+5V")
+		(at 33.02 123.19 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "bf6ca23c-8cad-4ad5-b6e6-1f7c85b21c4b")
+		(property "Reference" "#PWR0204"
+			(at 33.02 119.38 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "5V"
+			(at 33.02 119.634 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 123.19 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 33.02 123.19 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 123.19 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "ef534f3d-0d30-42e9-848d-e7d9fae5b11e")
+		)
+		(instances
+			(project "guac"
+				(path "/5ff26309-9be7-4732-9683-b5a799424d79"
+					(reference "#PWR0204")
+					(unit 1)
+				)
+			)
+		)
+	)
 )
