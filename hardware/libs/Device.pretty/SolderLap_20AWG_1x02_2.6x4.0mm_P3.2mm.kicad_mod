@@ -2,7 +2,7 @@
 	(version 20241229)
 	(generator "pcbnew")
 	(layer "F.Cu")
-	(descr "Two SMD lap-solder pads for 20 AWG wire (ESC battery feed). Pad 1 VBUS, pad 2 GND. Wire lies along the pad, zip-tie through the adjacent slot.")
+	(descr "Two SMD lap-solder pads for 20 AWG wire (ESC battery feed). Pad 1 VBUS, pad 2 GND. Wire lies along the pad (N-S). No room for a zip-tie slot (board edge 0.3 mm E of pad 2, S beam N of the pads, ledge S): strain relief is the chassis wire clip on the S-ledge face plus an epoxy fillet over each joint.")
 	(tags "solder wire lap SMD 20AWG")
 	(attr smd)
 	(property "Reference" "REF**"

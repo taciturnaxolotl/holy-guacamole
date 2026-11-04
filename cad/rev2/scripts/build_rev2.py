@@ -9,10 +9,12 @@ Run from cad/rev2 (after scripts/slice_v33b.py, which tessellates the STEPs to /
       python scripts/build_rev2.py
 """
 import math, ezdxf, trimesh, numpy as np
-from shapely.geometry import Polygon, Point, box
+from shapely.geometry import Polygon, Point, box, LineString
 from shapely.ops import unary_union
 
-WORK = "/tmp/hg33b_work/"
+import os
+WORK = os.environ.get("WORK", "/tmp/hg33b_work/")      # dir with the chassis meshes
+MPFX = os.environ.get("MPFX", "v33b_")                 # v33b_ (rev B slices) or v33m_ (chassis v3.4d STLs from the frame generator)
 # ---------------- v33 rev B constants (concept_v33.py / README) ----------------
 BAY = (-20.5, 20.5, -39.5, 39.5)
 LEDGE_Y0 = 29.9; BAT_Z0 = 7.2; USB_Z1 = 7.2
@@ -77,8 +79,10 @@ PL = [
     ("J6_XT30_BAT", 11.0, 16.6, -18.6, -8.0, None, "XT30UPB-M vertical, rotated 90 deg, pins (13.8,-15.8)/(13.8,-10.8); mated body per v3.4c"),
     ("D2",        12.6, 19.6, -7.7, -4.2, 2.2, "SMAJ15CA (D_SMA) horizontal, centre (16.1,-5.95), in the key band (limit 4.0)"),
     ("J1_ESC_PWR", 13.9, 19.7, -29.3, -25.3, 0.5, "2x SMD lap pads 2.6x4.0 for 20AWG, VBUS x 13.9..16.5, GND x 17.1..19.7; south of the S beam"),
-    ("J4_ESC_SIG", 4.27, 13.73, -29.6, -23.2, 4.25, "JST-GH 4p horizontal, centre (9.0,-26.4), opening S into the v34 groove"),
-    ("J5_RX",     -5.23, 4.23, -29.6, -23.2, 4.25, "JST-GH 4p horizontal, centre (-0.5,-26.4), opening S, plug under the rx lead drop (x +-3)"),
+    ("J4_ESC_SIG", 4.27, 13.73, -29.6, -25.55, 4.25, "JST-GH 4p horizontal, centre (9.0,-26.4), opening S into the v34 groove: header body"),
+    ("J4_REARPADS", 4.27, 13.73, -25.55, -23.2, 0.2, "J4 SMD mounting/signal pads behind the body (flat, under the S beam)"),
+    ("J5_RX",     -5.23, 4.23, -29.6, -25.55, 4.25, "JST-GH 4p horizontal, centre (-0.5,-26.4), opening S, plug under the rx lead drop (x +-3): header body"),
+    ("J5_REARPADS", -5.23, 4.23, -25.55, -23.2, 0.2, "J5 SMD pads behind the body (flat, under the S beam)"),
     ("J2_LED",    -19.7, -13.3, -19.5, -12.54, 4.25, "JST-GH 2p horizontal rotated 90 deg, centre (-16.5,-16.02), opening E; both TinySLEDs on one plug, Y-spliced"),
     ("J2_PLUG",   -13.3, -7.4, -19.5, -12.54, 4.25, "J2 mating plug + cable exit"),
 ]
@@ -87,7 +91,7 @@ IMU_NOM = [("U4", 12.0, 0.0), ("U5", 18.0, 90.0), ("U6", 18.0, 210.0)]   # (ref,
 IMU_HALF = 2.0                                                          # 3x3 LGA + 0.5 courtyard
 
 # ---------------- geometry checks against rev B ----------------
-mesh = {n: trimesh.load(WORK + f"v33b_{n}.stl") for n in ("lower", "upper", "bot")}
+mesh = {n: trimesh.load(WORK + f"{MPFX}{n}.stl") for n in ("lower", "upper", "bot")}
 def sec(n, z):
     s = mesh[n].section(plane_origin=[0, 0, z], plane_normal=[0, 0, 1])
     return unary_union([p.buffer(0) for p in s.to_2D(to_2D=np.eye(4))[0].polygons_full]) if s is not None else Polygon()
@@ -145,6 +149,11 @@ K = {
     "USB_CHIMNEY": unary_union([R_(USB_X[0], USB_X[1], 28.82, Y1), R_(NX0, NX1, NY, Y1)]),
     "LED_CORNER": R_(-20.0, -7.4, -19.5, -12.54),
     "RX_ENTRY": R_(RX_GROOVE[0], RX_GROOVE[1], -29.9, -23.2),
+    # chassis v3.4d harness (viewer harness.js, collision-checked): 2-core GH cables for the two TinySLEDs + their Y-splice into J2
+    "LED_BOT_LEAD_UNDER_BEAM_NO_PARTS": LineString([(-20.0, -26.95), (-19.6, -26.6), (-15.0, -24.4), (-9.6, -22.4), (-6.2, -21.1), (-3.0, -20.6)]).buffer(0.8),   # cable z 2.7..3.8 lies on the board
+    f"LED_BOT_HOOK_{tag(0.3)}": R_(-2.0, -0.7, -20.2, -17.0),        # bottom lead climbs z 3.4 -> 4.6 beside U5 into the splice
+    f"LED_TOP_LEAD_{tag(1.2)}": LineString([(-12.6, -11.4), (-10.4, -11.4), (-5.0, -11.8), (-2.4, -13.2), (-2.0, -14.8), (-3.0, -15.37), (-4.0, -15.37)]).buffer(0.8),    # cable bottom z 4.05
+    f"LED_SPLICE_{tag(1.0)}": R_(-7.6, -1.0, -18.0, -14.0),          # Y-splice sleeve x -6.6..-4.0, bottom z 3.85; bottom-lead hook-in at x -1.3
 }
 for k, v in K.items():
     g = v.intersection(BOARD)

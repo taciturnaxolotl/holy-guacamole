@@ -1,44 +1,44 @@
-lower z= 0.95: solid over board  543.91 mm2; outside the end-ledge blocks 0.000
-lower z= 1.50: solid over board  543.91 mm2; outside the end-ledge blocks 0.000
-lower z= 2.20: solid over board  398.11 mm2; outside the end-ledge blocks 0.000
-lower z= 2.45: solid over board  398.11 mm2; outside the end-ledge blocks 0.000
-lower z= 3.00: solid over board  398.11 mm2; outside the end-ledge blocks 0.000
-lower z= 4.50: solid over board  398.11 mm2; outside the end-ledge blocks 0.000
-lower z= 6.00: solid over board  398.11 mm2; outside the end-ledge blocks 0.000
-lower z= 7.15: solid over board  398.11 mm2; outside the end-ledge blocks 0.000
-lower z= 7.25: solid over board    0.00 mm2; outside the end-ledge blocks 0.000
-lower z= 7.50: solid over board    0.00 mm2; outside the end-ledge blocks 0.000
-lower z= 9.00: solid over board    0.00 mm2; outside the end-ledge blocks 0.000
-lower z=12.00: solid over board    0.00 mm2; outside the end-ledge blocks 0.000
+lower z= 0.95: solid over board    0.00 mm2; outside the end-ledge blocks 0.000
+lower z= 1.50: solid over board    0.00 mm2; outside the end-ledge blocks 0.000
+lower z= 2.20: solid over board    0.00 mm2; outside the end-ledge blocks 0.000
+lower z= 2.45: solid over board    0.00 mm2; outside the end-ledge blocks 0.000
+lower z= 3.00: solid over board  366.81 mm2; outside the end-ledge blocks 0.000
+lower z= 4.50: solid over board  566.78 mm2; outside the end-ledge blocks 200.000
+lower z= 6.00: solid over board  566.92 mm2; outside the end-ledge blocks 200.000
+lower z= 7.15: solid over board  598.11 mm2; outside the end-ledge blocks 200.000
+lower z= 7.25: solid over board   73.40 mm2; outside the end-ledge blocks 20.400
+lower z= 7.50: solid over board   73.40 mm2; outside the end-ledge blocks 20.400
+lower z= 9.00: solid over board   73.40 mm2; outside the end-ledge blocks 20.400
+lower z=12.00: solid over board   53.00 mm2; outside the end-ledge blocks 0.000
 lower z=16.50: solid over board    0.00 mm2; outside the end-ledge blocks 0.000
-upper z=17.00: solid over board  170.40 mm2 [(-8.5, -33.5, -6.5, -11.0), (6.5, -33.5, 8.5, -11.0), (-8.5, 11.0, -6.5, 33.0), (6.5, 11.0, 8.5, 29.2)]
-upper z=20.00: solid over board  170.40 mm2 [(-8.5, -33.5, -6.5, -11.0), (6.5, -33.5, 8.5, -11.0), (-8.5, 11.0, -6.5, 33.0), (6.5, 11.0, 8.5, 29.2)]
-upper z=25.00: solid over board  170.40 mm2 [(-8.5, -33.5, -6.5, -11.0), (6.5, -33.5, 8.5, -11.0), (-8.5, 11.0, -6.5, 33.0), (6.5, 11.0, 8.5, 29.2)]
-upper z=26.00: solid over board 1174.01 mm2 [(-20.0, -33.5, -6.5, -11.0), (-20.0, 11.0, -6.5, 33.0), (6.5, -33.5, 20.0, -11.0), (6.5, 11.0, 20.0, 33.0)]
-upper z=28.00: solid over board 1174.01 mm2 [(-20.0, -33.5, -6.5, -11.0), (-20.0, 11.0, -6.5, 33.0), (6.5, -33.5, 20.0, -11.0), (6.5, 11.0, 20.0, 33.0)]
-bottom plate (z 0.1): open area under the board 0.000 mm2; plate z -0.33..0.58; gap to board bottom 0.32
-  old plate hole at (-24.75, 24.0): open 28.2 mm2 (to be removed)
-  old plate hole at (24.5, -24.0): open 28.2 mm2 (to be removed)
-S ledge voids z=2.2: [(-13.5, -39.45, 4.5, -29.9)]
-S ledge voids z=3.0: [(-13.5, -39.45, 4.5, -29.9)]
-S ledge voids z=5.0: [(-13.5, -39.45, 4.5, -29.9)]
-S ledge voids z=7.0: [(-13.5, -39.45, 4.5, -29.9)]
-N ledge voids z=2.2: [(0.7, 29.9, 12.7, 39.5)]
-N ledge voids z=5.0: [(0.7, 29.9, 12.7, 39.5)]
+upper z=17.00: solid over board  191.25 mm2 [(-10.75, -22.5, -8.75, -11.0), (8.75, -22.5, 10.75, -11.0), (8.75, 11.0, 10.75, 29.2), (-10.75, 11.0, 0.4, 38.0)]
+upper z=20.00: solid over board  162.90 mm2 [(-10.75, -22.5, -8.75, -11.0), (8.75, -22.5, 10.75, -11.0), (8.75, 11.0, 10.75, 29.2), (-10.75, 11.0, 0.4, 38.0)]
+upper z=25.00: solid over board  162.90 mm2 [(-10.75, -22.5, -8.75, -11.0), (8.75, -22.5, 10.75, -11.0), (8.75, 11.0, 10.75, 29.2), (-10.75, 11.0, 0.4, 38.0)]
+upper z=26.00: solid over board  645.41 mm2 [(8.75, -22.5, 20.0, -11.0), (8.75, 11.0, 20.0, 31.5), (-20.0, 11.0, 0.4, 38.0), (-20.0, -22.5, -8.75, -11.0)]
+upper z=28.00: solid over board  645.41 mm2 [(-20.0, -22.5, -8.75, -11.0), (8.75, -22.5, 20.0, -11.0), (8.75, 11.0, 20.0, 31.5), (-20.0, 11.0, 0.4, 38.0)]
+bottom plate (z 0.1): open area under the board 99.376 mm2; plate z -0.33..0.58; gap to board bottom 0.32
+  old plate hole at (-24.75, 24.0): open 0.0 mm2 (to be removed)
+  old plate hole at (24.5, -24.0): open 0.0 mm2 (to be removed)
+S ledge voids z=2.2: [(-20.5, -38.5, 20.5, -29.9)]
+S ledge voids z=3.0: [(-4.5, -39.45, 13.5, -29.9), (15.43, -36.07, 18.6, -32.93), (-18.57, -36.07, -15.4, -32.93)]
+S ledge voids z=5.0: [(-4.5, -39.45, 13.5, -29.9), (15.42, -36.08, 18.6, -32.95), (-18.58, -36.08, -15.4, -32.95)]
+S ledge voids z=7.0: [(-4.5, -39.45, 13.5, -29.9)]
+N ledge voids z=2.2: [(-20.5, 29.9, 20.5, 39.5)]
+N ledge voids z=5.0: [(0.7, 29.9, 12.7, 39.5), (15.02, 32.92, 18.2, 36.05), (-18.18, 32.92, -15.0, 36.05)]
 SW wall void (LED lead channel) z=3.0: [(-30.0, -30.0, -20.5, -24.0)]
 board edge -> bay wall at z 1.5 (|y|<29.9): 0.500 mm
 board ∩ USB plug channel: 0.000 mm2
-hole (-16.6,34.5): Ø5.2 void in rev B ledge at z 3/4.5/6/7 = [0.0, 0.0, 0.0, 0.0]; Ø3.2 bore wall to groove v33b 62.57 / v34 63.63, to USB channel 15.7, to bay wall x±20.5 2.30, to ledge face 3.00
-hole (16.6,34.5): Ø5.2 void in rev B ledge at z 3/4.5/6/7 = [0.0, 0.0, 0.0, 0.0]; Ø3.2 bore wall to groove v33b 63.63 / v34 62.57, to USB channel 2.3, to bay wall x±20.5 2.30, to ledge face 3.00
-hole (-17.0,-34.5): Ø5.2 void in rev B ledge at z 3/4.5/6/7 = [0.0, 0.0, 0.0, 0.0]; Ø3.2 bore wall to groove v33b 1.9 / v34 10.9, to USB channel 65.0, to bay wall x±20.5 1.90, to ledge face 3.00
-hole (17.0,-34.5): Ø5.2 void in rev B ledge at z 3/4.5/6/7 = [0.0, 0.0, 0.0, 0.0]; Ø3.2 bore wall to groove v33b 10.9 / v34 1.9, to USB channel 62.74, to bay wall x±20.5 1.90, to ledge face 3.00
+hole (-16.6,34.5): Ø5.2 void in rev B ledge at z 3/4.5/6/7 = [7.824, 7.833, 7.797, 0.0]; Ø3.2 bore wall to groove v33b 62.57 / v34 63.63, to USB channel 15.7, to bay wall x±20.5 2.30, to ledge face 3.00
+hole (16.6,34.5): Ø5.2 void in rev B ledge at z 3/4.5/6/7 = [7.824, 7.833, 7.797, 0.0]; Ø3.2 bore wall to groove v33b 63.63 / v34 62.57, to USB channel 2.3, to bay wall x±20.5 2.30, to ledge face 3.00
+hole (-17.0,-34.5): Ø5.2 void in rev B ledge at z 3/4.5/6/7 = [7.824, 7.833, 7.797, 0.0]; Ø3.2 bore wall to groove v33b 1.9 / v34 10.9, to USB channel 65.0, to bay wall x±20.5 1.90, to ledge face 3.00
+hole (17.0,-34.5): Ø5.2 void in rev B ledge at z 3/4.5/6/7 = [7.824, 7.833, 7.797, 0.0]; Ø3.2 bore wall to groove v33b 10.9 / v34 1.9, to USB channel 62.74, to bay wall x±20.5 1.90, to ledge face 3.00
 IMU rigid-rotation scan (deg CCW, relative to firmware 0/90/210): feasible ranges [(163, 168)]; nominal 0° feasible: False
   nominal U4 (12.00,0.00) collides with nothing; in key band: True
   nominal U5 (0.00,18.00) collides with ['U1_XIAO']; in key band: False
   nominal U6 (-15.59,-9.00) collides with nothing; in key band: True
   chosen rotation 166° (min clearance 0.90 mm to placed parts/ledges/holes, 3.40 mm to L1/buck)
   U4 at (-11.64,2.90) r=12.0 angle=166°  zones: ['KEYBAND_4P0', 'CORRIDOR_23P0']
-  U5 at (-4.35,-17.47) r=18.0 angle=256°  zones: ['BATTERY_4P7']
+  U5 at (-4.35,-17.47) r=18.0 angle=256°  zones: ['BATTERY_4P7', 'LED_TOP_LEAD_1P2', 'LED_SPLICE_1P0']
   U6 at (17.30,4.96) r=18.0 angle=16°  zones: ['KEYBAND_4P0', 'CORRIDOR_23P0']
 U1_XIAO      x[ -2.17, 15.61] y[  7.86, 28.82] h=3.2  inside board: True  overlaps -  zones ['BATTERY_4P7', 'KEYBAND_4P0', 'RIB_14P4', 'CORRIDOR_23P0']
 U1_USBC      x[  2.25, 11.19] y[ 23.60, 30.90] h=4.3  inside board: False  overlaps -  zones ['BATTERY_4P7', 'RIB_14P4', 'CORRIDOR_23P0', 'USB_CHIMNEY']
@@ -49,8 +49,10 @@ C21          x[  0.50,  9.00] y[-19.30,-14.30] h=4.3  inside board: True  overla
 J6_XT30_BAT  x[ 11.00, 16.60] y[-18.60, -8.00] h=None  inside board: True  overlaps -  zones ['CORRIDOR_23P0', 'XT30_BAT']
 D2           x[ 12.60, 19.60] y[ -7.70, -4.20] h=2.2  inside board: True  overlaps -  zones ['KEYBAND_4P0', 'CORRIDOR_23P0']
 J1_ESC_PWR   x[ 13.90, 19.70] y[-29.30,-25.30] h=0.5  inside board: True  overlaps -  zones ['S_GAP_XH_PLUG_LOW_PARTS', 'MOTOR_SVC_LOOP_7P5', 'ESC_EDGE']
-J4_ESC_SIG   x[  4.27, 13.73] y[-29.60,-23.20] h=4.25  inside board: True  overlaps -  zones ['S_BEAM_1P2', 'S_GAP_XH_PLUG_LOW_PARTS', 'ESC_EDGE']
-J5_RX        x[ -5.23,  4.23] y[-29.60,-23.20] h=4.25  inside board: True  overlaps -  zones ['S_BEAM_1P2', 'S_GAP_XH_PLUG_LOW_PARTS', 'RX_ENTRY']
+J4_ESC_SIG   x[  4.27, 13.73] y[-29.60,-25.55] h=4.25  inside board: True  overlaps -  zones ['S_GAP_XH_PLUG_LOW_PARTS', 'ESC_EDGE']
+J4_REARPADS  x[  4.27, 13.73] y[-25.55,-23.20] h=0.2  inside board: True  overlaps -  zones ['S_BEAM_1P2', 'S_GAP_XH_PLUG_LOW_PARTS', 'ESC_EDGE']
+J5_RX        x[ -5.23,  4.23] y[-29.60,-25.55] h=4.25  inside board: True  overlaps -  zones ['S_GAP_XH_PLUG_LOW_PARTS', 'RX_ENTRY']
+J5_REARPADS  x[ -5.23,  4.23] y[-25.55,-23.20] h=0.2  inside board: True  overlaps -  zones ['S_BEAM_1P2', 'S_GAP_XH_PLUG_LOW_PARTS', 'RX_ENTRY']
 J2_LED       x[-19.70,-13.30] y[-19.50,-12.54] h=4.25  inside board: True  overlaps -  zones ['MOTOR_LEADS_7P3', 'CORRIDOR_23P0', 'LED_CORNER']
-J2_PLUG      x[-13.30, -7.40] y[-19.50,-12.54] h=4.25  inside board: True  overlaps -  zones ['BATTERY_4P7', 'RIB_14P4', 'CORRIDOR_23P0', 'LED_CORNER']
+J2_PLUG      x[-13.30, -7.40] y[-19.50,-12.54] h=4.25  inside board: True  overlaps -  zones ['BATTERY_4P7', 'RIB_14P4', 'CORRIDOR_23P0', 'LED_CORNER', 'LED_SPLICE_1P0']
 XIAO in battery strip |x|<=9.0: 234.1 mm2 of 372.7 (x -2.17..9.0 = 11.17 mm wide); directly under the battery (|x|<=8.5): 10.67 mm wide

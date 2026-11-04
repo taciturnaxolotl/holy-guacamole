@@ -10,6 +10,24 @@ The STEPs were tessellated to `/tmp/hg33b_work/` and sliced with trimesh.
 
 **Superseded work:** `stale_bodystep/` (old July chassis) and `stale_v33a/` (v33 rev A). Ignore both.
 
+## v3.4d harness keepouts (chassis session, on top of 1c456dd)
+
+The chassis viewer now carries a collision-checked wiring harness (every wire, plug, bullet and splice against the frame, the parts and each other). It fits 1c456dd; these layers protect the routes on the board side:
+
+| Layer | Region | Limit | Why |
+|---|---|---|---|
+| `LED_BOT_LEAD_UNDER_BEAM_NO_PARTS` | 0.8 mm either side of (−20, −26.95) → (−15, −24.4) → (−9.6, −22.4) → (−6.2, −21.1) → (−3.0, −20.6) | no top-side parts (vias OK) | bottom TinySLED 2-core lead lies on the board, z 2.7…3.8, under the S beam |
+| `LED_BOT_HOOK_0P3` | x −2.0…−0.7, y −20.2…−17.0 | ≤ 0.3 | same lead climbing z 3.4 → 4.6 beside U5 into the splice |
+| `LED_TOP_LEAD_1P2` | 0.8 mm either side of (−12.6, −11.4) → (−5.0, −11.8) → (−2.4, −13.2) → (−2.0, −14.8) → (−4.0, −15.37) | ≤ 1.2 | top TinySLED lead under the battery floor, bottom z 4.05 |
+| `LED_SPLICE_1P0` | x −7.6…−1.0, y −18…−14 | ≤ 1.0 | Y-splice sleeve x −6.6…−4.0 at y −16.02, bottom z 3.85 (U5 fits at 1.0) |
+
+Also:
+- `J4_ESC_SIG` / `J5_RX` courtyards split: header body y −29.6…−25.55 (4.25 tall) + `J4_REARPADS` / `J5_REARPADS` y −25.55…−23.2 at 0.2, so the S-beam check stops flagging the flat pads.
+- `J1` strain relief: the board has no room for tie slots (pad 2 is 0.3 mm from the board edge, beam to the N, ledge to the S). The chassis adds snap channels for both 20 AWG leads on the S-ledge top (y −31.8…−30.2, slots 1.5 wide at x 14.85…16.35 and 17.65…19.15) just before they drop to the pads; finish each joint with an epoxy fillet. Footprint description updated.
+- Chassis side of 1c456dd: shelf windows widened so both mated XT30s go straight down (SE shelf now ends at y −19.2; NW gap y 18.6…30.0), and TinySLED cradles added under both LED pockets.
+- TinySLED current: unchanged, they were already paralleled on Q1 in Rev A.
+- `build_rev2.py` takes `WORK` / `MPFX` env vars, so the checks can slice the chassis v3.4d STLs (`MPFX=v33m_`) instead of rev B.
+
 ## v3.4c update (current; supersedes the placement tables further down)
 
 The chassis designer's v3.4c constraints are encoded in `scripts/build_rev2.py` as boxes (no v3.4c STEP yet; the section checks and overview PNGs still slice v33b meshes). New keepout layers: `S_BEAM_1P2`, `S_GAP_XH_PLUG_LOW_PARTS`, `MOTOR_SVC_LOOP_7P5`, `LED_CHANNEL_MOUTH_CLEAR`; `BATTERY_4P7` is now |x| ≤ 9.0, y −19.8…29.9; ribs at |x| 8.75…10.75.
