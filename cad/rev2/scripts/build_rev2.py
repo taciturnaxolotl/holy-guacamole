@@ -17,8 +17,12 @@ WORK = "/tmp/hg33b_work/"
 BAY = (-20.5, 20.5, -39.5, 39.5)
 LEDGE_Y0 = 29.9; BAT_Z0 = 7.2; USB_Z1 = 7.2
 USB_X = (0.7, 12.7); CHIM_Y = (48.0, 58.0)
-BAT = (-6.0, 6.0, -33.95, 33.95)                          # 68x20x12 on edge, z 7.25..27.25 (step bbox)
-RIB_X0, RIB_T = 6.5, 2.0; RIB_Y = ((11.0, 33.0), (-33.5, -11.0)); Z_SPLIT = 16.88; Z_SHELF = 25.5
+BAT = (-8.5, 8.5, -23.2, 31.6)                            # v3.4c: GNB 3S 380, 55x17x20, bottom z 7.2, leads + XH-4P out of the S end
+BEAM = (-20.5, 20.5, -24.8, -19.8)                        # v3.4c S cross-beam, lower half, z 4.0..7.2 (parts <= 1.2 under it)
+SVC_LOOP = (14.0, 17.5, -28.0, -20.0)                     # v3.4c motor-lead service loop, both sides (mirror in x), z 10..22
+S_GAP = (-20.5, 20.5, -29.9, -24.8)                       # v3.4c S gap: XH plug + motor leads pass above the board
+BAT_STRIP_X = 9.0
+RIB_X0, RIB_T = 8.75, 2.0; RIB_Y = ((11.0, 32.7), (-22.5, -11.0)); Z_SPLIT = 16.88; Z_SHELF = 25.5
 Z_KEY = 6.53                                              # lowest point of the 2.5 mm L-key sweep (screw z 7.78 - 1.25)
 LEADCH = (19.5, 31.5, -25.0, -15.0, 9.8, 19.2)
 ESC = (-13.0, 13.0, -39.3, -34.3)                         # 5 mm envelope, z 7.25..27.25; real board y -39.3..-37.3
@@ -36,7 +40,7 @@ X0, X1, Y0, Y1 = -20.0, 20.0, -38.0, 38.0
 R = 1.5
 NX0, NX1, NY = 0.4, 13.0, 29.2                            # USB notch (clears the plug channel x 0.7..12.7, y>=29.7)
 RI, RM = 1.0, 0.5
-HOLES = [(-16.6, 34.5), (16.6, 34.5), (-16.6, -34.5), (16.6, -34.5)]
+HOLES = [(-16.6, 34.5), (16.6, 34.5), (-17.0, -34.5), (17.0, -34.5)]
 DRILL, KEEP_D = 2.2, 4.5
 
 def limits(T):
@@ -66,20 +70,19 @@ XIAO_DX = 0.0                                              # receptacle centred 
 PL = [
     ("U1_XIAO",   -2.17 + XIAO_DX, 15.61 + XIAO_DX, 7.86, 28.82, 3.2, "XIAO RP2350 module (shield top +3.19), USB-C to N"),
     ("U1_USBC",    2.25 + XIAO_DX, 11.19 + XIAO_DX, 23.60, 30.90, 4.3, "XIAO USB-C receptacle, mouth y 30.9 in the plug channel"),
-    ("J7_XT30_SW", -19.7, -8.5, 22.3, 28.5, None, "XT30UPB-F vertical, pins (-16.6,25.4)/(-11.6,25.4)"),
-    ("L1",        -19.35, -12.45, 15.1, 22.2, 5.8, "SRP6060FA, centre (-15.9,18.65)"),
-    ("C21",       -19.5, -10.1, 8.0, 15.1, 5.8, "CP_Elec_6.3x5.8, centre (-14.8,11.55) (no room at SE, see README)"),
+    ("J7_XT30_SW", -16.6, -11.0, 19.0, 29.6, None, "XT30UPB-F vertical, rotated 90 deg, pins (-13.8,21.8)/(-13.8,26.8); mated body per v3.4c"),
+    ("L1",        -19.35, -12.45, 11.0, 18.1, 5.8, "SRP6060FA, centre (-15.9,14.55)"),
     ("U2_BUCK",   -10.0, -2.7, 8.3, 22.1, 1.2, "AP63301 + Cin/Cout/boot/FB/EN divider, beside L1"),
-    ("J6_XT30_BAT", 8.5, 19.7, -14.6, -8.4, None, "XT30UPB-M vertical, pins (11.6,-11.5)/(16.6,-11.5)"),
-    ("D2",        12.6, 19.6, -20.4, -16.9, 2.2, "SMAJ15CA (D_SMA) horizontal, centre (16.1,-18.65)"),
-    ("J1_ESC_PWR", 16.45, 19.75, -29.3, -20.7, 2.5, "2x 20AWG pads P4.8 vertical, pads (18.1,-27.4)/(18.1,-22.6)"),
-    ("J4_ESC_SIG", 4.77, 14.23, -29.6, -23.2, 4.25, "JST-GH 4p horizontal, centre (9.5,-26.4), opening S: plug lies in the v34 S-ledge groove"),
-    ("J5_RX",     -4.73, 4.73, -29.6, -23.2, 4.25, "JST-GH 4p horizontal, centre (0.0,-26.4), opening S: plug in the groove under the rx lead drop (x ±3)"),
-    ("J3_LED_BOT", -19.5, -13.1, -29.6, -22.64, 4.25, "JST-GH 2p horizontal rotated 90°, centre (-16.3,-26.12), opening E"),
-    ("J2_LED_TOP", -19.5, -13.1, -22.4, -15.44, 4.25, "JST-GH 2p horizontal rotated 90°, centre (-16.3,-18.92), opening E"),
-    ("J2J3_PLUGS", -13.1, -7.2, -29.6, -15.44, 4.25, "J2/J3 mating plugs + cable exits"),
+    ("C21",        0.5, 9.0, -19.3, -14.3, 4.3, "100uF 25V polymer tantalum 7343-43 (<=4.3 mm), battery strip, ~12 mm from J1"),
+    ("J6_XT30_BAT", 11.0, 16.6, -18.6, -8.0, None, "XT30UPB-M vertical, rotated 90 deg, pins (13.8,-15.8)/(13.8,-10.8); mated body per v3.4c"),
+    ("D2",        12.6, 19.6, -7.7, -4.2, 2.2, "SMAJ15CA (D_SMA) horizontal, centre (16.1,-5.95), in the key band (limit 4.0)"),
+    ("J1_ESC_PWR", 13.9, 19.7, -29.3, -25.3, 0.5, "2x SMD lap pads 2.6x4.0 for 20AWG, VBUS x 13.9..16.5, GND x 17.1..19.7; south of the S beam"),
+    ("J4_ESC_SIG", 4.27, 13.73, -29.6, -23.2, 4.25, "JST-GH 4p horizontal, centre (9.0,-26.4), opening S into the v34 groove"),
+    ("J5_RX",     -5.23, 4.23, -29.6, -23.2, 4.25, "JST-GH 4p horizontal, centre (-0.5,-26.4), opening S, plug under the rx lead drop (x +-3)"),
+    ("J2_LED",    -19.7, -13.3, -19.5, -12.54, 4.25, "JST-GH 2p horizontal rotated 90 deg, centre (-16.5,-16.02), opening E; both TinySLEDs on one plug, Y-spliced"),
+    ("J2_PLUG",   -13.3, -7.4, -19.5, -12.54, 4.25, "J2 mating plug + cable exit"),
 ]
-THT = [(11.6, -11.5), (16.6, -11.5), (-16.6, 25.4), (-11.6, 25.4), (18.1, -27.4), (18.1, -22.6)]   # J6, J7, J1 through-hole pins
+THT = [(13.8, -15.8), (13.8, -10.8), (-13.8, 21.8), (-13.8, 26.8)]   # J6, J7 through-hole pins (J1 is now SMD)
 IMU_NOM = [("U4", 12.0, 0.0), ("U5", 18.0, 90.0), ("U6", 18.0, 210.0)]   # (ref, r, angle) = firmware imu_geom.c
 IMU_HALF = 2.0                                                          # 3x3 LGA + 0.5 courtyard
 
@@ -123,20 +126,24 @@ for hx, hy in HOLES:
 # ---------------- keepout regions ----------------
 def R_(x0, x1, y0, y1): return box(x0, y0, x1, y1)
 K = {
-    f"BATTERY_{tag(L16['bat'])}": R_(-6.5, 6.5, -LEDGE_Y0, LEDGE_Y0),
+    f"BATTERY_{tag(L16['bat'])}": R_(-BAT_STRIP_X, BAT_STRIP_X, BEAM[3], LEDGE_Y0),
+    f"S_BEAM_{tag(1.2)}": R_(X0, X1, BEAM[2], BEAM[3]),
+    "S_GAP_XH_PLUG_LOW_PARTS": R_(X0, X1, S_GAP[2], S_GAP[3]),
+    f"MOTOR_SVC_LOOP_{tag(10.0 - Z_BOT - 1.6)}": unary_union([R_(*SVC_LOOP), R_(-SVC_LOOP[1], -SVC_LOOP[0], SVC_LOOP[2], SVC_LOOP[3])]),
+    "LED_CHANNEL_MOUTH_CLEAR": R_(-20.0, -19.0, -28.5, -25.5),
     f"KEYBAND_{tag(L16['key'])}": unary_union([R_(3.75, X1, -8, 8), R_(X0, -3.75, -8, 8)]),
-    f"MOTOR_LEADS_{tag(L16['leads'])}": unary_union([R_(8.5, X1, -29.6, -15.0), R_(X0, -8.5, -29.6, -15.0)]),
+    f"MOTOR_LEADS_{tag(L16['leads'])}": unary_union([R_(17.5, X1, -25.0, -15.0), R_(X0, -17.5, -25.0, -15.0)]),   # lead entries at the bay wall (v3.4c J6 sits inboard of them)
     f"RIB_{tag(L16['rib'])}": unary_union([R_(s * RIB_X0, s * (RIB_X0 + RIB_T), *y) for s in (1, -1) for y in RIB_Y]),
-    f"CORRIDOR_{tag(L16['shelf'])}": unary_union([R_(8.5, X1, -LEDGE_Y0, LEDGE_Y0), R_(X0, -8.5, -LEDGE_Y0, LEDGE_Y0)]),
+    f"CORRIDOR_{tag(L16['shelf'])}": unary_union([R_(BAT_STRIP_X, X1, BEAM[3], LEDGE_Y0), R_(X0, -BAT_STRIP_X, BEAM[3], LEDGE_Y0)]),
     "LEDGE_CLAMP_NO_PARTS": unary_union([R_(X0, X1, LEDGE_Y0 - 0.3, Y1), R_(X0, X1, Y0, -LEDGE_Y0 + 0.3)]).difference(
         R_(SGROOVE_V34[0], SGROOVE_V34[1], Y0, -LEDGE_Y0)),
     f"S_GROOVE_WIRES_{tag(L16['groove'])}": R_(SGROOVE_V34[0], SGROOVE_V34[1], Y0, -LEDGE_Y0),
     "BOTTOM_FLUSH_PADS_ONLY": R_(X0, X1, Y0, Y1),
-    "XT30_BAT": R_(8.5, 19.7, -14.6, -8.4),
-    "XT30_SW": R_(-19.7, -8.5, 22.3, 28.5),
-    "ESC_EDGE": unary_union([R_(4.77, 19.75, -29.9, -23.2), R_(16.45, 19.75, -23.2, -16.9), R_(12.6, 16.45, -20.4, -16.9)]),
+    "XT30_BAT": R_(11.0, 16.6, -18.6, -8.0),
+    "XT30_SW": R_(-16.6, -11.0, 19.0, 29.6),
+    "ESC_EDGE": R_(4.27, 19.7, -29.6, -23.2),
     "USB_CHIMNEY": unary_union([R_(USB_X[0], USB_X[1], 28.82, Y1), R_(NX0, NX1, NY, Y1)]),
-    "LED_CORNER": unary_union([R_(-20.0, -7.2, -29.6, -15.44), R_(-20.0, -19.0, -28.5, -25.5)]),
+    "LED_CORNER": R_(-20.0, -7.4, -19.5, -12.54),
     "RX_ENTRY": R_(RX_GROOVE[0], RX_GROOVE[1], -29.9, -23.2),
 }
 for k, v in K.items():
@@ -185,8 +192,8 @@ for p in PL:
     rep.append(f"{p[0]:12s} x[{p[1]:6.2f},{p[2]:6.2f}] y[{p[3]:6.2f},{p[4]:6.2f}] h={p[5]}  inside board: {BOARD.buffer(1e-6).contains(bb)}  "
                f"overlaps {over or '-'}  zones {zones}")
 xi = box(PL[0][1], PL[0][3], PL[0][2], PL[0][4])
-rep.append(f"XIAO in battery strip |x|<=6.5: {xi.intersection(K['BATTERY_' + tag(L16['bat'])]).area:.1f} mm2 of {xi.area:.1f} "
-           f"(x {PL[0][1]:.2f}..6.5 = {6.5 - PL[0][1]:.2f} mm wide); directly under the battery (|x|<=6): {6.0 - PL[0][1]:.2f} mm wide")
+rep.append(f"XIAO in battery strip |x|<=9.0: {xi.intersection(K['BATTERY_' + tag(L16['bat'])]).area:.1f} mm2 of {xi.area:.1f} "
+           f"(x {PL[0][1]:.2f}..9.0 = {9.0 - PL[0][1]:.2f} mm wide); directly under the battery (|x|<=8.5): {8.5 - PL[0][1]:.2f} mm wide")
 print("\n".join(rep)); open("scripts/build_rev2_checks.txt", "w").write("\n".join(rep) + "\n")
 
 # ---------------- DXF ----------------
@@ -213,7 +220,7 @@ REF = {
     "REF_BAY": [BAY], "REF_LEDGES": [(BAY[0], USB_X[0], LEDGE_Y0, BAY[3]), (USB_X[1], BAY[1], LEDGE_Y0, BAY[3]), (BAY[0], BAY[1], -BAY[3], -LEDGE_Y0)],
     "REF_LEDGE_RECESS_NEW": [(BAY[0], BAY[1], LEDGE_Y0, Y1 + 0.5), (BAY[0], BAY[1], Y0 - 0.5, -LEDGE_Y0)],
     "REF_USB_CHANNEL": [(USB_X[0], USB_X[1], LEDGE_Y0 - 0.2, CHIM_Y[1])], "REF_CHIMNEY": [(USB_X[0], USB_X[1], *CHIM_Y)],
-    "REF_BATTERY": [BAT], "REF_ESC_ENVELOPE": [ESC], "REF_S_GROOVE_V33B": [SGROOVE_V33B], "REF_S_GROOVE_V34": [SGROOVE_V34],
+    "REF_BATTERY": [BAT], "REF_S_BEAM": [BEAM], "REF_S_GAP": [S_GAP], "REF_ESC_ENVELOPE": [ESC], "REF_S_GROOVE_V33B": [SGROOVE_V33B], "REF_S_GROOVE_V34": [SGROOVE_V34],
     "REF_RX": [RX], "REF_RX_LEAD_GROOVE": [RX_GROOVE], "REF_LED_LEAD_CHANNEL": [LEDCH],
     "REF_SWITCH": [SWITCH], "REF_SWITCH_SLOT": [SW_SLOT],
     "REF_MOTOR_LEAD_CHANNEL": [(LEADCH[0], LEADCH[1], LEADCH[2], LEADCH[3]), (-LEADCH[1], -LEADCH[0], LEADCH[2], LEADCH[3])],

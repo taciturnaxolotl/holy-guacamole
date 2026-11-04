@@ -6031,7 +6031,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "ESC power feed (20AWG pads)"
+		(property "Value" "ESC power feed (20AWG SMD lap pads)"
 			(at 35.56 30.48 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6042,7 +6042,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Connector_Wire:SolderWire-0.5sqmm_1x02_P4.8mm_D0.9mm_OD2.3mm"
+		(property "Footprint" "Device:SolderLap_20AWG_1x02_2.6x4.0mm_P3.2mm"
 			(at 33.02 29.21 0)
 			(hide yes)
 			(show_name no)
@@ -6841,7 +6841,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "100uF 25V low-ESR"
+		(property "Value" "100uF 25V polymer tantalum"
 			(at 55.88 60.96 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6852,7 +6852,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:CP_Elec_6.3x5.8"
+		(property "Footprint" "Capacitor_Tantalum_SMD:CP_EIA-7343-43_Kemet-X"
 			(at 53.34 59.69 0)
 			(hide yes)
 			(show_name no)

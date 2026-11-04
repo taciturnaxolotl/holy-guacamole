@@ -1700,22 +1700,10 @@
 		(uuid "fafc475c-e481-4058-87aa-93cfcd6e2cc4")
 	)
 	(junction
-		(at 148.59 44.45)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "96a20b2c-a51a-421f-9030-ec8113046be4")
-	)
-	(junction
 		(at 158.75 31.75)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "bbb6ce1a-1033-4a03-aae7-8791357b2e81")
-	)
-	(junction
-		(at 146.05 41.91)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "d82ce80e-55ad-4bc2-bd6b-523d9ac01b91")
 	)
 	(wire
 		(pts
@@ -1769,16 +1757,6 @@
 	)
 	(wire
 		(pts
-			(xy 148.59 58.42) (xy 142.24 58.42)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "406ea18f-709f-4f73-98d1-6a7c089802e3")
-	)
-	(wire
-		(pts
 			(xy 146.05 20.32) (xy 146.05 26.67)
 		)
 		(stroke
@@ -1829,16 +1807,6 @@
 	)
 	(wire
 		(pts
-			(xy 142.24 55.88) (xy 146.05 55.88)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "8ba944ec-e032-4d28-9f33-711af5a2d433")
-	)
-	(wire
-		(pts
 			(xy 158.75 31.75) (xy 171.45 31.75)
 		)
 		(stroke
@@ -1856,26 +1824,6 @@
 			(type default)
 		)
 		(uuid "b0180069-ef59-42d0-946f-4fdfa52f4156")
-	)
-	(wire
-		(pts
-			(xy 148.59 44.45) (xy 148.59 58.42)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c88fe348-0727-4005-830e-c0d81990b7b2")
-	)
-	(wire
-		(pts
-			(xy 146.05 55.88) (xy 146.05 41.91)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ec9071e8-3091-4e5e-be6f-aff12d64cddd")
 	)
 	(wire
 		(pts
@@ -1897,97 +1845,6 @@
 			(justify left)
 		)
 		(uuid "77592aaa-aaf2-4ef6-b3ad-82cecca19611")
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x02")
-		(at 137.16 58.42 180)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board yes)
-		(in_pos_files no)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "0f2fbef4-77a5-442f-a985-b5e89fb54ed9")
-		(property "Reference" "J3"
-			(at 137.16 49.53 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "TinySLED bottom (JST-GH 2p)"
-			(at 137.16 52.07 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Connector_JST:JST_GH_SM02B-GHS-TB_1x02-1MP_P1.25mm_Horizontal"
-			(at 137.16 58.42 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 137.16 58.42 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 137.16 58.42 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "LCSC Part" "NONE"
-			(at 415.29 187.96 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "8ee67e8f-a735-4726-8046-b5c27e9131b5")
-		)
-		(pin "2"
-			(uuid "29635b57-88c2-496a-9dc4-fb8dc6e6e89d")
-		)
-		(instances
-			(project "guac"
-				(path "/5ff26309-9be7-4732-9683-b5a799424d79/6b70a2bc-130a-4171-86aa-9b05a1a552ce"
-					(reference "J3")
-					(unit 1)
-				)
-			)
-		)
 	)
 	(symbol
 		(lib_id "Device:R_Small")
@@ -2517,7 +2374,7 @@
 				)
 			)
 		)
-		(property "Value" "TinySLED top (JST-GH 2p)"
+		(property "Value" "TinySLEDs top+bottom (JST-GH 2p, Y-spliced harness)"
 			(at 137.16 38.1 0)
 			(show_name no)
 			(do_not_autoplace no)

@@ -30,28 +30,27 @@ board edge -> bay wall at z 1.5 (|y|<29.9): 0.500 mm
 board ∩ USB plug channel: 0.000 mm2
 hole (-16.6,34.5): Ø5.2 void in rev B ledge at z 3/4.5/6/7 = [0.0, 0.0, 0.0, 0.0]; Ø3.2 bore wall to groove v33b 62.57 / v34 63.63, to USB channel 15.7, to bay wall x±20.5 2.30, to ledge face 3.00
 hole (16.6,34.5): Ø5.2 void in rev B ledge at z 3/4.5/6/7 = [0.0, 0.0, 0.0, 0.0]; Ø3.2 bore wall to groove v33b 63.63 / v34 62.57, to USB channel 2.3, to bay wall x±20.5 2.30, to ledge face 3.00
-hole (-16.6,-34.5): Ø5.2 void in rev B ledge at z 3/4.5/6/7 = [0.0, 0.0, 0.0, 0.0]; Ø3.2 bore wall to groove v33b 1.5 / v34 10.5, to USB channel 64.89, to bay wall x±20.5 2.30, to ledge face 3.00
-hole (16.6,-34.5): Ø5.2 void in rev B ledge at z 3/4.5/6/7 = [0.0, 0.0, 0.0, 0.0]; Ø3.2 bore wall to groove v33b 10.5 / v34 1.5, to USB channel 62.72, to bay wall x±20.5 2.30, to ledge face 3.00
-IMU rigid-rotation scan (deg CCW, relative to firmware 0/90/210): feasible ranges [(164, 168)]; nominal 0° feasible: False
+hole (-17.0,-34.5): Ø5.2 void in rev B ledge at z 3/4.5/6/7 = [0.0, 0.0, 0.0, 0.0]; Ø3.2 bore wall to groove v33b 1.9 / v34 10.9, to USB channel 65.0, to bay wall x±20.5 1.90, to ledge face 3.00
+hole (17.0,-34.5): Ø5.2 void in rev B ledge at z 3/4.5/6/7 = [0.0, 0.0, 0.0, 0.0]; Ø3.2 bore wall to groove v33b 10.9 / v34 1.9, to USB channel 62.74, to bay wall x±20.5 1.90, to ledge face 3.00
+IMU rigid-rotation scan (deg CCW, relative to firmware 0/90/210): feasible ranges [(163, 168)]; nominal 0° feasible: False
   nominal U4 (12.00,0.00) collides with nothing; in key band: True
   nominal U5 (0.00,18.00) collides with ['U1_XIAO']; in key band: False
   nominal U6 (-15.59,-9.00) collides with nothing; in key band: True
-  chosen rotation 166° (min clearance 0.85 mm to placed parts/ledges/holes, 3.40 mm to L1/buck)
+  chosen rotation 166° (min clearance 0.90 mm to placed parts/ledges/holes, 3.40 mm to L1/buck)
   U4 at (-11.64,2.90) r=12.0 angle=166°  zones: ['KEYBAND_4P0', 'CORRIDOR_23P0']
   U5 at (-4.35,-17.47) r=18.0 angle=256°  zones: ['BATTERY_4P7']
   U6 at (17.30,4.96) r=18.0 angle=16°  zones: ['KEYBAND_4P0', 'CORRIDOR_23P0']
 U1_XIAO      x[ -2.17, 15.61] y[  7.86, 28.82] h=3.2  inside board: True  overlaps -  zones ['BATTERY_4P7', 'KEYBAND_4P0', 'RIB_14P4', 'CORRIDOR_23P0']
 U1_USBC      x[  2.25, 11.19] y[ 23.60, 30.90] h=4.3  inside board: False  overlaps -  zones ['BATTERY_4P7', 'RIB_14P4', 'CORRIDOR_23P0', 'USB_CHIMNEY']
-J7_XT30_SW   x[-19.70, -8.50] y[ 22.30, 28.50] h=None  inside board: True  overlaps -  zones ['CORRIDOR_23P0', 'XT30_SW']
-L1           x[-19.35,-12.45] y[ 15.10, 22.20] h=5.8  inside board: True  overlaps -  zones ['CORRIDOR_23P0']
-C21          x[-19.50,-10.10] y[  8.00, 15.10] h=5.8  inside board: True  overlaps -  zones ['CORRIDOR_23P0']
+J7_XT30_SW   x[-16.60,-11.00] y[ 19.00, 29.60] h=None  inside board: True  overlaps -  zones ['CORRIDOR_23P0', 'XT30_SW']
+L1           x[-19.35,-12.45] y[ 11.00, 18.10] h=5.8  inside board: True  overlaps -  zones ['CORRIDOR_23P0']
 U2_BUCK      x[-10.00, -2.70] y[  8.30, 22.10] h=1.2  inside board: True  overlaps -  zones ['BATTERY_4P7', 'RIB_14P4', 'CORRIDOR_23P0']
-J6_XT30_BAT  x[  8.50, 19.70] y[-14.60, -8.40] h=None  inside board: True  overlaps -  zones ['CORRIDOR_23P0', 'XT30_BAT']
-D2           x[ 12.60, 19.60] y[-20.40,-16.90] h=2.2  inside board: True  overlaps -  zones ['MOTOR_LEADS_7P3', 'CORRIDOR_23P0', 'ESC_EDGE']
-J1_ESC_PWR   x[ 16.45, 19.75] y[-29.30,-20.70] h=2.5  inside board: True  overlaps -  zones ['MOTOR_LEADS_7P3', 'CORRIDOR_23P0', 'ESC_EDGE']
-J4_ESC_SIG   x[  4.77, 14.23] y[-29.60,-23.20] h=4.25  inside board: True  overlaps -  zones ['BATTERY_4P7', 'MOTOR_LEADS_7P3', 'RIB_14P4', 'CORRIDOR_23P0', 'ESC_EDGE']
-J5_RX        x[ -4.73,  4.73] y[-29.60,-23.20] h=4.25  inside board: True  overlaps -  zones ['BATTERY_4P7', 'RX_ENTRY']
-J3_LED_BOT   x[-19.50,-13.10] y[-29.60,-22.64] h=4.25  inside board: True  overlaps -  zones ['MOTOR_LEADS_7P3', 'CORRIDOR_23P0', 'LED_CORNER']
-J2_LED_TOP   x[-19.50,-13.10] y[-22.40,-15.44] h=4.25  inside board: True  overlaps -  zones ['MOTOR_LEADS_7P3', 'CORRIDOR_23P0', 'LED_CORNER']
-J2J3_PLUGS   x[-13.10, -7.20] y[-29.60,-15.44] h=4.25  inside board: True  overlaps -  zones ['MOTOR_LEADS_7P3', 'RIB_14P4', 'CORRIDOR_23P0', 'LED_CORNER']
-XIAO in battery strip |x|<=6.5: 181.7 mm2 of 372.7 (x -2.17..6.5 = 8.67 mm wide); directly under the battery (|x|<=6): 8.17 mm wide
+C21          x[  0.50,  9.00] y[-19.30,-14.30] h=4.3  inside board: True  overlaps -  zones ['BATTERY_4P7', 'RIB_14P4']
+J6_XT30_BAT  x[ 11.00, 16.60] y[-18.60, -8.00] h=None  inside board: True  overlaps -  zones ['CORRIDOR_23P0', 'XT30_BAT']
+D2           x[ 12.60, 19.60] y[ -7.70, -4.20] h=2.2  inside board: True  overlaps -  zones ['KEYBAND_4P0', 'CORRIDOR_23P0']
+J1_ESC_PWR   x[ 13.90, 19.70] y[-29.30,-25.30] h=0.5  inside board: True  overlaps -  zones ['S_GAP_XH_PLUG_LOW_PARTS', 'MOTOR_SVC_LOOP_7P5', 'ESC_EDGE']
+J4_ESC_SIG   x[  4.27, 13.73] y[-29.60,-23.20] h=4.25  inside board: True  overlaps -  zones ['S_BEAM_1P2', 'S_GAP_XH_PLUG_LOW_PARTS', 'ESC_EDGE']
+J5_RX        x[ -5.23,  4.23] y[-29.60,-23.20] h=4.25  inside board: True  overlaps -  zones ['S_BEAM_1P2', 'S_GAP_XH_PLUG_LOW_PARTS', 'RX_ENTRY']
+J2_LED       x[-19.70,-13.30] y[-19.50,-12.54] h=4.25  inside board: True  overlaps -  zones ['MOTOR_LEADS_7P3', 'CORRIDOR_23P0', 'LED_CORNER']
+J2_PLUG      x[-13.30, -7.40] y[-19.50,-12.54] h=4.25  inside board: True  overlaps -  zones ['BATTERY_4P7', 'RIB_14P4', 'CORRIDOR_23P0', 'LED_CORNER']
+XIAO in battery strip |x|<=9.0: 234.1 mm2 of 372.7 (x -2.17..9.0 = 11.17 mm wide); directly under the battery (|x|<=8.5): 10.67 mm wide

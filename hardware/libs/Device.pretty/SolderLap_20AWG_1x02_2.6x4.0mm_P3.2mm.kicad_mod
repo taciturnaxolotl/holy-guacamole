@@ -1,0 +1,23 @@
+(footprint "SolderLap_20AWG_1x02_2.6x4.0mm_P3.2mm"
+	(version 20241229)
+	(generator "pcbnew")
+	(layer "F.Cu")
+	(descr "Two SMD lap-solder pads for 20 AWG wire (ESC battery feed). Pad 1 VBUS, pad 2 GND. Wire lies along the pad, zip-tie through the adjacent slot.")
+	(tags "solder wire lap SMD 20AWG")
+	(attr smd)
+	(property "Reference" "REF**"
+		(at 0 -3 0)
+		(layer "F.SilkS")
+		(effects (font (size 0.8 0.8) (thickness 0.12)))
+	)
+	(property "Value" "SolderLap_20AWG"
+		(at 0 3 0)
+		(layer "F.Fab")
+		(effects (font (size 0.8 0.8) (thickness 0.12)))
+	)
+	(fp_rect (start -3.2 -2.25) (end 3.2 2.25) (stroke (width 0.05) (type solid)) (fill no) (layer "F.CrtYd"))
+	(fp_text user "+" (at -1.6 -2.8 0) (layer "F.SilkS") (effects (font (size 0.8 0.8) (thickness 0.15))))
+	(fp_text user "-" (at 1.6 -2.8 0) (layer "F.SilkS") (effects (font (size 0.8 0.8) (thickness 0.15))))
+	(pad "1" smd rect (at -1.6 0) (size 2.6 4.0) (layers "F.Cu" "F.Paste" "F.Mask"))
+	(pad "2" smd rect (at 1.6 0) (size 2.6 4.0) (layers "F.Cu" "F.Paste" "F.Mask"))
+)

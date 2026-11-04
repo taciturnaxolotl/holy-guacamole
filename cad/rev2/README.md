@@ -10,6 +10,40 @@ The STEPs were tessellated to `/tmp/hg33b_work/` and sliced with trimesh.
 
 **Superseded work:** `stale_bodystep/` (old July chassis) and `stale_v33a/` (v33 rev A). Ignore both.
 
+## v3.4c update (current; supersedes the placement tables further down)
+
+The chassis designer's v3.4c constraints are encoded in `scripts/build_rev2.py` as boxes (no v3.4c STEP yet; the section checks and overview PNGs still slice v33b meshes). New keepout layers: `S_BEAM_1P2`, `S_GAP_XH_PLUG_LOW_PARTS`, `MOTOR_SVC_LOOP_7P5`, `LED_CHANNEL_MOUTH_CLEAR`; `BATTERY_4P7` is now |x| ≤ 9.0, y −19.8…29.9; ribs at |x| 8.75…10.75.
+
+| Constraint (v3.4c) | Value |
+|---|---|
+| Battery | GNB 3S 380, 55 × 17 × 20, x ±8.5, y −23.2…+31.6, bottom z 7.2; leads + XH-4P out of the S end |
+| Upper ribs | \|x\| 8.75…10.75 from z 16.9, y 11…32.7 and −22.5…−11 |
+| S cross-beam | full width, y −24.8…−19.8, z 4.0…7.2 → ≤ 1.2 mm parts under it |
+| S gap | y −29.9…−24.8: XH plug and motor leads pass above; low parts only |
+| Motor-lead service loop | x ±(14…17.5), y −28…−20, z 10…22 |
+| Phase bullets | y −34…−30, z 10…22 (under the ledge, no board impact) |
+| Shelf windows | J6 under the SE shelf end (y < −15.1); J7 in the NW gap y 21.8…29.0 |
+
+| Part | Courtyard x | Courtyard y | Height above board | Notes |
+|---|---|---|---|---|
+| J6 battery XT30 (XT30UPB-M) | 11.0…16.6 | −18.6…−8.0 | mated ≈ 21 [A] | rotated 90°, pins (13.8, −15.8) / (13.8, −10.8) |
+| J7 switch XT30 (XT30UPB-F) | −16.6…−11.0 | 19.0…29.6 | mated ≈ 21 [A] | rotated 90°, pins (−13.8, 21.8) / (−13.8, 26.8) |
+| L1 SRP6060FA | −19.35…−12.45 | 11.0…18.1 | 5.8 | moved S out of J7 |
+| U2 buck block | −10.0…−2.7 | 8.3…22.1 | ≤ 1.2 | unchanged |
+| C21 100 µF 25 V polymer tantalum, 7343-43 | 0.5…9.0 | −19.3…−14.3 | ≤ 4.3 | was a 6.3 × 5.8 can in the NW; now in the battery strip, ~12 mm from J1 |
+| D2 SMAJ15CA | 12.6…19.6 | −7.7…−4.2 | 2.2 | moved into the key band (limit 4.0), clear of J6 |
+| J1 ESC power, 2 SMD lap pads 2.6 × 4.0 | 13.9…19.7 | −29.3…−25.3 | ≈ 0.5 (+ wire 0.8) | pad 1 VBUS at x 13.9…16.5, pad 2 GND at x 17.1…19.7; south of the beam. No longer through-hole |
+| J4 ESC signal GH-4 | 4.27…13.73 | −29.6…−23.2 | 4.25 | centre (9.0, −26.4), opens S into the groove. Body y −29.6…−25.55; only the flat rear pads sit under the beam |
+| J5 receiver GH-4 | −5.23…4.23 | −29.6…−23.2 | 4.25 | centre (−0.5, −26.4), same as J4 |
+| J2 TinySLEDs GH-2 (both LEDs) | −19.7…−13.3 | −19.5…−12.54 | 4.25 | opens E, plug zone x −13.3…−7.4. J3 deleted; the two LEDs share one plug through a Y-splice in the harness |
+| XIAO | −2.17…15.61 | 7.86…28.82 | 3.2 (USB-C 4.3) | unchanged |
+| IMUs | | | ≈ 1 | 166° rotation still clear (window 163…168°) |
+
+Through-hole pins left (bottom-plate Ø4 reliefs, layer `BOTTOM_PLATE_THT_RELIEF`): J6 (13.8, −15.8), (13.8, −10.8); J7 (−13.8, 21.8), (−13.8, 26.8). J1's two reliefs can go.
+
+LED lead route: from the SW channel mouth (x −20…−19, y −28.5…−25.5, z < 4) north under the S beam (1.5 mm clear between board top 2.5 and beam bottom 4.0, enough for two 28 AWG) to J2's plug at y ≈ −16. The channel mouth stays clear.
+
+
 Regenerate:
 ```
 U="uv run --with cadquery --with shapely --with ezdxf --with trimesh --with matplotlib --with networkx --with scipy --with rtree"
@@ -51,12 +85,12 @@ $U python scripts/build_rev2.py      # board_outline.dxf, keepout.dxf, overview 
 |---|---|---|---|---|---|---|---|---|
 | NW | −16.6 | +34.5 | 0 | — | — | 15.7 | 2.30 | 3.00 |
 | NE | +16.6 | +34.5 | 0 | — | — | **2.30** | 2.30 | 3.00 |
-| SW | −16.6 | −34.5 | 0 | 10.5 | **1.50** | — | 2.30 | 3.00 |
-| SE | +16.6 | −34.5 | 0 | **1.50** | 10.5 | — | 2.30 | 3.00 |
+| SW | −17.0 | −34.5 | 0 | 10.9 | **1.90** | — | 2.30 | 3.00 |
+| SE | +17.0 | −34.5 | 0 | **1.90** | 10.9 | — | 2.30 | 3.00 |
 
 - All four land on solid ledge and clear the grooves.
 - With the v34 mirror, the SE insert bore has a 1.5 mm wall to the groove edge (x 13.5). That passes the MJF 1.0 minimum, but a Ø5.2 boss would break into the groove by 0.5.
-  **Option [A]:** move the S holes to x ±17.0 to get 1.9 mm to both the groove and the bay wall.
+  **Done (v34):** the S holes are at x ±17.0, giving 1.9 mm to both the groove and the bay wall.
 - **Insert length:** the ledge above the recess is 7.2 − (board top + 0.1), i.e. 4.6 for a 1.6 board. Keeping 1 mm of cap means **a 3 mm M2 heat-set** (≤ 3.6).
 - **M2 head height:** must be ≤ 1.23 to stay flush with the plate underside (0.32 gap + 0.91 plate). Use a wafer/ultra-low head (k ≈ 0.8–1.0) [A]. A standard M2 pan head (k 1.3–1.6) protrudes by up to 0.4.
 
@@ -110,11 +144,11 @@ $U python scripts/build_rev2.py      # board_outline.dxf, keepout.dxf, overview 
 |---|---|---|---|---|---|
 | U1 XIAO | −2.17…15.61 | 7.86…28.82 | Rev A position | 3.2 | USB-C receptacle centred on the channel. **8.67 mm of its 17.78 width (49 %, 182 mm²) is in the battery strip; 8.17 mm is directly under the battery.** Touches the key band by 0.14 (module PCB only). |
 | U1 USB-C | 2.25…11.19 | 23.6…30.9 | mouth 1.2 into the channel (starts y 29.7) | 4.3 | 0.40 to the battery and channel ceiling. Max E shift keeping the receptacle in the channel is +1.5 (only for a plug ≤ 9.96 wide); not taken. |
-| J7 XT30 (sw loop) | −19.7…−8.5 | 22.3…28.5 | pins (−16.6, 25.4), (−11.6, 25.4) | mated ≈ 21 [A] → top 23.5 | NW corridor, under the shelf (limit 23.0 → wire exits sideways). Leads go up to the switch tabs at x −7.2…−2.8, y ≈ 38, z ≥ 17.7. |
+| J7 XT30 (sw loop) | −19.7…−8.5 | 22.3…28.5 | pins (−16.6, 25.4), (−11.6, 25.4) | mated ≈ 21 [A] → top 23.5 | NW corridor; v34 opens a shelf gap at y 21.8…29.0 over it, so the plug goes straight down. Keep J7 inside that window. Leads go up to the switch tabs at x −7.2…−2.8, y ≈ 38, z ≥ 17.7. |
 | L1 SRP6060FA | −19.35…−12.45 | 15.1…22.2 | (−15.9, 18.65) | 5.8 | NW corridor. |
 | C21 100 µF 6.3×5.8 | −19.5…−10.1 | 8.0…15.1 | (−14.8, 11.55) | 5.8 | NW corridor, body 0.25 N of the key band. **See conflict 1.** |
 | U2 buck zone | −10.0…−2.7 | 8.3…22.1 | AP63301 + passives | ≤ 1.2 | partly in the battery strip (fine at this height). |
-| J6 XT30 (battery) | 8.5…19.7 | −14.6…−8.4 | pins (11.6, −11.5), (16.6, −11.5) | mated ≈ 21 [A] → top 23.5 | SE corridor, 0.4 clear of the key band (y −8) and of the lead entries (y −15). Partly under the shelf (y < −11). |
+| J6 XT30 (battery) | 8.5…19.7 | −14.6…−8.4 | pins (11.6, −11.5), (16.6, −11.5) | mated ≈ 21 [A] → top 23.5 | SE corridor, 0.4 clear of the key band (y −8) and of the lead entries (y −15). v34: the SE shelf now ends at y −15.1, so the mated plug goes straight down beside the battery. |
 | D2 SMAJ15CA | 12.6…19.6 | −20.4…−16.9 | (16.1, −18.65), horizontal | 2.2 | SE, between J1 and J6. |
 | J1 ESC power (20 AWG) | 16.45…19.75 | −29.3…−20.7 | pads (18.1, −27.4), (18.1, −22.6) | 2.5 | SE corner, just inside the S ledge face. |
 | J4 ESC signal (GH-4) | 4.77…14.23 | −29.6…−23.2 | (9.5, −26.4), **opening S** | 4.25 | Plug (≈ 6.75 wide [A], x 6.1…12.9) lies in the v34 groove (4.8 high). |
@@ -152,7 +186,7 @@ $U python scripts/build_rev2.py      # board_outline.dxf, keepout.dxf, overview 
 4. **XIAO under the battery:** 49 % of its width, USB-C margin 0.40 (1.6 board). A 1.2 board gives 0.80. That is the tightest item in the Z stack.
 5. **IMU nominal U5 collides with the XIAO.** The 166° array rotation fixes it; the feasible window is only ±2°, so later moves of J2/J3 plugs, J6 or C21 can close it.
 6. **Through-hole J6/J7/J1 vs the 0.32 gap.** Needs plate relief windows or SMD parts. "Nothing on the underside" is otherwise met.
-7. **SE M2 hole** has a 1.5 mm wall to the mirrored groove. OK for MJF, but consider moving the S holes to x ±17.0.
+7. **SE M2 hole:** moved to x ±17.0 in v34; 1.9 mm wall to the mirrored groove.
 8. The v33b N-ledge XT30 (x 10…18.2, y 33.8…39.45) goes away in rev 2. Both XT30s are on the board, so the `xt30` box and the top-plate depth note that depended on it are moot.
 9. **XT30 mated height** (~21, from the v33 box) and **pin tail length** are assumptions; I could not reach the AMASS datasheet. Verify that the J6/J7 wire exits stay under the 25.5 shelves.
 10. **Debug access with the bottom plate off:** the whole underside (flush test pads) and the 4 M2 screws are reachable. The board drops out downward once the plugs and the 20 AWG pads are free; top side and edges are not reachable. USB via the chimney works with the top plate off and the battery in.

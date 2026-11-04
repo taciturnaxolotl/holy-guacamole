@@ -445,7 +445,7 @@ $SKPOLY
   9
 $TDCREATE
  40
-2461348.6450578705
+2461349.1203587963
   9
 $TDUCREATE
  40
@@ -453,7 +453,7 @@ $TDUCREATE
   9
 $TDUPDATE
  40
-2461348.6450578705
+2461349.1203587963
   9
 $TDUUPDATE
  40
@@ -505,7 +505,7 @@ $SPLINESEGS
   9
 $HANDSEED
   5
-C6
+CF
   9
 $SURFTAB1
  70
@@ -885,11 +885,11 @@ $PSTYLEMODE
   9
 $FINGERPRINTGUID
   2
-{28DA3369-E6C7-4738-A0B6-BAFDA3C6F3D4}
+{28795FFB-61FB-4DC9-B9C7-BB6EA3E16DBC}
   9
 $VERSIONGUID
   2
-{BDEC1D2E-4455-4F2A-801D-6A37DACE641B}
+{E03DF3F5-4D7D-4BDE-B3CD-CCFEFBF25E71}
   9
 $EXTNAMES
 290
@@ -1315,7 +1315,7 @@ LAYER
 100
 AcDbSymbolTable
  70
-54
+59
   0
 LAYER
   5
@@ -1395,7 +1395,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-KEYBAND_4P0
+S_BEAM_1P2
  70
 0
  62
@@ -1417,7 +1417,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-MOTOR_LEADS_7P3
+S_GAP_XH_PLUG_LOW_PARTS
  70
 0
  62
@@ -1439,7 +1439,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-RIB_14P4
+MOTOR_SVC_LOOP_7P5
  70
 0
  62
@@ -1461,7 +1461,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-CORRIDOR_23P0
+LED_CHANNEL_MOUTH_CLEAR
  70
 0
  62
@@ -1483,7 +1483,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-LEDGE_CLAMP_NO_PARTS
+KEYBAND_4P0
  70
 0
  62
@@ -1505,7 +1505,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-S_GROOVE_WIRES_4P8
+MOTOR_LEADS_7P3
  70
 0
  62
@@ -1527,7 +1527,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-BOTTOM_FLUSH_PADS_ONLY
+RIB_14P4
  70
 0
  62
@@ -1549,7 +1549,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-XT30_BAT
+CORRIDOR_23P0
  70
 0
  62
@@ -1571,7 +1571,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-XT30_SW
+LEDGE_CLAMP_NO_PARTS
  70
 0
  62
@@ -1593,7 +1593,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-ESC_EDGE
+S_GROOVE_WIRES_4P8
  70
 0
  62
@@ -1615,7 +1615,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-USB_CHIMNEY
+BOTTOM_FLUSH_PADS_ONLY
  70
 0
  62
@@ -1637,7 +1637,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-LED_CORNER
+XT30_BAT
  70
 0
  62
@@ -1659,7 +1659,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-RX_ENTRY
+XT30_SW
  70
 0
  62
@@ -1681,7 +1681,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-MOUNT_KEEPOUT
+ESC_EDGE
  70
 0
  62
@@ -1703,7 +1703,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-BOTTOM_PLATE_M2_HEAD_HOLES
+USB_CHIMNEY
  70
 0
  62
@@ -1725,7 +1725,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-BOTTOM_PLATE_THT_RELIEF
+LED_CORNER
  70
 0
  62
@@ -1747,7 +1747,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-PLACEMENT_U1_XIAO
+RX_ENTRY
  70
 0
  62
@@ -1769,7 +1769,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-PLACEMENT_U1_USBC
+MOUNT_KEEPOUT
  70
 0
  62
@@ -1791,7 +1791,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-PLACEMENT_J7_XT30_SW
+BOTTOM_PLATE_M2_HEAD_HOLES
  70
 0
  62
@@ -1813,7 +1813,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-PLACEMENT_L1
+BOTTOM_PLATE_THT_RELIEF
  70
 0
  62
@@ -1835,7 +1835,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-PLACEMENT_C21
+PLACEMENT_U1_XIAO
  70
 0
  62
@@ -1857,7 +1857,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-PLACEMENT_U2_BUCK
+PLACEMENT_U1_USBC
  70
 0
  62
@@ -1879,7 +1879,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-PLACEMENT_J6_XT30_BAT
+PLACEMENT_J7_XT30_SW
  70
 0
  62
@@ -1901,7 +1901,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-PLACEMENT_D2
+PLACEMENT_L1
  70
 0
  62
@@ -1923,7 +1923,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-PLACEMENT_J1_ESC_PWR
+PLACEMENT_U2_BUCK
  70
 0
  62
@@ -1945,7 +1945,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-PLACEMENT_J4_ESC_SIG
+PLACEMENT_C21
  70
 0
  62
@@ -1967,7 +1967,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-PLACEMENT_J5_RX
+PLACEMENT_J6_XT30_BAT
  70
 0
  62
@@ -1989,7 +1989,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-PLACEMENT_J3_LED_BOT
+PLACEMENT_D2
  70
 0
  62
@@ -2011,7 +2011,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-PLACEMENT_J2_LED_TOP
+PLACEMENT_J1_ESC_PWR
  70
 0
  62
@@ -2033,7 +2033,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-PLACEMENT_J2J3_PLUGS
+PLACEMENT_J4_ESC_SIG
  70
 0
  62
@@ -2055,7 +2055,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-PLACEMENT_U4
+PLACEMENT_J5_RX
  70
 0
  62
@@ -2077,7 +2077,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-PLACEMENT_U5
+PLACEMENT_J2_LED
  70
 0
  62
@@ -2099,7 +2099,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-PLACEMENT_U6
+PLACEMENT_J2_PLUG
  70
 0
  62
@@ -2121,7 +2121,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-IMU_CENTRE
+PLACEMENT_U4
  70
 0
  62
@@ -2143,7 +2143,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-REF_BOARD
+PLACEMENT_U5
  70
 0
  62
@@ -2165,7 +2165,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-REF_OLD_TABHOLES
+PLACEMENT_U6
  70
 0
  62
@@ -2187,7 +2187,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-REF_BAY
+IMU_CENTRE
  70
 0
  62
@@ -2209,7 +2209,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-REF_LEDGES
+REF_BOARD
  70
 0
  62
@@ -2231,7 +2231,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-REF_LEDGE_RECESS_NEW
+REF_OLD_TABHOLES
  70
 0
  62
@@ -2253,7 +2253,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-REF_USB_CHANNEL
+REF_BAY
  70
 0
  62
@@ -2275,7 +2275,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-REF_CHIMNEY
+REF_LEDGES
  70
 0
  62
@@ -2297,7 +2297,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-REF_BATTERY
+REF_LEDGE_RECESS_NEW
  70
 0
  62
@@ -2319,7 +2319,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-REF_ESC_ENVELOPE
+REF_USB_CHANNEL
  70
 0
  62
@@ -2341,7 +2341,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-REF_S_GROOVE_V33B
+REF_CHIMNEY
  70
 0
  62
@@ -2363,7 +2363,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-REF_S_GROOVE_V34
+REF_BATTERY
  70
 0
  62
@@ -2385,7 +2385,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-REF_RX
+REF_S_BEAM
  70
 0
  62
@@ -2407,7 +2407,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-REF_RX_LEAD_GROOVE
+REF_S_GAP
  70
 0
  62
@@ -2429,7 +2429,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-REF_LED_LEAD_CHANNEL
+REF_ESC_ENVELOPE
  70
 0
  62
@@ -2451,7 +2451,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-REF_SWITCH
+REF_S_GROOVE_V33B
  70
 0
  62
@@ -2473,7 +2473,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-REF_SWITCH_SLOT
+REF_S_GROOVE_V34
  70
 0
  62
@@ -2495,11 +2495,121 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-REF_MOTOR_LEAD_CHANNEL
+REF_RX
  70
 0
  62
 3
+  6
+Continuous
+370
+-3
+390
+13
+  0
+LAYER
+  5
+63
+330
+1
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+REF_RX_LEAD_GROOVE
+ 70
+0
+ 62
+4
+  6
+Continuous
+370
+-3
+390
+13
+  0
+LAYER
+  5
+64
+330
+1
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+REF_LED_LEAD_CHANNEL
+ 70
+0
+ 62
+5
+  6
+Continuous
+370
+-3
+390
+13
+  0
+LAYER
+  5
+65
+330
+1
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+REF_SWITCH
+ 70
+0
+ 62
+6
+  6
+Continuous
+370
+-3
+390
+13
+  0
+LAYER
+  5
+66
+330
+1
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+REF_SWITCH_SLOT
+ 70
+0
+ 62
+7
+  6
+Continuous
+370
+-3
+390
+13
+  0
+LAYER
+  5
+67
+330
+1
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+REF_MOTOR_LEAD_CHANNEL
+ 70
+0
+ 62
+1
   6
 Continuous
 370
@@ -2607,7 +2717,7 @@ ACAD
   0
 APPID
   5
-C3
+CC
 330
 3
 100
@@ -2621,7 +2731,7 @@ HATCHBACKGROUNDCOLOR
   0
 APPID
   5
-C4
+CD
 330
 3
 100
@@ -2915,7 +3025,7 @@ ENTITIES
   0
 LWPOLYLINE
   5
-63
+68
 330
 17
 100
@@ -2929,15 +3039,15 @@ AcDbPolyline
  70
 1
  10
-6.5
+9.0
  20
--29.9
+-19.8
  10
--6.5
+-9.0
  20
--29.9
+-19.8
  10
--6.5
+-9.0
  20
 29.9
  10
@@ -3361,169 +3471,9 @@ AcDbPolyline
  20
 29.2
  10
-6.5
+9.0
  20
 29.2
-  0
-LWPOLYLINE
-  5
-64
-330
-17
-100
-AcDbEntity
-  8
-KEYBAND_4P0
-100
-AcDbPolyline
- 90
-4
- 70
-1
- 10
--3.75
- 20
-8.0
- 10
--3.75
- 20
--8.0
- 10
--20.0
- 20
--8.0
- 10
--20.0
- 20
-8.0
-  0
-LWPOLYLINE
-  5
-65
-330
-17
-100
-AcDbEntity
-  8
-KEYBAND_4P0
-100
-AcDbPolyline
- 90
-4
- 70
-1
- 10
-20.0
- 20
-8.0
- 10
-20.0
- 20
--8.0
- 10
-3.75
- 20
--8.0
- 10
-3.75
- 20
-8.0
-  0
-LWPOLYLINE
-  5
-66
-330
-17
-100
-AcDbEntity
-  8
-MOTOR_LEADS_7P3
-100
-AcDbPolyline
- 90
-4
- 70
-1
- 10
--8.5
- 20
--15.0
- 10
--8.5
- 20
--29.6
- 10
--20.0
- 20
--29.6
- 10
--20.0
- 20
--15.0
-  0
-LWPOLYLINE
-  5
-67
-330
-17
-100
-AcDbEntity
-  8
-MOTOR_LEADS_7P3
-100
-AcDbPolyline
- 90
-4
- 70
-1
- 10
-20.0
- 20
--15.0
- 10
-20.0
- 20
--29.6
- 10
-8.5
- 20
--29.6
- 10
-8.5
- 20
--15.0
-  0
-LWPOLYLINE
-  5
-68
-330
-17
-100
-AcDbEntity
-  8
-RIB_14P4
-100
-AcDbPolyline
- 90
-4
- 70
-1
- 10
--8.5
- 20
--11.0
- 10
--6.5
- 20
--11.0
- 10
--6.5
- 20
--33.5
- 10
--8.5
- 20
--33.5
   0
 LWPOLYLINE
   5
@@ -3533,7 +3483,7 @@ LWPOLYLINE
 100
 AcDbEntity
   8
-RIB_14P4
+S_BEAM_1P2
 100
 AcDbPolyline
  90
@@ -3541,21 +3491,21 @@ AcDbPolyline
  70
 1
  10
-6.5
+20.0
  20
--33.5
+-24.8
  10
-6.5
+-20.0
  20
--11.0
+-24.8
  10
-8.5
+-20.0
  20
--11.0
+-19.8
  10
-8.5
+20.0
  20
--33.5
+-19.8
   0
 LWPOLYLINE
   5
@@ -3565,7 +3515,7 @@ LWPOLYLINE
 100
 AcDbEntity
   8
-RIB_14P4
+S_GAP_XH_PLUG_LOW_PARTS
 100
 AcDbPolyline
  90
@@ -3573,25 +3523,249 @@ AcDbPolyline
  70
 1
  10
-6.5
+20.0
  20
-29.2
+-29.9
  10
-8.5
+-20.0
  20
-29.2
+-29.9
  10
-8.5
+-20.0
  20
-11.0
+-24.8
  10
-6.5
+20.0
  20
-11.0
+-24.8
   0
 LWPOLYLINE
   5
 6B
+330
+17
+100
+AcDbEntity
+  8
+MOTOR_SVC_LOOP_7P5
+100
+AcDbPolyline
+ 90
+4
+ 70
+1
+ 10
+-14.0
+ 20
+-20.0
+ 10
+-14.0
+ 20
+-28.0
+ 10
+-17.5
+ 20
+-28.0
+ 10
+-17.5
+ 20
+-20.0
+  0
+LWPOLYLINE
+  5
+6C
+330
+17
+100
+AcDbEntity
+  8
+MOTOR_SVC_LOOP_7P5
+100
+AcDbPolyline
+ 90
+4
+ 70
+1
+ 10
+17.5
+ 20
+-20.0
+ 10
+17.5
+ 20
+-28.0
+ 10
+14.0
+ 20
+-28.0
+ 10
+14.0
+ 20
+-20.0
+  0
+LWPOLYLINE
+  5
+6D
+330
+17
+100
+AcDbEntity
+  8
+LED_CHANNEL_MOUTH_CLEAR
+100
+AcDbPolyline
+ 90
+4
+ 70
+1
+ 10
+-19.0
+ 20
+-25.5
+ 10
+-19.0
+ 20
+-28.5
+ 10
+-20.0
+ 20
+-28.5
+ 10
+-20.0
+ 20
+-25.5
+  0
+LWPOLYLINE
+  5
+6E
+330
+17
+100
+AcDbEntity
+  8
+KEYBAND_4P0
+100
+AcDbPolyline
+ 90
+4
+ 70
+1
+ 10
+-3.75
+ 20
+8.0
+ 10
+-3.75
+ 20
+-8.0
+ 10
+-20.0
+ 20
+-8.0
+ 10
+-20.0
+ 20
+8.0
+  0
+LWPOLYLINE
+  5
+6F
+330
+17
+100
+AcDbEntity
+  8
+KEYBAND_4P0
+100
+AcDbPolyline
+ 90
+4
+ 70
+1
+ 10
+20.0
+ 20
+8.0
+ 10
+20.0
+ 20
+-8.0
+ 10
+3.75
+ 20
+-8.0
+ 10
+3.75
+ 20
+8.0
+  0
+LWPOLYLINE
+  5
+70
+330
+17
+100
+AcDbEntity
+  8
+MOTOR_LEADS_7P3
+100
+AcDbPolyline
+ 90
+4
+ 70
+1
+ 10
+-17.5
+ 20
+-15.0
+ 10
+-17.5
+ 20
+-25.0
+ 10
+-20.0
+ 20
+-25.0
+ 10
+-20.0
+ 20
+-15.0
+  0
+LWPOLYLINE
+  5
+71
+330
+17
+100
+AcDbEntity
+  8
+MOTOR_LEADS_7P3
+100
+AcDbPolyline
+ 90
+4
+ 70
+1
+ 10
+20.0
+ 20
+-15.0
+ 10
+20.0
+ 20
+-25.0
+ 10
+17.5
+ 20
+-25.0
+ 10
+17.5
+ 20
+-15.0
+  0
+LWPOLYLINE
+  5
+72
 330
 17
 100
@@ -3605,25 +3779,121 @@ AcDbPolyline
  70
 1
  10
--8.5
+-10.75
  20
-33.0
+-11.0
  10
--6.5
+-8.75
  20
-33.0
+-11.0
  10
--6.5
+-8.75
+ 20
+-22.5
+ 10
+-10.75
+ 20
+-22.5
+  0
+LWPOLYLINE
+  5
+73
+330
+17
+100
+AcDbEntity
+  8
+RIB_14P4
+100
+AcDbPolyline
+ 90
+4
+ 70
+1
+ 10
+8.75
+ 20
+-22.5
+ 10
+8.75
+ 20
+-11.0
+ 10
+10.75
+ 20
+-11.0
+ 10
+10.75
+ 20
+-22.5
+  0
+LWPOLYLINE
+  5
+74
+330
+17
+100
+AcDbEntity
+  8
+RIB_14P4
+100
+AcDbPolyline
+ 90
+4
+ 70
+1
+ 10
+8.75
+ 20
+29.2
+ 10
+10.75
+ 20
+29.2
+ 10
+10.75
  20
 11.0
  10
--8.5
+8.75
  20
 11.0
   0
 LWPOLYLINE
   5
-6C
+75
+330
+17
+100
+AcDbEntity
+  8
+RIB_14P4
+100
+AcDbPolyline
+ 90
+4
+ 70
+1
+ 10
+-10.75
+ 20
+32.7
+ 10
+-8.75
+ 20
+32.7
+ 10
+-8.75
+ 20
+11.0
+ 10
+-10.75
+ 20
+11.0
+  0
+LWPOLYLINE
+  5
+76
 330
 17
 100
@@ -3637,17 +3907,17 @@ AcDbPolyline
  70
 1
  10
--8.5
+-9.0
  20
 29.9
  10
--8.5
+-9.0
  20
--29.9
+-19.8
  10
 -20.0
  20
--29.9
+-19.8
  10
 -20.0
  20
@@ -3655,7 +3925,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-6D
+77
 330
 17
 100
@@ -4095,19 +4365,19 @@ AcDbPolyline
  10
 20.0
  20
--29.9
+-19.8
  10
-8.5
+9.0
  20
--29.9
+-19.8
  10
-8.5
+9.0
  20
 29.2
   0
 LWPOLYLINE
   5
-6E
+78
 330
 17
 100
@@ -6227,7 +6497,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-6F
+79
 330
 17
 100
@@ -7767,7 +8037,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-70
+7A
 330
 17
 100
@@ -9307,7 +9577,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-71
+7B
 330
 17
 100
@@ -9339,7 +9609,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-72
+7C
 330
 17
 100
@@ -15075,7 +15345,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-73
+7D
 330
 17
 100
@@ -15089,25 +15359,25 @@ AcDbPolyline
  70
 1
  10
-8.5
+11.0
  20
--14.6
+-18.6
  10
-8.5
+11.0
  20
--8.4
+-8.0
  10
-19.7
+16.6
  20
--8.4
+-8.0
  10
-19.7
+16.6
  20
--14.6
+-18.6
   0
 LWPOLYLINE
   5
-74
+7E
 330
 17
 100
@@ -15121,25 +15391,25 @@ AcDbPolyline
  70
 1
  10
--19.7
+-16.6
  20
-22.3
+19.0
  10
--19.7
+-16.6
  20
-28.5
+29.6
  10
--8.5
+-11.0
  20
-28.5
+29.6
  10
--8.5
+-11.0
  20
-22.3
+19.0
   0
 LWPOLYLINE
   5
-75
+7F
 330
 17
 100
@@ -15149,53 +15419,29 @@ ESC_EDGE
 100
 AcDbPolyline
  90
-10
+4
  70
 1
  10
-4.77
+4.27
  20
--29.9
+-29.6
  10
-4.77
+4.27
  20
 -23.2
  10
-16.45
+19.7
  20
 -23.2
  10
-16.45
+19.7
  20
--20.4
- 10
-12.6
- 20
--20.4
- 10
-12.6
- 20
--16.9
- 10
-16.45
- 20
--16.9
- 10
-19.75
- 20
--16.9
- 10
-19.75
- 20
--23.2
- 10
-19.75
- 20
--29.9
+-29.6
   0
 LWPOLYLINE
   5
-76
+80
 330
 17
 100
@@ -16275,7 +16521,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-77
+81
 330
 17
 100
@@ -16285,37 +16531,29 @@ LED_CORNER
 100
 AcDbPolyline
  90
-6
+4
  70
 1
  10
--20.0
+-7.4
  20
--15.44
+-12.54
  10
--7.2
+-7.4
  20
--15.44
- 10
--7.2
- 20
--29.6
+-19.5
  10
 -20.0
  20
--29.6
+-19.5
  10
 -20.0
  20
--28.5
- 10
--20.0
- 20
--25.5
+-12.54
   0
 LWPOLYLINE
   5
-78
+82
 330
 17
 100
@@ -16347,223 +16585,23 @@ AcDbPolyline
   0
 CIRCLE
   5
-79
-330
-17
-100
-AcDbEntity
-  8
-MOUNT_KEEPOUT
-100
-AcDbCircle
- 10
--16.6
- 20
-34.5
- 30
-0.0
- 40
-2.25
-  0
-CIRCLE
-  5
-7A
-330
-17
-100
-AcDbEntity
-  8
-BOTTOM_PLATE_M2_HEAD_HOLES
-100
-AcDbCircle
- 10
--16.6
- 20
-34.5
- 30
-0.0
- 40
-2.0
-  0
-CIRCLE
-  5
-7B
-330
-17
-100
-AcDbEntity
-  8
-MOUNT_KEEPOUT
-100
-AcDbCircle
- 10
-16.6
- 20
-34.5
- 30
-0.0
- 40
-2.25
-  0
-CIRCLE
-  5
-7C
-330
-17
-100
-AcDbEntity
-  8
-BOTTOM_PLATE_M2_HEAD_HOLES
-100
-AcDbCircle
- 10
-16.6
- 20
-34.5
- 30
-0.0
- 40
-2.0
-  0
-CIRCLE
-  5
-7D
-330
-17
-100
-AcDbEntity
-  8
-MOUNT_KEEPOUT
-100
-AcDbCircle
- 10
--16.6
- 20
--34.5
- 30
-0.0
- 40
-2.25
-  0
-CIRCLE
-  5
-7E
-330
-17
-100
-AcDbEntity
-  8
-BOTTOM_PLATE_M2_HEAD_HOLES
-100
-AcDbCircle
- 10
--16.6
- 20
--34.5
- 30
-0.0
- 40
-2.0
-  0
-CIRCLE
-  5
-7F
-330
-17
-100
-AcDbEntity
-  8
-MOUNT_KEEPOUT
-100
-AcDbCircle
- 10
-16.6
- 20
--34.5
- 30
-0.0
- 40
-2.25
-  0
-CIRCLE
-  5
-80
-330
-17
-100
-AcDbEntity
-  8
-BOTTOM_PLATE_M2_HEAD_HOLES
-100
-AcDbCircle
- 10
-16.6
- 20
--34.5
- 30
-0.0
- 40
-2.0
-  0
-CIRCLE
-  5
-81
-330
-17
-100
-AcDbEntity
-  8
-BOTTOM_PLATE_THT_RELIEF
-100
-AcDbCircle
- 10
-11.6
- 20
--11.5
- 30
-0.0
- 40
-2.0
-  0
-CIRCLE
-  5
-82
-330
-17
-100
-AcDbEntity
-  8
-BOTTOM_PLATE_THT_RELIEF
-100
-AcDbCircle
- 10
-16.6
- 20
--11.5
- 30
-0.0
- 40
-2.0
-  0
-CIRCLE
-  5
 83
 330
 17
 100
 AcDbEntity
   8
-BOTTOM_PLATE_THT_RELIEF
+MOUNT_KEEPOUT
 100
 AcDbCircle
  10
 -16.6
  20
-25.4
+34.5
  30
 0.0
  40
-2.0
+2.25
   0
 CIRCLE
   5
@@ -16573,13 +16611,13 @@ CIRCLE
 100
 AcDbEntity
   8
-BOTTOM_PLATE_THT_RELIEF
+BOTTOM_PLATE_M2_HEAD_HOLES
 100
 AcDbCircle
  10
--11.6
+-16.6
  20
-25.4
+34.5
  30
 0.0
  40
@@ -16593,17 +16631,17 @@ CIRCLE
 100
 AcDbEntity
   8
-BOTTOM_PLATE_THT_RELIEF
+MOUNT_KEEPOUT
 100
 AcDbCircle
  10
-18.1
+16.6
  20
--27.4
+34.5
  30
 0.0
  40
-2.0
+2.25
   0
 CIRCLE
   5
@@ -16613,13 +16651,173 @@ CIRCLE
 100
 AcDbEntity
   8
+BOTTOM_PLATE_M2_HEAD_HOLES
+100
+AcDbCircle
+ 10
+16.6
+ 20
+34.5
+ 30
+0.0
+ 40
+2.0
+  0
+CIRCLE
+  5
+87
+330
+17
+100
+AcDbEntity
+  8
+MOUNT_KEEPOUT
+100
+AcDbCircle
+ 10
+-17.0
+ 20
+-34.5
+ 30
+0.0
+ 40
+2.25
+  0
+CIRCLE
+  5
+88
+330
+17
+100
+AcDbEntity
+  8
+BOTTOM_PLATE_M2_HEAD_HOLES
+100
+AcDbCircle
+ 10
+-17.0
+ 20
+-34.5
+ 30
+0.0
+ 40
+2.0
+  0
+CIRCLE
+  5
+89
+330
+17
+100
+AcDbEntity
+  8
+MOUNT_KEEPOUT
+100
+AcDbCircle
+ 10
+17.0
+ 20
+-34.5
+ 30
+0.0
+ 40
+2.25
+  0
+CIRCLE
+  5
+8A
+330
+17
+100
+AcDbEntity
+  8
+BOTTOM_PLATE_M2_HEAD_HOLES
+100
+AcDbCircle
+ 10
+17.0
+ 20
+-34.5
+ 30
+0.0
+ 40
+2.0
+  0
+CIRCLE
+  5
+8B
+330
+17
+100
+AcDbEntity
+  8
 BOTTOM_PLATE_THT_RELIEF
 100
 AcDbCircle
  10
-18.1
+13.8
  20
--22.6
+-15.8
+ 30
+0.0
+ 40
+2.0
+  0
+CIRCLE
+  5
+8C
+330
+17
+100
+AcDbEntity
+  8
+BOTTOM_PLATE_THT_RELIEF
+100
+AcDbCircle
+ 10
+13.8
+ 20
+-10.8
+ 30
+0.0
+ 40
+2.0
+  0
+CIRCLE
+  5
+8D
+330
+17
+100
+AcDbEntity
+  8
+BOTTOM_PLATE_THT_RELIEF
+100
+AcDbCircle
+ 10
+-13.8
+ 20
+21.8
+ 30
+0.0
+ 40
+2.0
+  0
+CIRCLE
+  5
+8E
+330
+17
+100
+AcDbEntity
+  8
+BOTTOM_PLATE_THT_RELIEF
+100
+AcDbCircle
+ 10
+-13.8
+ 20
+26.8
  30
 0.0
  40
@@ -16627,7 +16825,7 @@ AcDbCircle
   0
 LWPOLYLINE
   5
-87
+8F
 330
 17
 100
@@ -16659,7 +16857,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-88
+90
 330
 17
 100
@@ -16691,7 +16889,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-89
+91
 330
 17
 100
@@ -16705,25 +16903,25 @@ AcDbPolyline
  70
 1
  10
--8.5
+-11.0
  20
-22.3
+19.0
  10
--8.5
+-11.0
  20
-28.5
+29.6
  10
--19.7
+-16.6
  20
-28.5
+29.6
  10
--19.7
+-16.6
  20
-22.3
+19.0
   0
 LWPOLYLINE
   5
-8A
+92
 330
 17
 100
@@ -16739,55 +16937,23 @@ AcDbPolyline
  10
 -12.45
  20
-15.1
+11.0
  10
 -12.45
  20
-22.2
+18.1
  10
 -19.35
  20
-22.2
+18.1
  10
 -19.35
  20
-15.1
+11.0
   0
 LWPOLYLINE
   5
-8B
-330
-17
-100
-AcDbEntity
-  8
-PLACEMENT_C21
-100
-AcDbPolyline
- 90
-4
- 70
-1
- 10
--10.1
- 20
-8.0
- 10
--10.1
- 20
-15.1
- 10
--19.5
- 20
-15.1
- 10
--19.5
- 20
-8.0
-  0
-LWPOLYLINE
-  5
-8C
+93
 330
 17
 100
@@ -16819,7 +16985,39 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-8D
+94
+330
+17
+100
+AcDbEntity
+  8
+PLACEMENT_C21
+100
+AcDbPolyline
+ 90
+4
+ 70
+1
+ 10
+9.0
+ 20
+-19.3
+ 10
+9.0
+ 20
+-14.3
+ 10
+0.5
+ 20
+-14.3
+ 10
+0.5
+ 20
+-19.3
+  0
+LWPOLYLINE
+  5
+95
 330
 17
 100
@@ -16833,25 +17031,25 @@ AcDbPolyline
  70
 1
  10
-19.7
+16.6
  20
--14.6
+-18.6
  10
-19.7
+16.6
  20
--8.4
+-8.0
  10
-8.5
+11.0
  20
--8.4
+-8.0
  10
-8.5
+11.0
  20
--14.6
+-18.6
   0
 LWPOLYLINE
   5
-8E
+96
 330
 17
 100
@@ -16867,23 +17065,23 @@ AcDbPolyline
  10
 19.6
  20
--20.4
+-7.7
  10
 19.6
  20
--16.9
+-4.2
  10
 12.6
  20
--16.9
+-4.2
  10
 12.6
  20
--20.4
+-7.7
   0
 LWPOLYLINE
   5
-8F
+97
 330
 17
 100
@@ -16897,25 +17095,25 @@ AcDbPolyline
  70
 1
  10
-19.75
+19.7
  20
 -29.3
  10
-19.75
+19.7
  20
--20.7
+-25.3
  10
-16.45
+13.9
  20
--20.7
+-25.3
  10
-16.45
+13.9
  20
 -29.3
   0
 LWPOLYLINE
   5
-90
+98
 330
 17
 100
@@ -16929,25 +17127,25 @@ AcDbPolyline
  70
 1
  10
-14.23
+13.73
  20
 -29.6
  10
-14.23
+13.73
  20
 -23.2
  10
-4.77
+4.27
  20
 -23.2
  10
-4.77
+4.27
  20
 -29.6
   0
 LWPOLYLINE
   5
-91
+99
 330
 17
 100
@@ -16961,31 +17159,31 @@ AcDbPolyline
  70
 1
  10
-4.73
+4.23
  20
 -29.6
  10
-4.73
+4.23
  20
 -23.2
  10
--4.73
+-5.23
  20
 -23.2
  10
--4.73
+-5.23
  20
 -29.6
   0
 LWPOLYLINE
   5
-92
+9A
 330
 17
 100
 AcDbEntity
   8
-PLACEMENT_J3_LED_BOT
+PLACEMENT_J2_LED
 100
 AcDbPolyline
  90
@@ -16993,31 +17191,31 @@ AcDbPolyline
  70
 1
  10
--13.1
+-13.3
  20
--29.6
- 10
--13.1
- 20
--22.64
- 10
 -19.5
- 20
--22.64
  10
--19.5
+-13.3
  20
--29.6
+-12.54
+ 10
+-19.7
+ 20
+-12.54
+ 10
+-19.7
+ 20
+-19.5
   0
 LWPOLYLINE
   5
-93
+9B
 330
 17
 100
 AcDbEntity
   8
-PLACEMENT_J2_LED_TOP
+PLACEMENT_J2_PLUG
 100
 AcDbPolyline
  90
@@ -17025,57 +17223,25 @@ AcDbPolyline
  70
 1
  10
--13.1
+-7.4
  20
--22.4
- 10
--13.1
- 20
--15.44
- 10
 -19.5
- 20
--15.44
  10
--19.5
+-7.4
  20
--22.4
+-12.54
+ 10
+-13.3
+ 20
+-12.54
+ 10
+-13.3
+ 20
+-19.5
   0
 LWPOLYLINE
   5
-94
-330
-17
-100
-AcDbEntity
-  8
-PLACEMENT_J2J3_PLUGS
-100
-AcDbPolyline
- 90
-4
- 70
-1
- 10
--7.2
- 20
--29.6
- 10
--7.2
- 20
--15.44
- 10
--13.1
- 20
--15.44
- 10
--13.1
- 20
--29.6
-  0
-LWPOLYLINE
-  5
-95
+9C
 330
 17
 100
@@ -17107,7 +17273,7 @@ AcDbPolyline
   0
 POINT
   5
-96
+9D
 330
 17
 100
@@ -17125,7 +17291,7 @@ AcDbPoint
   0
 LWPOLYLINE
   5
-97
+9E
 330
 17
 100
@@ -17157,7 +17323,7 @@ AcDbPolyline
   0
 POINT
   5
-98
+9F
 330
 17
 100
@@ -17175,7 +17341,7 @@ AcDbPoint
   0
 LWPOLYLINE
   5
-99
+A0
 330
 17
 100
@@ -17207,7 +17373,7 @@ AcDbPolyline
   0
 POINT
   5
-9A
+A1
 330
 17
 100
@@ -17225,7 +17391,7 @@ AcDbPoint
   0
 CIRCLE
   5
-9B
+A2
 330
 17
 100
@@ -17245,201 +17411,27 @@ AcDbCircle
   0
 LINE
   5
-9C
-330
-17
-100
-AcDbEntity
-  8
-IMU_CENTRE
-100
-AcDbLine
- 10
--3.0
- 20
-0.0
- 30
-0.0
- 11
-3.0
- 21
-0.0
- 31
-0.0
-  0
-LINE
-  5
-9D
-330
-17
-100
-AcDbEntity
-  8
-IMU_CENTRE
-100
-AcDbLine
- 10
-0.0
- 20
--3.0
- 30
-0.0
- 11
-0.0
- 21
-3.0
- 31
-0.0
-  0
-LINE
-  5
-9E
-330
-17
-100
-AcDbEntity
-  8
-REF_BOARD
-100
-AcDbLine
- 10
--18.5
- 20
--38.0
- 30
-0.0
- 11
-18.5
- 21
--38.0
- 31
-0.0
-  0
-ARC
-  5
-9F
-330
-17
-100
-AcDbEntity
-  8
-REF_BOARD
-100
-AcDbCircle
- 10
-18.5
- 20
--36.5
- 30
-0.0
- 40
-1.5
-100
-AcDbArc
- 50
-270.0
- 51
-360.0
-  0
-LINE
-  5
-A0
-330
-17
-100
-AcDbEntity
-  8
-REF_BOARD
-100
-AcDbLine
- 10
-20.0
- 20
--36.5
- 30
-0.0
- 11
-20.0
- 21
-36.5
- 31
-0.0
-  0
-ARC
-  5
-A1
-330
-17
-100
-AcDbEntity
-  8
-REF_BOARD
-100
-AcDbCircle
- 10
-18.5
- 20
-36.5
- 30
-0.0
- 40
-1.5
-100
-AcDbArc
- 50
-0.0
- 51
-90.0
-  0
-LINE
-  5
-A2
-330
-17
-100
-AcDbEntity
-  8
-REF_BOARD
-100
-AcDbLine
- 10
-18.5
- 20
-38.0
- 30
-0.0
- 11
-13.5
- 21
-38.0
- 31
-0.0
-  0
-ARC
-  5
 A3
 330
 17
 100
 AcDbEntity
   8
-REF_BOARD
+IMU_CENTRE
 100
-AcDbCircle
+AcDbLine
  10
-13.5
+-3.0
  20
-37.5
+0.0
  30
 0.0
- 40
-0.5
-100
-AcDbArc
- 50
-90.0
- 51
-180.0
+ 11
+3.0
+ 21
+0.0
+ 31
+0.0
   0
 LINE
   5
@@ -17449,6 +17441,180 @@ A4
 100
 AcDbEntity
   8
+IMU_CENTRE
+100
+AcDbLine
+ 10
+0.0
+ 20
+-3.0
+ 30
+0.0
+ 11
+0.0
+ 21
+3.0
+ 31
+0.0
+  0
+LINE
+  5
+A5
+330
+17
+100
+AcDbEntity
+  8
+REF_BOARD
+100
+AcDbLine
+ 10
+-18.5
+ 20
+-38.0
+ 30
+0.0
+ 11
+18.5
+ 21
+-38.0
+ 31
+0.0
+  0
+ARC
+  5
+A6
+330
+17
+100
+AcDbEntity
+  8
+REF_BOARD
+100
+AcDbCircle
+ 10
+18.5
+ 20
+-36.5
+ 30
+0.0
+ 40
+1.5
+100
+AcDbArc
+ 50
+270.0
+ 51
+360.0
+  0
+LINE
+  5
+A7
+330
+17
+100
+AcDbEntity
+  8
+REF_BOARD
+100
+AcDbLine
+ 10
+20.0
+ 20
+-36.5
+ 30
+0.0
+ 11
+20.0
+ 21
+36.5
+ 31
+0.0
+  0
+ARC
+  5
+A8
+330
+17
+100
+AcDbEntity
+  8
+REF_BOARD
+100
+AcDbCircle
+ 10
+18.5
+ 20
+36.5
+ 30
+0.0
+ 40
+1.5
+100
+AcDbArc
+ 50
+0.0
+ 51
+90.0
+  0
+LINE
+  5
+A9
+330
+17
+100
+AcDbEntity
+  8
+REF_BOARD
+100
+AcDbLine
+ 10
+18.5
+ 20
+38.0
+ 30
+0.0
+ 11
+13.5
+ 21
+38.0
+ 31
+0.0
+  0
+ARC
+  5
+AA
+330
+17
+100
+AcDbEntity
+  8
+REF_BOARD
+100
+AcDbCircle
+ 10
+13.5
+ 20
+37.5
+ 30
+0.0
+ 40
+0.5
+100
+AcDbArc
+ 50
+90.0
+ 51
+180.0
+  0
+LINE
+  5
+AB
+330
+17
+100
+AcDbEntity
+  8
 REF_BOARD
 100
 AcDbLine
@@ -17467,7 +17633,7 @@ AcDbLine
   0
 ARC
   5
-A5
+AC
 330
 17
 100
@@ -17493,7 +17659,7 @@ AcDbArc
   0
 LINE
   5
-A6
+AD
 330
 17
 100
@@ -17517,7 +17683,7 @@ AcDbLine
   0
 ARC
   5
-A7
+AE
 330
 17
 100
@@ -17543,7 +17709,7 @@ AcDbArc
   0
 LINE
   5
-A8
+AF
 330
 17
 100
@@ -17567,7 +17733,7 @@ AcDbLine
   0
 ARC
   5
-A9
+B0
 330
 17
 100
@@ -17593,7 +17759,7 @@ AcDbArc
   0
 LINE
   5
-AA
+B1
 330
 17
 100
@@ -17617,7 +17783,7 @@ AcDbLine
   0
 ARC
   5
-AB
+B2
 330
 17
 100
@@ -17643,7 +17809,7 @@ AcDbArc
   0
 LINE
   5
-AC
+B3
 330
 17
 100
@@ -17667,7 +17833,7 @@ AcDbLine
   0
 ARC
   5
-AD
+B4
 330
 17
 100
@@ -17693,7 +17859,7 @@ AcDbArc
   0
 CIRCLE
   5
-AE
+B5
 330
 17
 100
@@ -17713,7 +17879,7 @@ AcDbCircle
   0
 CIRCLE
   5
-AF
+B6
 330
 17
 100
@@ -17733,7 +17899,7 @@ AcDbCircle
   0
 LWPOLYLINE
   5
-B0
+B7
 330
 17
 100
@@ -17765,7 +17931,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-B1
+B8
 330
 17
 100
@@ -17797,7 +17963,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-B2
+B9
 330
 17
 100
@@ -17829,7 +17995,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-B3
+BA
 330
 17
 100
@@ -17861,7 +18027,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-B4
+BB
 330
 17
 100
@@ -17893,7 +18059,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-B5
+BC
 330
 17
 100
@@ -17925,7 +18091,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-B6
+BD
 330
 17
 100
@@ -17957,7 +18123,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-B7
+BE
 330
 17
 100
@@ -17989,7 +18155,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-B8
+BF
 330
 17
 100
@@ -18003,25 +18169,89 @@ AcDbPolyline
  70
 1
  10
-6.0
+8.5
  20
--33.95
+-23.2
  10
-6.0
+8.5
  20
-33.95
+31.6
  10
--6.0
+-8.5
  20
-33.95
+31.6
  10
--6.0
+-8.5
  20
--33.95
+-23.2
   0
 LWPOLYLINE
   5
-B9
+C0
+330
+17
+100
+AcDbEntity
+  8
+REF_S_BEAM
+100
+AcDbPolyline
+ 90
+4
+ 70
+1
+ 10
+20.5
+ 20
+-24.8
+ 10
+20.5
+ 20
+-19.8
+ 10
+-20.5
+ 20
+-19.8
+ 10
+-20.5
+ 20
+-24.8
+  0
+LWPOLYLINE
+  5
+C1
+330
+17
+100
+AcDbEntity
+  8
+REF_S_GAP
+100
+AcDbPolyline
+ 90
+4
+ 70
+1
+ 10
+20.5
+ 20
+-29.9
+ 10
+20.5
+ 20
+-24.8
+ 10
+-20.5
+ 20
+-24.8
+ 10
+-20.5
+ 20
+-29.9
+  0
+LWPOLYLINE
+  5
+C2
 330
 17
 100
@@ -18053,7 +18283,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-BA
+C3
 330
 17
 100
@@ -18085,7 +18315,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-BB
+C4
 330
 17
 100
@@ -18117,7 +18347,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-BC
+C5
 330
 17
 100
@@ -18149,7 +18379,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-BD
+C6
 330
 17
 100
@@ -18181,7 +18411,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-BE
+C7
 330
 17
 100
@@ -18213,7 +18443,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-BF
+C8
 330
 17
 100
@@ -18245,7 +18475,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-C0
+C9
 330
 17
 100
@@ -18277,7 +18507,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-C1
+CA
 330
 17
 100
@@ -18309,7 +18539,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-C2
+CB
 330
 17
 100
@@ -19329,7 +19559,7 @@ CREATED_BY_EZDXF
   3
 WRITTEN_BY_EZDXF
 350
-C5
+CE
   0
 DICTIONARYVAR
   5
@@ -19341,11 +19571,11 @@ DictionaryVariables
 280
 0
   1
-1.4.5 @ 2026-11-03T20:28:53.642317+00:00
+1.4.5 @ 2026-11-04T07:53:19.280334+00:00
   0
 DICTIONARYVAR
   5
-C5
+CE
 330
 2D
 100
@@ -19353,7 +19583,7 @@ DictionaryVariables
 280
 0
   1
-1.4.5 @ 2026-11-03T20:28:53.661590+00:00
+1.4.5 @ 2026-11-04T07:53:19.314081+00:00
   0
 ENDSEC
   0
