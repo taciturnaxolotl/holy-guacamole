@@ -198,7 +198,7 @@ USB runs through a ribbon extension with a slim male end, from the XIAO to the U
 | NW corridor | `J7` switch-loop XT30, near the switch at (−5, 50.5) |
 | SE corridor, above the ESC pads | `J6` battery XT30, clear of the key band and the motor-lead entries |
 | S gap, SE | `J1` ESC power lap pads (south of the beam), `J4` ESC signal. The ESC (turned 180° in v34) stands against the S bay wall with BAT/GND on the E side; its leads drop through the mirrored groove |
-| W corridor, north of the beam | `J2` TinySLED socket, opening E. The LED leads come from the SW channel mouth (keep it clear) and run north under the beam (1.5 mm gap) |
+| W corridor, north of the beam | `J2` TinySLED socket at (−14.0, −16.3), opening N; plug and Y-splice north of it under the L-key sweep. The LED leads come up from the SW channel mouth (keep it clear) |
 | S, near x 0 | `J5` receiver harness; the leads come down beside the ESC into the groove at x ±3 |
 | Centre | IMU array on the spin axis |
 | \|y\| > 29.9 | Nothing on top (clamped under the ledges) |
@@ -219,7 +219,7 @@ The array stays centred on the spin axis. Nominal intent is unchanged:
 | `U5` H3LIS331DL | 90° | 18 mm | About 324 g |
 | `U6` H3LIS331DL | 210° | 18 mm | Asymmetric, breaks heading singularities |
 
-With the v33b placement (`cad/rev2/README.md`), the nominal array puts U5 under the XIAO. Rotating the **whole array 166° CCW** clears everything (only 164–168° works): U4 (−11.64, 2.90), U5 (−4.35, −17.47), U6 (17.30, 4.96). Firmware adds 166° to each nominal angle (0/90/210 become 166/256/16). The window is 163–168° with the v3.4c placement; moving J2, J6 or C21 can close it, so re-check after any change. Firmware must use **measured** post-assembly IMU coordinates.
+With the v33b placement (`cad/rev2/README.md`), the nominal array puts U5 under the XIAO. Rotating the **whole array 166° CCW** clears everything (only 164–168° works): U4 (−11.64, 2.90), U5 (−4.35, −17.47), U6 (17.30, 4.96). Firmware adds 166° to each nominal angle (0/90/210 become 166/256/16). The window is 152–168° with J2 opening N; moving J2, J6 or C21 can close it, so re-check after any change. Firmware must use **measured** post-assembly IMU coordinates.
 
 Mount each chip with X radial outward and Y tangential in the positive rotation direction; verify against the datasheet axis diagrams.
 

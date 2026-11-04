@@ -9,10 +9,12 @@ Run from cad/rev2 (after scripts/slice_v33b.py, which tessellates the STEPs to /
       python scripts/build_rev2.py
 """
 import math, ezdxf, trimesh, numpy as np
-from shapely.geometry import Polygon, Point, box
+from shapely.geometry import Polygon, Point, box, LineString
 from shapely.ops import unary_union
 
-WORK = "/tmp/hg33b_work/"
+import os
+WORK = os.environ.get("WORK", "/tmp/hg33b_work/")      # dir with the chassis meshes
+MPFX = os.environ.get("MPFX", "v33b_")                 # v33b_ (rev B slices) or v33m_ (chassis v3.4d STLs from the frame generator)
 # ---------------- v33 rev B constants (concept_v33.py / README) ----------------
 BAY = (-20.5, 20.5, -39.5, 39.5)
 LEDGE_Y0 = 29.9; BAT_Z0 = 7.2; USB_Z1 = 7.2
@@ -77,17 +79,19 @@ PL = [
     ("J6_XT30_BAT", 11.0, 16.6, -18.6, -8.0, None, "XT30UPB-M vertical, rotated 90 deg, pins (13.8,-15.8)/(13.8,-10.8); mated body per v3.4c"),
     ("D2",        12.6, 19.6, -7.7, -4.2, 2.2, "SMAJ15CA (D_SMA) horizontal, centre (16.1,-5.95), in the key band (limit 4.0)"),
     ("J1_ESC_PWR", 13.9, 19.7, -29.3, -25.3, 0.5, "2x SMD lap pads 2.6x4.0 for 20AWG, VBUS x 13.9..16.5, GND x 17.1..19.7; south of the S beam"),
-    ("J4_ESC_SIG", 4.27, 13.73, -29.6, -23.2, 4.25, "JST-GH 4p horizontal, centre (9.0,-26.4), opening S into the v34 groove"),
-    ("J5_RX",     -5.23, 4.23, -29.6, -23.2, 4.25, "JST-GH 4p horizontal, centre (-0.5,-26.4), opening S, plug under the rx lead drop (x +-3)"),
-    ("J2_LED",    -19.7, -13.3, -19.5, -12.54, 4.25, "JST-GH 2p horizontal rotated 90 deg, centre (-16.5,-16.02), opening E; both TinySLEDs on one plug, Y-spliced"),
-    ("J2_PLUG",   -13.3, -7.4, -19.5, -12.54, 4.25, "J2 mating plug + cable exit"),
+    ("J4_ESC_SIG", 4.27, 13.73, -29.6, -25.55, 4.25, "JST-GH 4p horizontal, centre (9.0,-26.4), opening S into the v34 groove: header body"),
+    ("J4_REARPADS", 4.27, 13.73, -25.55, -23.2, 0.2, "J4 SMD mounting/signal pads behind the body (flat, under the S beam)"),
+    ("J5_RX",     -5.23, 4.23, -29.6, -25.55, 4.25, "JST-GH 4p horizontal, centre (-0.5,-26.4), opening S, plug under the rx lead drop (x +-3): header body"),
+    ("J5_REARPADS", -5.23, 4.23, -25.55, -23.2, 0.2, "J5 SMD pads behind the body (flat, under the S beam)"),
+    ("J2_LED",    -17.48, -10.52, -19.5, -13.1, 4.25, "JST-GH 2p horizontal, centre (-14.0,-16.3), opening N; back pads at y -19.5; both TinySLEDs on one plug, Y-spliced"),
+    ("J2_PLUG",   -17.0, -11.0, -13.1, -8.6, 4.25, "J2 mating plug + cable exit to the N; splice N of it at y ~-9.5 (under the L-key sweep, limit 4.0)"),
 ]
 THT = [(13.8, -15.8), (13.8, -10.8), (-13.8, 21.8), (-13.8, 26.8)]   # J6, J7 through-hole pins (J1 is now SMD)
 IMU_NOM = [("U4", 12.0, 0.0), ("U5", 18.0, 90.0), ("U6", 18.0, 210.0)]   # (ref, r, angle) = firmware imu_geom.c
 IMU_HALF = 2.0                                                          # 3x3 LGA + 0.5 courtyard
 
 # ---------------- geometry checks against rev B ----------------
-mesh = {n: trimesh.load(WORK + f"v33b_{n}.stl") for n in ("lower", "upper", "bot")}
+mesh = {n: trimesh.load(WORK + f"{MPFX}{n}.stl") for n in ("lower", "upper", "bot")}
 def sec(n, z):
     s = mesh[n].section(plane_origin=[0, 0, z], plane_normal=[0, 0, 1])
     return unary_union([p.buffer(0) for p in s.to_2D(to_2D=np.eye(4))[0].polygons_full]) if s is not None else Polygon()
@@ -143,8 +147,9 @@ K = {
     "XT30_SW": R_(-16.6, -11.0, 19.0, 29.6),
     "ESC_EDGE": R_(4.27, 19.7, -29.6, -23.2),
     "USB_CHIMNEY": unary_union([R_(USB_X[0], USB_X[1], 28.82, Y1), R_(NX0, NX1, NY, Y1)]),
-    "LED_CORNER": R_(-20.0, -7.4, -19.5, -12.54),
+    "LED_CORNER": R_(-18.0, -10.0, -19.5, -8.6),
     "RX_ENTRY": R_(RX_GROOVE[0], RX_GROOVE[1], -29.9, -23.2),
+    # chassis harness LED routes: to be re-added from the v3.4e harness.js once J2 opens N
 }
 for k, v in K.items():
     g = v.intersection(BOARD)
@@ -159,6 +164,7 @@ def imu_boxes(theta):
         out.append((ref, x, y, box(x - IMU_HALF, y - IMU_HALF, x + IMU_HALF, y + IMU_HALF)))
     return out
 OBST = unary_union([box(p[1], p[3], p[2], p[4]) for p in PL] + [K["LEDGE_CLAMP_NO_PARTS"], K["S_GROOVE_WIRES_" + tag(L16['groove'])]] +
+                   [v for k, v in K.items() if k.startswith("LED_") and k != "LED_CORNER"] +
                    [Point(h).buffer(KEEP_D / 2) for h in HOLES])
 NOISY = unary_union([box(p[1], p[3], p[2], p[4]) for p in PL if p[0] in ("L1", "U2_BUCK")])
 scan = []
@@ -178,7 +184,8 @@ nom = imu_boxes(0)
 for ref, x, y, b in nom:
     hits = [p[0] for p in PL if b.intersects(box(p[1], p[3], p[2], p[4]))]
     rep.append(f"  nominal {ref} ({x:.2f},{y:.2f}) collides with {hits or 'nothing'}; in key band: {b.intersects(K[KB])}")
-best = max(okr, key=lambda s: (round(s[2], 1), s[3])) if okr else None
+PIN_TH = 166                                                            # committed firmware rotation; keep it while it stays feasible
+best = next((s for s in okr if s[0] == PIN_TH), None) or (max(okr, key=lambda s: (round(s[2], 1), s[3])) if okr else None)
 TH = best[0] if best else 0
 rep.append(f"  chosen rotation {TH}° (min clearance {best[2]:.2f} mm to placed parts/ledges/holes, {best[3]:.2f} mm to L1/buck)" if best else "  no feasible rotation")
 IMUS = imu_boxes(TH)
