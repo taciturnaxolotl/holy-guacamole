@@ -3,7 +3,7 @@ Run after layout_rev2.py with KiCad's python. Idempotent: it removes any zone/tr
 (identified by the User_2 marker text) before adding them again.
 
 Power scheme (see docs/spec.md): the battery loop runs up the E edge on B.Cu as two adjacent strips,
-VBUS inner (x 14.4..16.8) and VBAT_RAW outer (x 17.1..19.45), then both turn west along the N end to the J7
+VBUS inner (x 14.4..16.45) and VBAT_RAW outer (x 17.45..19.45, 1 mm gap), then both turn west along the N end to the J7
 switch-loop XT30 (VBUS y 20.5..22.8, VBAT_RAW y 26.5..28.9). South of U6 the VBUS strip is on F.Cu along the
 edge from J1 up past D2, with a via field at y about -2.5 taking it to the B.Cu strip. 5V runs on B.Cu from
 the buck output up the W edge and east along y 24.3 to the XIAO 5V pad, between the two power strips.
@@ -95,17 +95,23 @@ def track(pts, net, layer, w):
 B, F = pcbnew.B_Cu, pcbnew.F_Cu
 
 # VBAT_RAW: J6 pin 2 stub -> outer E strip -> N strip -> J7 pin 2
-zone(VBAT, B, [rect(13.0, 19.45, -12.0, -9.6), rect(17.1, 19.45, -12.0, 28.9), rect(-15.3, 19.45, 26.5, 28.9)],
+zone(VBAT, B, [rect(13.0, 19.45, -12.0, -9.6), rect(17.45, 19.45, -12.0, 28.9), rect(-15.3, 19.45, 26.5, 28.9)],
      "VBAT_RAW B", 3)
 # VBUS: F.Cu E edge from J1 pad 1 up past D2 to the via field, then B.Cu inner strip and N strip to J7 pin 1
 zone(VBUS, F, [rect(16.9, 19.45, -29.3, -1.3), rect(14.4, 19.45, -3.9, -1.3)], "VBUS F edge", 3)
 zone(VBAT, F, [rect(17.3, 19.45, 8.6, 28.9)], "VBAT_RAW F edge", 6)
 for y in (9.6, 12.4, 15.2, 18.0, 20.8, 23.6, 26.4, 28.2):
     via(18.4, y, VBAT, d=0.8, drill=0.4)
-zone(VBUS, B, [rect(14.4, 16.8, -3.7, 22.8), rect(-15.3, 16.8, 20.5, 22.8)], "VBUS B", 3)
+# the E strips face the bottom plate, so they keep a 1 mm gap (a chip bridging them would short the switch)
+zone(VBUS, B, [rect(14.4, 16.45, -3.7, 22.8), rect(-15.3, 16.45, 20.5, 22.8)], "VBUS B", 3)
 for x in (14.9, 15.6, 16.3):
     for y in (-1.9, -2.6, -3.3):
         via(x, y, VBUS, d=0.7, drill=0.35)
+# In2 doubles the B.Cu VBUS strip from the via field to just south of the XIAO; north of there the XIAO's
+# E pads sit over the strip and leave no room for stitching vias
+zone(VBUS, pcbnew.In2_Cu, [rect(14.4, 19.45, -3.9, 8.9)], "VBUS In2", 10, clearance=0.2)
+for x in (14.95, 15.75):
+    via(x, 8.4, VBUS, d=0.6, drill=0.3)
 # J1 pad 1 is SMD on F.Cu and already in the F.Cu strip; add vias so the B.Cu GND/pour side can carry current too
 # (not needed for VBUS). J7 pin 1 is THT and lands in the B.Cu strip directly.
 
@@ -162,7 +168,7 @@ for fp in board.GetFootprints():
 placed_vias = [(v.GetPosition().x / 1e6 - OX, OY - v.GetPosition().y / 1e6, v.GetWidth() / 2e6) for v in board.GetTracks() if v.GetClass() == "PCB_VIA"]
 
 
-STRIPS = [(17.1, 19.45, -12.0, 28.9), (17.3, 19.45, 8.6, 28.9), (-15.3, 19.45, 26.5, 28.9), (14.4, 16.8, -1.0, 22.8), (-15.3, 16.8, 20.5, 22.8)]
+STRIPS = [(17.45, 19.45, -12.0, 28.9), (17.3, 19.45, 8.6, 28.9), (-15.3, 19.45, 26.5, 28.9), (14.4, 16.45, -1.0, 22.8), (-15.3, 16.45, 20.5, 22.8)]
 
 
 def in_strip(x, y, m=0.55):
@@ -308,8 +314,8 @@ track([(14.8, 20.88), (9.6, 20.88), (9.6, 21.91)], V3, F, 0.25)
 
 
 # power strips on B.Cu: no foreign tracks or vias (the VBUS via field below y -1.0 is left open)
-for name, (x0, x1, y0, y1) in {"VBAT E": (17.1, 19.45, -12.0, 28.9), "VBAT N": (-15.3, 19.45, 26.5, 28.9),
-                               "VBUS E": (14.4, 16.8, -1.0, 22.8), "VBUS N": (-2.0, 16.8, 21.2, 22.8), "VBUS NW": (-15.3, -10.0, 20.5, 22.8)}.items():
+for name, (x0, x1, y0, y1) in {"VBAT E": (17.45, 19.45, -12.0, 28.9), "VBAT N": (-15.3, 19.45, 26.5, 28.9),
+                               "VBUS E": (14.4, 16.45, -1.0, 22.8), "VBUS N": (-2.0, 16.45, 21.2, 22.8), "VBUS NW": (-15.3, -10.0, 20.5, 22.8)}.items():
     ka = pcbnew.ZONE(board)
     ka.SetIsRuleArea(True)
     ka.SetDoNotAllowTracks(True)
@@ -329,7 +335,7 @@ for name, (x0, x1, y0, y1) in {"VBAT E": (17.1, 19.45, -12.0, 28.9), "VBAT N": (
     board.Add(ka)
 
 # no autorouted tracks on the inner layers (they are pours), and no tracks across the VBUS via field on B.Cu
-for name, layers, (x0, x1, y0, y1) in (("VBUS via field", (B,), (14.4, 16.8, -3.9, -1.0)), ("VBUS N feeds", (B,), (-10.0, -2.0, 21.4, 22.8)),
+for name, layers, (x0, x1, y0, y1) in (("VBUS via field", (B,), (14.4, 16.45, -3.9, -1.0)), ("VBUS N feeds", (B,), (-10.0, -2.0, 21.4, 22.8)),
                                        ("USB notch edge", (F, B), (-0.25, 13.65, 28.55, 38.1))):
     ka = pcbnew.ZONE(board)
     ka.SetIsRuleArea(True)

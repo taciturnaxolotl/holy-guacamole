@@ -114,7 +114,7 @@ Gender convention: the battery lead carries the female XT30, so the board gets t
 | Copper weight | 2 oz both layers (`project.toml`) |
 | Peak current | Repeat AM32 at antweight: 4–8 A per channel, so about 16 A worst-case burst on VBUS/GND |
 | VBAT_RAW, VBUS | Routed board (4 layers): VBUS on a 2.55 mm F.Cu strip from `J1` up the E edge to a 3×3 via field at y ≈ −2.6, then a 2.35 mm B.Cu strip up the E side and across the N end to `J7`. VBAT_RAW: 2.35 mm B.Cu strip outside it, doubled by a 2.15 mm F.Cu strip north of U6 (8 stitching vias). Rough rating on 2 oz: 7–10 A continuous per strip at 10–20 °C rise; the 16 A two-motor bursts are short. The VBUS B.Cu strip is the narrowest section and has no F.Cu twin (the XIAO pad column sits above it) |
-| Inner layers | In1 solid GND; In2 3V3 (centre) and 5V (W edge, N end, finger to `J5`) |
+| Inner layers | In1 solid GND; In2 3V3 (centre), 5V (W edge, N end, finger to `J5`) and a VBUS strip doubling the E edge from the via field to the XIAO |
 | GND | Poured on both layers, stitched; the high-current return path from `J1` to `J6` must not run under the IMU array |
 | Via stitching | At least six 0.4 mm vias per power-path layer change |
 
