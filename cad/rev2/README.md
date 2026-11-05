@@ -10,6 +10,18 @@ The STEPs were tessellated to `/tmp/hg33b_work/` and sliced with trimesh.
 
 **Superseded work:** `stale_bodystep/` (old July chassis) and `stale_v33a/` (v33 rev A). Ignore both.
 
+## v3.4e harness keepouts (current)
+
+From the chassis v3.4e `harness.js` (checker now tests U5 directly: 9.8 mm clearance). In `keepout.dxf`, also hard obstacles in the IMU rotation scan (window still 152…168°, 166° kept):
+
+| Layer | Geometry | Limit |
+|---|---|---|
+| `LED_BOT_LEAD_0P3` | 0.8 mm buffer on (−20.0, −26.95) → (−19.9, −26.6) → (−19.4, −24.0) → (−19.4, −12.0) → (−19.0, −7.5) → (−16.4, −3.7) → (−13.35, −3.9) → (−13.35, −5.8) | no parts (also a no-footprint rule area in the PCB) |
+| `LED_TOP_LEAD_1P2` | 0.8 mm buffer on (−17.9, −10.5) → (−17.8, −9.4) → (−17.2, −6.8) → (−15.6, −5.0) → (−14.65, −5.0) → (−14.65, −5.8) | ≤ 1.2 |
+| `LED_SPLICE_1P0` | x −15.0…−13.0, y −8.6…−5.6 | ≤ 1.0 |
+
+Note: the top-lead buffer touches the J2 plug zone at its NW corner (x −17.1…−17.0, y −9.7…−8.6); the lead is at z ≥ 4.65 there and ~0.25 mm W of the plug. The chassis checker passes it; worth a look on the first build.
+
 ## v3.4e: J2 opens N (current; on top of the v3.4d harness review)
 
 The v3.4d harness put the Y-splice and the top-LED lead over U5 (0.35 / 0.55 mm above the chip). Moving the splice west was not enough: with J2 opening E its pigtail had to U-turn in a 0.57 mm gap under the battery corner. So J2 now opens **N**:
@@ -64,7 +76,7 @@ The chassis designer's v3.4c constraints are encoded in `scripts/build_rev2.py` 
 | U2 buck block | −10.0…−2.7 | 8.3…22.1 | ≤ 1.2 | unchanged |
 | C21 100 µF 25 V polymer tantalum, 7343-43 | 0.5…9.0 | −19.3…−14.3 | ≤ 4.3 | was a 6.3 × 5.8 can in the NW; now in the battery strip, ~12 mm from J1 |
 | D2 SMAJ15CA | 12.6…19.6 | −7.7…−4.2 | 2.2 | moved into the key band (limit 4.0), clear of J6 |
-| J1 ESC power, 2 SMD lap pads 2.6 × 4.0 | 13.9…19.7 | −29.3…−25.3 | ≈ 0.5 (+ wire 0.8) | pad 1 VBUS at x 13.9…16.5, pad 2 GND at x 17.1…19.7; south of the beam. No longer through-hole |
+| J1 ESC power, 2 SMD lap pads 2.6 × 4.0 | 13.7…19.5 | −29.3…−25.3 | ≈ 0.5 (+ wire 0.8) | **routed board (v34e layout): pad 1 VBUS at x 16.9…19.5 (E, on the edge power strip), pad 2 GND at x 13.7…16.3**; south of the beam. No longer through-hole |
 | J4 ESC signal GH-4 | 4.27…13.73 | −29.6…−23.2 | 4.25 | centre (9.0, −26.4), opens S into the groove. Body y −29.6…−25.55; only the flat rear pads sit under the beam |
 | J5 receiver GH-4 | −5.23…4.23 | −29.6…−23.2 | 4.25 | centre (−0.5, −26.4), same as J4 |
 | J2 TinySLEDs GH-2 (both LEDs) | −19.7…−13.3 | −19.5…−12.54 | 4.25 | opens E, plug zone x −13.3…−7.4. J3 deleted; the two LEDs share one plug through a Y-splice in the harness |

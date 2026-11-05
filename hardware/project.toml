@@ -1,6 +1,6 @@
 # Solder project configuration. This file is applied to KiCad on every compile.
 [jlc]
-layers = 2
+layers = 4
 thickness_mm = 1.6
 color = "green"
 silkscreen = "white"

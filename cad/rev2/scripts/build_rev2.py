@@ -75,14 +75,14 @@ PL = [
     ("J7_XT30_SW", -16.6, -11.0, 19.0, 29.6, None, "XT30UPB-F vertical, rotated 90 deg, pins (-13.8,21.8)/(-13.8,26.8); mated body per v3.4c"),
     ("L1",        -19.35, -12.45, 11.0, 18.1, 5.8, "SRP6060FA, centre (-15.9,14.55)"),
     ("U2_BUCK",   -10.0, -2.7, 8.3, 22.1, 1.2, "AP63301 + Cin/Cout/boot/FB/EN divider, beside L1"),
-    ("C21",        0.5, 9.0, -19.3, -14.3, 4.3, "100uF 25V polymer tantalum 7343-43 (<=4.3 mm), battery strip, ~12 mm from J1"),
+    ("C21",        0.29, 9.21, -19.25, -14.35, 4.3, "100uF 25V polymer tantalum 7343-43 (<=4.3 mm), centre (4.75,-16.8), battery strip"),
     ("J6_XT30_BAT", 11.0, 16.6, -18.6, -8.0, None, "XT30UPB-M vertical, rotated 90 deg, pins (13.8,-15.8)/(13.8,-10.8); mated body per v3.4c"),
-    ("D2",        12.6, 19.6, -7.7, -4.2, 2.2, "SMAJ15CA (D_SMA) horizontal, centre (16.1,-5.95), in the key band (limit 4.0)"),
-    ("J1_ESC_PWR", 13.9, 19.7, -29.3, -25.3, 0.5, "2x SMD lap pads 2.6x4.0 for 20AWG, VBUS x 13.9..16.5, GND x 17.1..19.7; south of the S beam"),
-    ("J4_ESC_SIG", 4.27, 13.73, -29.6, -25.55, 4.25, "JST-GH 4p horizontal, centre (9.0,-26.4), opening S into the v34 groove: header body"),
-    ("J4_REARPADS", 4.27, 13.73, -25.55, -23.2, 0.2, "J4 SMD mounting/signal pads behind the body (flat, under the S beam)"),
-    ("J5_RX",     -5.23, 4.23, -29.6, -25.55, 4.25, "JST-GH 4p horizontal, centre (-0.5,-26.4), opening S, plug under the rx lead drop (x +-3): header body"),
-    ("J5_REARPADS", -5.23, 4.23, -25.55, -23.2, 0.2, "J5 SMD pads behind the body (flat, under the S beam)"),
+    ("D2",        12.56, 19.64, -7.5, -3.9, 2.2, "SMAJ15CA (D_SMA) horizontal, centre (16.1,-5.7), in the key band (limit 4.0)"),
+    ("J1_ESC_PWR", 13.35, 19.85, -29.6, -25.0, 0.5, "2x SMD lap pads 2.6x4.0 for 20AWG, VBUS (pad 1) x 16.9..19.5 on the E edge strip, GND (pad 2) x 13.7..16.3; south of the S beam"),
+    ("J4_ESC_SIG", 3.73, 13.27, -29.6, -25.55, 4.25, "JST-GH 4p horizontal, centre (8.5,-26.4), opening S into the v34 groove: header body"),
+    ("J4_REARPADS", 3.73, 13.27, -25.55, -23.2, 0.2, "J4 SMD mounting/signal pads behind the body (flat, under the S beam)"),
+    ("J5_RX",     -5.88, 3.68, -29.6, -25.55, 4.25, "JST-GH 4p horizontal, centre (-1.1,-26.4), opening S, plug under the rx lead drop (x +-3): header body"),
+    ("J5_REARPADS", -5.88, 3.68, -25.55, -23.2, 0.2, "J5 SMD pads behind the body (flat, under the S beam)"),
     ("J2_LED",    -17.48, -10.52, -19.5, -13.1, 4.25, "JST-GH 2p horizontal, centre (-14.0,-16.3), opening N; back pads at y -19.5; both TinySLEDs on one plug, Y-spliced"),
     ("J2_PLUG",   -17.0, -11.0, -13.1, -8.6, 4.25, "J2 mating plug + cable exit to the N; splice N of it at y ~-9.5 (under the L-key sweep, limit 4.0)"),
 ]
@@ -149,7 +149,10 @@ K = {
     "USB_CHIMNEY": unary_union([R_(USB_X[0], USB_X[1], 28.82, Y1), R_(NX0, NX1, NY, Y1)]),
     "LED_CORNER": R_(-18.0, -10.0, -19.5, -8.6),
     "RX_ENTRY": R_(RX_GROOVE[0], RX_GROOVE[1], -29.9, -23.2),
-    # chassis harness LED routes: to be re-added from the v3.4e harness.js once J2 opens N
+    # chassis v3.4e harness (harness.js, collision-checked against U5 in the chassis model): LED leads + Y-splice
+    f"LED_BOT_LEAD_{tag(0.3)}": LineString([(-20.0, -26.95), (-19.9, -26.6), (-19.4, -24.0), (-19.4, -12.0), (-19.0, -7.5), (-16.4, -3.7), (-13.35, -3.9), (-13.35, -5.8)]).buffer(0.8),
+    f"LED_TOP_LEAD_{tag(1.2)}": LineString([(-17.9, -10.5), (-17.8, -9.4), (-17.2, -6.8), (-15.6, -5.0), (-14.65, -5.0), (-14.65, -5.8)]).buffer(0.8),
+    f"LED_SPLICE_{tag(1.0)}": R_(-15.0, -13.0, -8.6, -5.6),
 }
 for k, v in K.items():
     g = v.intersection(BOARD)

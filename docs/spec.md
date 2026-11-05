@@ -58,7 +58,7 @@ Runtime IO stays on the XIAO edge pads; underside XIAO pads are NC.
 | `U5`, `U6` | H3LIS331DLTR outer high-G accelerometers | LGA-16 3 × 3 |
 | `U11` | SN74HC595PWR chip-select latch | TSSOP-16 |
 | `Q1` | AO3402 TinySLED low-side switch | SOT-23 |
-| `J1` | ESC battery feed, two 2.6 × 4.0 mm SMD lap pads for 20 AWG; pad 1 VBUS (W), pad 2 GND (E) | `Device:SolderLap_20AWG_1x02_2.6x4.0mm_P3.2mm` (project library) |
+| `J1` | ESC battery feed, two 2.6 × 4.0 mm SMD lap pads for 20 AWG; pad 1 VBUS on the E (board-edge) side, pad 2 GND on the W side | `Device:SolderLap_20AWG_1x02_2.6x4.0mm_P3.2mm` (project library) |
 | `J2` | TinySLEDs, top and bottom on one Y-spliced harness, JST-GH 2-pin | `JST_GH_SM02B-GHS-TB` |
 | `J4` | AM32 ESC signal, JST-GH 4-pin | `JST_GH_SM04B-GHS-TB` |
 | `J5` | ELRS receiver harness, JST-GH 4-pin | `JST_GH_SM04B-GHS-TB` |
@@ -113,7 +113,8 @@ Gender convention: the battery lead carries the female XT30, so the board gets t
 |---|---|
 | Copper weight | 2 oz both layers (`project.toml`) |
 | Peak current | Repeat AM32 at antweight: 4–8 A per channel, so about 16 A worst-case burst on VBUS/GND |
-| VBAT_RAW, VBUS | Netclass `Power_Main`: 1.5 mm minimum track, 0.3 mm clearance, poured on both layers between `J6`, `J7`, `J1`, `C21` |
+| VBAT_RAW, VBUS | Routed board (4 layers): VBUS on a 2.55 mm F.Cu strip from `J1` up the E edge to a 3×3 via field at y ≈ −2.6, then a 2.35 mm B.Cu strip up the E side and across the N end to `J7`. VBAT_RAW: 2.35 mm B.Cu strip outside it, doubled by a 2.15 mm F.Cu strip north of U6 (8 stitching vias). Rough rating on 2 oz: 7–10 A continuous per strip at 10–20 °C rise; the 16 A two-motor bursts are short. The VBUS B.Cu strip is the narrowest section and has no F.Cu twin (the XIAO pad column sits above it) |
+| Inner layers | In1 solid GND; In2 3V3 (centre) and 5V (W edge, N end, finger to `J5`) |
 | GND | Poured on both layers, stitched; the high-current return path from `J1` to `J6` must not run under the IMU array |
 | Via stitching | At least six 0.4 mm vias per power-path layer change |
 
@@ -137,7 +138,7 @@ The Repeat AM32 BEC stays **isolated**. Do not tie it to the carrier 5 V rail. R
 | UVLO | `JP1`: **bridge 2-3 for this pack** = 3S (`R25`/`R26`, about 8.85 V off / 9.92 V on, so it cuts at about 2.95 V/cell). 1-2 = 2S (`R23`/`R24`, 5.96 / 6.66 V). Open = bypass |
 | Input-cap margin | At 13.05 V each Samsung `CL21A226MAYNNNE` keeps a little under the 4.4 µF it has at 12.6 V, so the three-cap worst case is about 10 µF, right at the reference design value. Acceptable; use a 35 V 22 µF 0805 (for example Murata GRM21BR6YA226ME43) for more margin |
 
-Keep the SW node compact, take FB from the `C4`/`C5` node, and keep `L1` and SW away from the IMUs and `VBAT_SNS`. `L1` is the tallest part after the XT30s; stake it (see [Impact hardening](#impact-hardening)).
+Routed board: `C2` (100 nF) then `C1` sit directly off U2 VIN/GND (loop under 3 mm), with `C19`/`C20` stacked beside `C1` on a 0.6 mm VBUS spine that drops into the N VBUS strip. Keep the SW node compact, take FB from the `C4`/`C5` node, and keep `L1` and SW away from the IMUs and `VBAT_SNS`. `L1` is the tallest part after the XT30s; stake it (see [Impact hardening](#impact-hardening)).
 
 ---
 
