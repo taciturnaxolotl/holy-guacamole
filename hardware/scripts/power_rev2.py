@@ -94,22 +94,38 @@ def track(pts, net, layer, w):
 
 B, F = pcbnew.B_Cu, pcbnew.F_Cu
 
-# VBAT_RAW: J6 pin 2 stub -> outer E strip -> N strip -> J7 pin 2
-zone(VBAT, B, [rect(13.0, 19.45, -12.0, -9.6), rect(17.45, 19.45, -12.0, 28.9), rect(-15.3, 19.45, 26.5, 28.9)],
-     "VBAT_RAW B", 3)
+# The drive motors run for the whole match, so the loop is sized for sustained current, not bursts: every
+# stretch is either about 4 mm wide on one outer layer or doubled on a second layer. The outer-layer VBUS to
+# VBAT_RAW gap is 1 mm everywhere (guac.kicad_dru), since a chip bridging them would short the switch.
+# VBAT_RAW: J6 pin 2 stub -> outer E strip -> N strip -> J7 pin 2. The N strip is widened south to y 24.6.
+zone(VBAT, B, [rect(13.0, 19.45, -12.0, -9.6), rect(17.45, 19.45, -12.0, 28.9), rect(-15.3, 19.45, 26.5, 28.9),
+               rect(-15.3, 19.45, 24.6, 28.9)], "VBAT_RAW B", 3)
 # VBUS: F.Cu E edge from J1 pad 1 up past D2 to the via field, then B.Cu inner strip and N strip to J7 pin 1
 zone(VBUS, F, [rect(16.9, 19.45, -29.3, -1.3), rect(14.4, 19.45, -3.9, -1.3)], "VBUS F edge", 3)
 zone(VBAT, F, [rect(17.3, 19.45, 8.6, 28.9)], "VBAT_RAW F edge", 6)
 for y in (9.6, 12.4, 15.2, 18.0, 20.8, 23.6, 26.4, 28.2):
     via(18.4, y, VBAT, d=0.8, drill=0.4)
-# the E strips face the bottom plate, so they keep a 1 mm gap (a chip bridging them would short the switch)
-zone(VBUS, B, [rect(14.4, 16.45, -3.7, 22.8), rect(-15.3, 16.45, 20.5, 22.8)], "VBUS B", 3)
+# B.Cu VBUS: the E strip, widened west under the XIAO (its underside is free on B.Cu north of the CRSF_RX
+# via) and the N strip widened south under it to y 16; the S copy under the F.Cu edge strip from J1 to J6
+zone(VBUS, B, [rect(14.4, 16.45, -3.7, 22.8), rect(-15.3, 16.45, 20.5, 22.8), rect(11.9, 16.45, 10.0, 22.8),
+               rect(-15.3, 16.45, 16.0, 24.6), rect(16.9, 19.45, -29.3, -13.8)], "VBUS B", 3)
 for x in (14.9, 15.6, 16.3):
     for y in (-1.9, -2.6, -3.3):
         via(x, y, VBUS, d=0.7, drill=0.35)
-# In2 doubles the B.Cu VBUS strip from the via field to just south of the XIAO; north of there the XIAO's
-# E pads sit over the strip and leave no room for stitching vias
-zone(VBUS, pcbnew.In2_Cu, [rect(14.4, 19.45, -3.9, 8.9)], "VBUS In2", 10, clearance=0.2)
+# J1 pad 1 is SMD on F.Cu, so all of the ESC current arrives there: the first stitches sit just N of the pad
+# edge (y -25.3), not in it, so they don't wick solder from the 20 AWG lap joint
+for y in (-14.6, -16.2, -19.6, -21.2, -22.8, -24.4):
+    via(18.6, y, VBUS, d=0.7, drill=0.35)
+for y in (-14.6, -16.2, -22.8, -24.4):
+    via(17.4, y, VBUS, d=0.7, drill=0.35)
+# J1 pad 2 (GND) reaches In1 through vias along its N edge, again outside the pad
+for x in (14.0, 16.0):
+    via(x, -24.6, GND, d=0.6, drill=0.3)
+# In2 doubles the narrow outer stretches: VBUS from the via field to just south of the XIAO (north of there
+# the XIAO's E pads leave no room for stitching vias) and from J1 to J6; VBAT_RAW from J6 pin 2 (THT, so it
+# lands in the pour directly) up the E edge to the first stitching via at y 9.6
+zone(VBUS, pcbnew.In2_Cu, [rect(14.4, 16.7, -3.9, 8.9), rect(16.9, 19.45, -29.3, -13.8)], "VBUS In2", 10, clearance=0.2)
+zone(VBAT, pcbnew.In2_Cu, [rect(17.2, 19.45, -12.6, 10.0), rect(13.0, 19.45, -12.6, -9.0)], "VBAT_RAW In2", 12, clearance=0.2)
 for x in (14.95, 15.75):
     via(x, 8.4, VBUS, d=0.6, drill=0.3)
 # J1 pad 1 is SMD on F.Cu and already in the F.Cu strip; add vias so the B.Cu GND/pour side can carry current too
@@ -156,7 +172,7 @@ track([(-1.725, -29.0), (-1.725, -24.55)], V5, F, 0.3)
 # plane fanout: every 3V3 / 5V SMD pad gets a via to the In2 pour. Pads are grouped per footprint edge and
 # only adjacent pads share a via; candidate spots and the stub path are checked against every other pad and via.
 import math
-FANOUT_SKIP = {("U1", "14"), ("U1", "12"), ("U1", "28"), ("J5", "2"), ("U6", "1"), ("U6", "14"), ("U6", "15"), ("C10", "1"),
+FANOUT_SKIP = {("J1", "2"), ("U1", "14"), ("U1", "12"), ("U1", "28"), ("J5", "2"), ("U6", "1"), ("U6", "14"), ("U6", "15"), ("C10", "1"),
                ("U6", "5"), ("C10", "2"), ("U4", "6"), ("D5", "2"), ("U6", "10"), ("U6", "12"), ("U6", "13"), ("U6", "16")}
 VIA_R = 0.3
 CLR = 0.17
@@ -168,7 +184,7 @@ for fp in board.GetFootprints():
 placed_vias = [(v.GetPosition().x / 1e6 - OX, OY - v.GetPosition().y / 1e6, v.GetWidth() / 2e6) for v in board.GetTracks() if v.GetClass() == "PCB_VIA"]
 
 
-STRIPS = [(17.45, 19.45, -12.0, 28.9), (17.3, 19.45, 8.6, 28.9), (-15.3, 19.45, 26.5, 28.9), (14.4, 16.45, -1.0, 22.8), (-15.3, 16.45, 20.5, 22.8)]
+STRIPS = [(17.45, 19.45, -12.0, 28.9), (17.3, 19.45, 8.6, 28.9), (-15.3, 19.45, 26.5, 28.9), (14.4, 16.45, -1.0, 22.8), (-15.3, 16.45, 20.5, 22.8), (11.9, 16.45, 10.0, 22.8)]
 
 
 def in_strip(x, y, m=0.55):
@@ -315,7 +331,7 @@ track([(14.8, 20.88), (9.6, 20.88), (9.6, 21.91)], V3, F, 0.25)
 
 # power strips on B.Cu: no foreign tracks or vias (the VBUS via field below y -1.0 is left open)
 for name, (x0, x1, y0, y1) in {"VBAT E": (17.45, 19.45, -12.0, 28.9), "VBAT N": (-15.3, 19.45, 26.5, 28.9),
-                               "VBUS E": (14.4, 16.45, -1.0, 22.8), "VBUS N": (-2.0, 16.45, 21.2, 22.8), "VBUS NW": (-15.3, -10.0, 20.5, 22.8)}.items():
+                               "VBUS E": (14.4, 16.45, -1.0, 22.8), "VBUS N": (-2.0, 16.45, 21.2, 22.8), "VBUS under XIAO": (11.9, 16.45, 10.0, 22.8), "VBUS NW": (-15.3, -10.0, 20.5, 22.8)}.items():
     ka = pcbnew.ZONE(board)
     ka.SetIsRuleArea(True)
     ka.SetDoNotAllowTracks(True)

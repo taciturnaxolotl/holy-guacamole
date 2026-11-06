@@ -1,0 +1,9 @@
+(version 1)
+
+# The battery side (VBAT_RAW) and the switched side (VBUS) only meet through the power switch.
+# On the outer layers a metal chip or a cracked mask between them would short the switch, so they
+# keep 1 mm apart there, well above what the 13 V between them needs.
+(rule "VBUS to VBAT_RAW, outer layers"
+  (layer outer)
+  (condition "A.NetName == 'VBUS' && B.NetName == '/Power Subsystem/VBAT_RAW'")
+  (constraint clearance (min 1.0mm)))

@@ -112,9 +112,9 @@ Gender convention: the battery lead carries the female XT30, so the board gets t
 | Item | Rule |
 |---|---|
 | Copper weight | 2 oz both layers (`project.toml`) |
-| Peak current | Repeat AM32 at antweight: 4–8 A per channel, so about 16 A worst-case burst on VBUS/GND |
-| VBAT_RAW, VBUS | Routed board (4 layers): VBUS on a 2.55 mm F.Cu strip from `J1` up the E edge to a 3×3 via field at y ≈ −2.6, then a 2.35 mm B.Cu strip up the E side and across the N end to `J7`. VBAT_RAW: 2.35 mm B.Cu strip outside it, doubled by a 2.15 mm F.Cu strip north of U6 (8 stitching vias). Rough rating on 2 oz: 7–10 A continuous per strip at 10–20 °C rise; the 16 A two-motor bursts are short. The VBUS B.Cu strip is the narrowest section and has no F.Cu twin (the XIAO pad column sits above it) |
-| Inner layers | In1 solid GND; In2 3V3 (centre), 5V (W edge, N end, finger to `J5`) and a VBUS strip doubling the E edge from the via field to the XIAO |
+| Peak current | Repeat AM32 at antweight: 4–8 A per channel, so up to about 16 A on VBUS/GND, sustained for the whole match (a meltybrain spins continuously) |
+| VBAT_RAW, VBUS | Sized for sustained current, since the drive motors run for the whole match. Every stretch is about 4 mm or more on one outer layer, or doubled on a second layer, except 10 mm of VBUS beside `J6` (2.54 mm F.Cu alone, where `J6` pin 2 takes In2 and B.Cu). VBUS: 2.54 mm on F.Cu from `J1` up the E edge (doubled on B.Cu and In2 as far as `J6`), a 3×3 via field at y ≈ −2.6, then B.Cu up the E side (2.05 mm doubled on In2 to y 8.9, then 4.5 mm under the XIAO) and a 6.5–7.6 mm B.Cu strip across the N end to `J7`. VBAT_RAW: 2.0 mm B.Cu outside it, doubled on In2 from `J6` to y 10 and on F.Cu north of U6 (8 stitching vias), then 4.1–4.3 mm on B.Cu across the N end. Outer-layer VBUS to VBAT_RAW clearance is 1 mm everywhere (`guac.kicad_dru`): both strips face the bottom plate, and a chip bridging them shorts the switch. About 9 mΩ of board copper end to end (taking In2 as 1 oz). Confirm with a 3-minute bench soak at the ESC current limit before the first fight |
+| Inner layers | In1 solid GND; In2 3V3 (centre), 5V (W edge, N end, finger to `J5`), and E-edge VBUS and VBAT_RAW strips doubling the outer power copper |
 | GND | Poured on both layers, stitched; the high-current return path from `J1` to `J6` must not run under the IMU array |
 | Via stitching | At least six 0.4 mm vias per power-path layer change |
 
