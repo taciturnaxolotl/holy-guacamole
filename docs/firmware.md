@@ -6,7 +6,9 @@ SITL digital twin. Updated as code lands.
 and the simulator fidelity model. For hardware see `spec.md` (carrier PCB) and
 `braindump.md` (design research / rationale).
 
-> `spec.md` is the carrier-PCB spec and is not affected by firmware/sim work.
+> `spec.md` is the Rev B 2.1 system and carrier-PCB spec (chassis v3.4f, rev 2
+> carrier). Section 9 below lists what the code still assumes from the old
+> hardware and has to change for rev 2.
 > `braindump.md` is the design/research record and describes *intended* designs
 > (some ahead of the code). This doc tracks *what the code does today* and the
 > numbers the twin is anchored to.
@@ -65,6 +67,7 @@ the ExpressLRS Configurator over USB.
 | SITL sim | **hand-rolled plant (Box2D dropped), realistic IMU, scenario harness**, see §7 |
 | Drivers (`imu_spi`, `dshot`, `crsf`, `latch`) | in progress |
 | Heading/status LED (`head_led`) | implemented; PIO one-shot pulses, strobe + status codes (see section 3.1). Not yet bench-verified |
+| Rev 2 hardware match | **not yet**: 2S cell count, nominal IMU angles, one axis convention for all IMUs, old chassis plant numbers (section 9) |
 
 ---
 
@@ -221,24 +224,29 @@ this table; change here and in the struct together.
 
 | Parameter | Value | Notes |
 |---|---|---|
-| Mass | 0.454 kg | 1 lb antweight |
-| Disc body radius `R_body` | 0.085 m | 170 mm body diameter (mass) |
-| Weapon-tip radius `R_tip` | 0.115 m | 230 mm tip-to-tip; **collision radius** |
-| Moment of inertia `I` | `k·m·R_body²`, k≈0.55 → ~1.8e-3 kg·m² | k tunable (mass distribution) |
-| Thrust lever `r_w` | ~0.055–0.06 m | effective drive-wheel lever from centre |
+| Mass | 0.454 kg (sim) / **0.446 kg** (v3.4f CAD) | 1 lb antweight |
+| Disc body radius `R_body` | 0.085 m (sim) / **0.078 m** (v3.4f ring Ro; frame is Ø145) | mass + body contact |
+| Weapon-tip radius `R_tip` | 0.115 m (sim) / **0.090 m** (v3.4f, Ø180 over the two teeth) | **collision radius** |
+| Moment of inertia `I` | `k·m·R_body²`, k≈0.55 → ~1.8e-3 kg·m² (sim) / **~1.39e-3 kg·m²** (v3.4f CAD; the 126 g ring at r 75.5 dominates; k≈0.51 on R 0.078) | k tunable (mass distribution) |
+| Thrust lever `r_w` | ~0.055–0.06 m / **0.056 m** (v3.4f wheel centre) | effective drive-wheel lever from centre |
+| Wheel | **Ø42 × 9 mm**, cast VytaFlex 40 tread | chassis rpm = motor rpm × 21/56 = **0.375 ×** (no slip) |
 | Normal RPM | 2600–2750 rpm (272–288 rad/s) | tracking mode, ~0.44 throttle |
 | Strike/burst RPM | 3750–4000 rpm (393–419 rad/s) | pre-attack punch, ~0.65 throttle |
 | Full-throttle terminal ω | ~644 rad/s (~6150 rpm) | headroom above combat RPM so drift modulation doesn't clip |
-| Battery | 2S 350 mAh | |
+| Battery | 2S 350 mAh (sim, `battery.h`) / **3S HV 380 mAh** (GNB, 13.05 V full, 11.4 V nominal) | 3S no-load chassis ≈ 1100 × 11.4 × 0.375 ≈ 4,700 rpm; the real loaded figure needs the bench |
 | Arena | ~1.8 m square (5.9 ft), ¼" polycarbonate walls | half-extent 0.9 m; matches braindump ~6 ft antweight arena |
 
 ### IMU array
 
 | IMU | Part | Radius | Angle | Gyro |
 |---|---|---|---|---|
-| A (inner) | LSM6DSV320X | 12 mm | 0° | yes |
-| B (outer) | H3LIS331DL | 18 mm | 90° | no |
-| C (outer) | H3LIS331DL | 18 mm | 210° | no |
+| A (inner) | LSM6DSV320X (`U4`) | 12 mm | 0° nominal / **166°** as placed | yes |
+| B (outer) | H3LIS331DL (`U5`) | 18 mm | 90° nominal / **256°** as placed | no |
+| C (outer) | H3LIS331DL (`U6`) | 18 mm | 210° nominal / **16°** as placed | no |
+
+Rev 2 rotates the whole array 166° CCW to clear the XIAO. Board positions:
+U4 (−11.64, 2.90), U5 (−4.35, −17.47), U6 (17.30, 4.96) mm. **Radial-outward
+axis from the footprints: +X on U4, +Y on U5, −X on U6** (see section 9).
 
 ### Sensor characteristics (from datasheets)
 
@@ -430,10 +438,10 @@ FIFO) and `accel_cal` correction inside the SI estimation path.
 
 - [ ] EKF is 3-state as-built vs 7-state in braindump §11.3. Reconcile or
       re-scope the braindump when the augmented filter lands.
-- [ ] Chassis geometry: braindump §4/§5 use 150 mm OD / 75 mm edge and are
-      **out of date**. Current build: 170 mm body diameter (85 mm radius,
-      carries mass), 230 mm tip-to-tip (115 mm weapon-tip collision radius).
-      Refresh braindump G-load / tip-speed calcs to match.
+- [ ] Plant constants still describe the old 170 / 230 mm concept. v3.4f is
+      Ø145 frame, Ø156 ring, Ø180 over the teeth, ~1.39e-3 kg·m², 0.446 kg,
+      r_w 0.056 (section 5). Update `plant_params_t` defaults (braindump
+      §4/§5 are now refreshed to v3.4f).
 - [x] Drift modulation mode is a **build-time flag** (`DRIFT_DEFAULT_MODE` in
       `control_loop.h`): flip the line or pass `-DDRIFT_DEFAULT_MODE=DRIFT_MOD_SQUARE`.
       No runtime toggle, by request.
@@ -478,3 +486,16 @@ build) latent warnings. Decide per item: **wire it or delete it.**
   `rpm` is printed in the status line, but the EKF has no eRPM measurement row
   (consistent with the 3-state filter). This is expected today; listed so the
   gap is explicit when the 7-state / eRPM-fusion work starts.
+
+---
+
+## 9. Rev 2 hardware deltas the code hasn't absorbed
+
+Checked against `spec.md` Rev B 2.1 and the routed board.
+
+| Item | Code today | Rev 2 / v3.4f | Change |
+|---|---|---|---|
+| Pack (`battery.h`) | `BATTERY_CELLS 2`, warn 3.75 / halt 3.60 V/cell | 3S HV 380, 13.05 V full | `BATTERY_CELLS 3`. The hardware UVLO (`JP1` 2-3) cuts at about 8.85 V, or 2.95 V/cell, so the firmware halt must stay above that |
+| IMU angles (`imu_geom.c`) | 0 / 90 / 210° | 166 / 256 / 16° | Add 166°, then replace with measured positions |
+| IMU axes (`imu_convert.c`) | X radial, Y tangential on all three | Radial is **+X on U4, +Y on U5, −X on U6** | Per-chip axis and sign map, radial and tangential, including the sign of tangential against the spin direction. Confirm on the bench spin (braindump §11.6 step 1) |
+| Plant (`sim/plant.c`) | 170 / 230 mm disc, 0.454 kg, I ≈ 1.8e-3 | Section 5 v3.4f numbers | Update `plant_params_t` defaults |
