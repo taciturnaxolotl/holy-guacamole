@@ -76,6 +76,12 @@ def bottom(bd):
     l2, _ = text('KIERAN KLUKAS  ·  dunkirk.sh/h/guac', 0.8, 'xbold', track=0.08); G.append(affinity.translate(l2, 0, -35.3))
     # underline swoosh under HOLY
     G.append(dfm(affinity.translate(tapered_arc(40, 262.5, 277.5, 0.55, skew=0.0), 0, 40-28.0), 0.15))
+    # OSHW logo + licence, view NE of the notch (board NW corner)
+    from oshw_logo import logo
+    G.append(logo(7.2, (5.2, 32.6)))
+    for k, t in enumerate(('OPEN', 'SOURCE', 'HARDWARE')):
+        g, w = text(t, 0.85, 'xbold', track=0.06, align='l'); G.append(affinity.translate(g, 9.7, 34.1 - k*1.45))
+    g, w = text('CERN-OHL-S-2.0', 0.8, 'xbold', track=0.04, align='l'); G.append(affinity.translate(g, 9.7, 29.15))
     g = unary_union(G)
     return affinity.scale(g, -1, 1, origin=(0, 0)), {}
 
