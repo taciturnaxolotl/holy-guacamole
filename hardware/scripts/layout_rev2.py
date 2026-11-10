@@ -79,15 +79,17 @@ PLACE = {
     "U1": (*XIAO, 90, "F"),
     # buck: U2 rotated so SW/BST/GND face west toward L1, FB/EN/VIN face east
     "U2": (*U2, 90, "F"),
-    "L1": (-16.3, 14.55, 180, "F"),
+    # L1 sits 3 mm S of the buck so the LED leads have a lead-in to J2 (chassis v3.4g)
+    "L1": (-16.3, 11.55, 180, "F"),
     # buck input loop: HF cap then first bulk cap stacked straight off U2 VIN (pin 3) / GND (pin 4)
     "C2": (-10.5, 17.0, 180, "F"),
     "C1": (-8.6, 18.55, 180, "F"),
     "C19": (-8.6, 20.65, 180, "F"),
     "C20": (-8.6, 22.75, 180, "F"),
     "C3": (-11.5, 11.9, 180, "F"),
-    "C4": (-18.3, 9.1, -90, "F"),
-    "C5": (-16.1, 9.1, -90, "F"),
+    # buck output caps in the W strip N of L1 (the LED leads cross S of L1 at y 6.5...8)
+    "C4": (-18.3, 16.9, 90, "F"),
+    "C5": (-18.3, 20.4, 90, "F"),
     "R27": (-8.5, 11.5, 90, "F"),
     "C18": (-7.4, 11.5, -90, "F"),
     "R28": (-6.3, 11.5, -90, "F"),
@@ -97,11 +99,12 @@ PLACE = {
     "R25": (-4.0, 15.8, 180, "F"),
     "R26": (-4.0, 16.9, 0, "F"),
     # power connectors
-    "J7": (-13.8, 21.8, 90, "F"),
+    # J7 (switch loop) mirrors J6 about x = 0, so the battery-to-switch run is a short strip across the S end
+    "J7": (-13.8, -15.8, 90, "F"),
     "J6": (13.8, -15.8, 90, "F"),
     "J1": (16.6, -27.3, 180, "F"),
     "C21": (4.75, -16.8, 180, "F"),
-    "D2": (16.1, -5.7, 180, "F"),
+    "D2": (16.1, -3.4, 180, "F"),
     # battery sense near XIAO A0 (pin 1, west column, north end)
     "R9": (-4.6, 26.0, 90, "F"),
     "R10": (-4.6, 28.1, 90, "F"),
@@ -129,11 +132,12 @@ PLACE = {
     "C10": (17.3, 1.2, 0, "F"),
     "R8": (12.0, 3.16, 90, "F"),
     "C6": (11.6, 6.6, 0, "F"),
-    # heading LED driver beside J2 (which opens N)
-    "J2": (-14.0, -16.3, 180, "F"),
-    "Q1": (-8.2, -12.3, 90, "F"),
-    "R16": (-7.6, -9.6, 0, "F"),
-    "R17": (-7.6, -8.5, 0, "F"),
+    # heading LED: J2 in the old NW J7 spot, opening S onto its plug and Y-splice zones (chassis v3.4g);
+    # its driver just E of it, N of the buck input caps
+    "J2": (-14.0, 26.2, 0, "F"),
+    "Q1": (-8.5, 25.9, 90, "F"),
+    "R16": (-9.85, 28.85, -90, "F"),
+    "R17": (-8.2, 28.85, 90, "F"),
     # S edge connectors, opening S into the groove
     "J4": (8.5, -26.4, 0, "F"),
     "J5": (-1.1, -26.4, 0, "F"),

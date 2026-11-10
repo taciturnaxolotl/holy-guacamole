@@ -18,7 +18,8 @@ STEP = 0.05
 TW, CLR, VR = 0.18, 0.215, 0.31
 VIA_COST = 40
 POUR_NETS = ("GND", "VBUS", "/Power Subsystem/VBAT_RAW", "3V3", "5V")
-LAYERS = [pcbnew.F_Cu, pcbnew.B_Cu]
+LAYERS = [pcbnew.F_Cu, pcbnew.B_Cu]   # routing layers
+ALL_CU = [pcbnew.F_Cu, pcbnew.In1_Cu, pcbnew.In2_Cu, pcbnew.B_Cu]   # connectivity (the In2 signal tunnel counts)
 # board outline in KiCad coordinates (chassis x -20..20, y -38..38; kx = 80 + x, ky = 65.5 - y), less 0.5 mm edge clearance
 EX0, EX1, EY0, EY1 = 60.5, 99.5, 27.5, 103.5
 EDGE = 0.5
@@ -51,7 +52,7 @@ def islands(net):
     for i, a in enumerate(items):
         for j in range(i + 1, len(items)):
             c = items[j]
-            if any(a.IsOnLayer(L) and c.IsOnLayer(L) and a.GetEffectiveShape(L).Collide(c.GetEffectiveShape(L), 0) for L in LAYERS):
+            if any(a.IsOnLayer(L) and c.IsOnLayer(L) and a.GetEffectiveShape(L).Collide(c.GetEffectiveShape(L), 0) for L in ALL_CU):
                 parent[find(i)] = find(j)
     groups = {}
     for i in range(len(items)):
@@ -200,6 +201,7 @@ def route(net, src, dst):
     return True
 
 
+OPEN = set()
 for code, net in sorted(board.GetNetsByNetcode().items()):
     name = net.GetNetname()
     if code == 0 or name in POUR_NETS or name.startswith("unconnected-"):
@@ -209,30 +211,12 @@ for code, net in sorted(board.GetNetsByNetcode().items()):
         ok = route(net, groups[0], groups[1])
         print("bridge", name, "ok" if ok else "NO PATH", flush=True)
         if not ok:
+            OPEN.add(name)
             break
         groups = islands(net)
 
 # vias that only touch copper on one layer carry nothing: freerouting leaves them when it reaches a pre-placed
-# escape via on the same layer as the escape track
-one_sided = []
-for v in [t for t in board.GetTracks() if t.GetClass() == "PCB_VIA" and t.GetNetname() not in POUR_NETS]:
-    used = []
-    vid = v.m_Uuid.AsString()
-    for L in LAYERS:
-        shape = v.GetEffectiveShape(L)
-        touch = any(o.m_Uuid.AsString() != vid and o.GetNetCode() == v.GetNetCode() and o.IsOnLayer(L) and o.GetEffectiveShape(L).Collide(shape, 0)
-                    for o in board.GetTracks())
-        touch = touch or any(p.GetNetCode() == v.GetNetCode() and p.IsOnLayer(L) and p.GetEffectiveShape(L).Collide(shape, 0)
-                             for f in board.GetFootprints() for p in f.Pads())
-        used.append(touch)
-    if not all(used):
-        print("removing one-sided via", v.GetNetname(), flush=True)
-        one_sided.append(v)
-for v in one_sided:
-    board.Delete(v)
-
-
-# then the escape stubs those vias ended, which now lead nowhere
+# escape via on the same layer as the escape track. All four layers count (tunnel vias land on In2).
 def end_touches(t, pt):
     code, tid = t.GetNetCode(), t.m_Uuid.AsString()
     dot = pcbnew.SHAPE_CIRCLE(pt, t.GetWidth() // 2)
@@ -243,14 +227,40 @@ def end_touches(t, pt):
                for f in board.GetFootprints() for p in f.Pads())
 
 
+# repeat until nothing changes: removing a via can strand a stub, and removing a stub can strand a via
 while True:
-    stubs = [t for t in board.GetTracks() if t.GetClass() == "PCB_TRACK" and t.GetNetname() not in POUR_NETS
-             and not (end_touches(t, t.GetStart()) and end_touches(t, t.GetEnd()))]
-    if not stubs:
+    removed = 0
+    one_sided = []
+    # (nets still open are left alone: their half-built escapes are what the next attempt connects to)
+    for v in [t for t in board.GetTracks() if t.GetClass() == "PCB_VIA" and t.GetNetname() not in POUR_NETS and t.GetNetname() not in OPEN]:
+        used = []
+        vid = v.m_Uuid.AsString()
+        for L in ALL_CU:
+            shape = v.GetEffectiveShape(L)
+            touch = any(o.m_Uuid.AsString() != vid and o.GetNetCode() == v.GetNetCode() and o.IsOnLayer(L) and o.GetEffectiveShape(L).Collide(shape, 0)
+                        for o in board.GetTracks())
+            touch = touch or any(p.GetNetCode() == v.GetNetCode() and p.IsOnLayer(L) and p.GetEffectiveShape(L).Collide(shape, 0)
+                                 for f in board.GetFootprints() for p in f.Pads())
+            used.append(touch)
+        if sum(used) < 2:
+            print("removing one-sided via", v.GetNetname(), flush=True)
+            one_sided.append(v)
+    for v in one_sided:
+        board.Delete(v)
+        removed += 1
+    # then the escape stubs those vias ended, which now lead nowhere
+    while True:
+        stubs = [t for t in board.GetTracks() if t.GetClass() == "PCB_TRACK" and t.GetNetname() not in POUR_NETS and t.GetNetname() not in OPEN
+                 and not (end_touches(t, t.GetStart()) and end_touches(t, t.GetEnd()))]
+        if not stubs:
+            break
+        for t in stubs:
+            print("removing dangling stub", t.GetNetname(), flush=True)
+            board.Delete(t)
+            removed += 1
+
+    if not removed:
         break
-    for t in stubs:
-        print("removing dangling stub", t.GetNetname(), flush=True)
-        board.Delete(t)
 
 pcbnew.ZONE_FILLER(board).Fill(board.Zones())
 board.Save(PCB)

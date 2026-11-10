@@ -120,8 +120,8 @@ The 5 V load is about 100–150 mA (XIAO plus receiver), which would keep an AP6
 ```text
 3S HV LiPo, 9.0–13.05 V
   -> J6 XT30-M (battery, SE corridor)        net VBAT_RAW
-      -> J7 XT30-F (switch loop, NW corridor) pin 2 VBAT_RAW out
-          -> Fingertech switch on a short XT30 pigtail, in its frame socket
+      -> J7 XT30-F (switch loop, SW corridor, mirror of J6) pin 2 VBAT_RAW out
+          -> Fingertech switch on a twisted 20 AWG XT30 pigtail (~85 mm, W corridor at z ≈ 24), in its frame socket
       <- J7 pin 1                              net VBUS (switched)
           -> C21 100 µF bulk + D2 SMAJ15CA     at the S edge
           -> J1 pads -> AM32 dual ESC battery pads (20 AWG)
@@ -145,13 +145,16 @@ Gender convention: the battery lead carries the female XT30, so the board gets t
 |---|---|
 | Copper weight | 2 oz outer, 1 oz inner |
 | Current | Up to about 16 A on VBUS/GND at 4–8 A per ESC channel, sustained for the whole match (a meltybrain spins continuously). The AM32 limit is set to 4–5 A per channel |
-| VBAT_RAW, VBUS | Sized for sustained current. Every stretch is about 4 mm or more on one outer layer, or doubled on a second layer, with one exception: 10 mm of VBUS beside `J6` is 2.54 mm on F.Cu alone, where `J6` pin 2 takes In2 and B.Cu. About 9 mΩ of board copper end to end, counting In2 as 1 oz (8.4 mΩ measured before the PCBWay reroute; the reroute trimmed the B.Cu VBAT_RAW pour by about 13%, so re-measure) |
-| VBUS to VBAT_RAW | 1.0 mm minimum on the outer layers (`guac.kicad_dru`). Both strips face the bottom plate, and a metal chip bridging them shorts the switch. 0.5 mm on In2 |
-| Inner layers | In1 is solid GND. In2 carries 3V3 (centre), 5V (W edge, N end, and a finger to `J5`), and E-edge VBUS and VBAT_RAW strips that double the outer power copper |
-| GND | Poured on all layers and stitched. The high-current return from `J1` to `J6` does not run under the IMU array |
-| Via stitching | At least six vias of 0.4 mm drill or larger at every power-path layer change |
+| Layout | `J6` and `J7` mirror each other about x = 0, with both VBAT_RAW pins on y −10.8. **VBAT_RAW** runs straight across between them on B.Cu (5.8 mm, y −13.3…−7.5), doubled on In2 at both ends. **VBUS** comes back right on top of it on F.Cu (6.8 mm, y −13.3…−6.5), with an F+B strip over the band's E half (y −6.5…−4.6) to get round `J6`'s VBAT pin, then runs down the E edge to `J1` on F, B and In2 (3.9 mm). Going out and back on top of each other, the two currents' fields cancel. No ESC current runs N of y −4.6. The fills keep the 1 mm outer-layer VBUS↔VBAT_RAW gap at each other's through-hole pins |
+| Resistance | DC solve of the board copper at 20 °C: VBAT_RAW 1.09 mΩ, VBUS 2.07 mΩ, GND return 0.20 mΩ, **3.4 mΩ** end to end (0.34 W at 10 A, 0.86 W at 16 A). The NW layout it replaced was 10.2 mΩ by the same solve. VBUS is the larger half because it has only F.Cu across the band (B.Cu is VBAT_RAW there). Add about 20% hot |
+| VBUS to VBAT_RAW | 1.0 mm minimum on the outer layers (`guac.kicad_dru`). Both strips face the bottom plate, and a metal chip bridging them shorts the switch |
+| Inner layers | In1 is solid GND, so the F.Cu VBUS band references GND. In2 carries 3V3 (centre), 5V (W edge, N end, and a finger to `J5`), the VBAT_RAW band ends, and the E-edge VBUS strip; the In2 3V3 pour keeps 1 mm from all power copper. 47 mm² of F.Cu and 41 mm² of B.Cu power copper still sit over In2 3V3, all of it on the band's edges and the E-edge strip, far from the IMUs |
+| Signal tunnel | F and B are both power copper across the band, so the eight signals that cross it (SPI SCK/MOSI/MISO, `CS_B`, CRSF TX/RX, DSHOT 1/2) go through short In2 lanes at x 1.0…5.6 between two staggered via rows just outside the band (0.66 mm lane pitch). 3V3 crosses as a 0.4 mm In2 lane at x 0.2. The router may also take a signal up the W edge past `J7` (DS1 and CRSF_TX do on the current board, about 1 mm from `J7`'s pins) |
+| GND | Poured on all layers. `scripts/stitch_rev2.py` adds a 3.5 mm stitching grid plus an edge ring wherever F, In1 and B GND overlap (257 GND vias on the current board). The return from `J1` to `J6` stays in the S end |
+| Via stitching | VBUS is stitched F to B every 1.6–1.8 mm along the E edge and the band's E strip (0.75/0.35 vias), plus six at `J7` pin 1 |
+| Clearances | Nearest IMU to ESC-path copper: `U5`, 2.05 mm (`U6` sat 0.6 mm from it before; now 5.5 mm). Autorouted signals keep at least 0.45 mm from power copper (keepouts grown 0.5 mm around the strips) |
 
-The buck input caps (`C1`, `C19`, `C20`, `C2`) take VBUS from the pour, not from the ESC path. The ESC current loop (`J6` → `J7` → `J1` and back) runs along the board's E edge strip, away from `U4`–`U6` and the `VBAT_SNS` divider.
+The buck, its input caps (`C1`, `C19`, `C20`, `C2`), the UVLO dividers, the `VBAT_SNS` divider and `J2` take VBUS from a 0.8 mm B.Cu feed that leaves the band's NW corner and runs up the W board edge, not from the ESC path. `C21` sits on a short F.Cu stub straight off the band, and `D2` on the top of the E-edge strip.
 
 ### ESC BEC policy
 
@@ -196,7 +199,7 @@ The outline and keepouts come from the chassis and live in `cad/rev2/` (`board_o
 2. Four M2 heat-set bores (≤ 3.7 mm deep with a 1.6 mm board).
 3. Bottom plate: 5 mm through-holes for the M2 heads, and Ø4 reliefs under the `J6`/`J7` pins.
 4. S-ledge wire groove at x −4.5…+13.5. The ESC stands with its BAT/GND corner on the E side.
-5. Shelf windows over `J6` (the SE shelf ends at y −15.1) and `J7` (the NW gap runs y 21.8…29.0).
+5. Shelf windows over `J6` (the SE shelf ends at y −15.1) and `J7` (v3.4g: the SW window mirrors the SE one; the NW window is closed).
 
 ### Z budget
 
@@ -218,7 +221,7 @@ The board bottom is at z 0.9. The bottom plate (0.8 mm) tops out at z 0.58, in a
 | Motor-lead entries, y −25…−15, z 9.8…19.2 | about 7 mm |
 | Ledge-clamped ends, \|y\| ≥ 29.9 | none (no top-side parts) |
 
-`L1` (6 mm) sits in the NW corridor. `C21` (≤ 4.3 mm) fits in the battery strip in the S, about 12 mm from `J1`. A 25 V polymer part at 13.05 V runs at 52% of its rating, inside the usual 80% derating. A mated XT30 stands about 21 mm, topping out near z 23.5 under the 26.5 side shelves; route its 16 AWG off sideways.
+`L1` (6 mm) sits in the NW corridor, 3 mm S of the buck so the LED leads have a lead-in to `J2`. `C21` (≤ 4.3 mm) fits in the battery strip in the S, right off the power band. A 25 V polymer part at 13.05 V runs at 52% of its rating, inside the usual 80% derating. A mated XT30 stands about 21 mm, topping out near z 23.5 under the 26.5 side shelves; route its 16 AWG off sideways.
 
 USB runs through a ribbon extension with a slim male end, from the XIAO to a USB-C female on the shelves (z 19.4…21.4) under the top-plate slot.
 
@@ -229,12 +232,12 @@ Exact coordinates are in `cad/rev2/README.md`.
 | Region | Contents |
 |---|---|
 | NE corridor | XIAO, as far into the corridor as its 17.5 mm width allows, with its USB-C end in the plug channel (x 0.7…12.7) under the N ledge |
-| NW corridor | `L1` (y 11…18) and `J7`, the switch-loop XT30, near the switch at (−5, 50.5) |
+| NW corridor | `L1` (y 8…15), the buck output caps `C4`/`C5` N of it on the W edge, and `J2`, the TinySLED socket, in the old `J7` spot: centre (−14.0, 26.2), opening S onto its plug zone (y 18.5…23.0) and Y-splice zone (y 15.4…18.5, parts ≤ 1.0 mm). `Q1`/`R16`/`R17` sit E of it. The LED leads come up the W board edge, jog E N of `U4` and run N between `L1` and the buck (x −12.4…−10.8, parts ≤ 1.2 mm) |
+| SW corridor | `J7`, the switch-loop XT30, mirror of `J6`: pin 1 VBUS (−13.8, −15.8), pin 2 VBAT_RAW (−13.8, −10.8). The switch at (−5, 50.5) reaches it on a twisted pigtail down the W corridor |
 | SE corridor, above the ESC pads | `J6` battery XT30, clear of the key band and the motor-lead entries |
-| SE key band | `D2` |
+| E key band | `D2`, centre (16.1, −3.4) |
 | Battery strip, S | `C21` |
 | S gap, SE | `J1` ESC power lap pads (south of the beam) and `J4` ESC signal. The ESC stands against the S bay wall with BAT/GND on the E side; its leads drop through the groove |
-| W corridor, north of the beam | `J2` TinySLED socket at (−14.0, −16.3), opening N, with the plug and Y-splice north of it under the L-key sweep. The LED leads come up from the SW channel mouth (keep it clear) |
 | S, near x 0 | `J5` receiver harness; the leads come down beside the ESC into the groove |
 | Centre | IMU array around the spin axis |
 | \|y\| > 29.9 | Nothing on top (clamped under the ledges) |
@@ -264,7 +267,7 @@ The nominal array is U4 at 0°/r12, U5 at 90°/r18, U6 at 210°/r18 (the asymmet
 
 Sensor axis map from the footprint rotations: the radial-outward direction is **+X on U4, +Y on U5, and −X on U6**. Firmware must take this per-chip mapping instead of assuming X radial on every chip. Store **measured** post-assembly IMU coordinates in firmware.
 
-The 166° window depends on `J2`, `J6` and `C21`; moving any of them can close it, so re-check after any change.
+The 166° window depends on `J2`, `J6`, `J7` and `C21`. Against the v3.4g meshes the scan gives 151…168°, so 166° stays, with 0.90 mm minimum clearance. Re-run `cad/rev2/scripts/build_rev2.py` after any placement change.
 
 ---
 
@@ -410,12 +413,12 @@ Keep duty below about 25% so on-times stay under the module's thermal limit. The
 | Run | Connector | Wire |
 |---|---|---|
 | Battery to `J6` | XT30 female on the battery | Pack leads |
-| Switch pigtail to `J7` | XT30 male on the pigtail | 20 AWG, as short as the frame socket allows |
+| Switch pigtail to `J7` | XT30 male on the pigtail | 20 AWG twisted pair, about 85 mm from the switch down the W corridor at z ≈ 24 |
 | `J1` to ESC battery pads | Lap-soldered at both ends | 20 AWG. J1 red lands on the pad at x 18.2, black on the pad at x 15.0, each up its own wall channel |
 | ESC to each motor | 2 mm bullets | Motor leads, about 70 mm |
 | `J4` to ESC signal | JST-GH 4-pin | 28 AWG |
 | `J5` to receiver | JST-GH 4-pin | 28 AWG, twisted |
-| `J2` to both TinySLEDs | JST-GH 2-pin, Y-splice near the plug | 26–28 AWG |
+| `J2` to both TinySLEDs | JST-GH 2-pin, Y-splice just S of the plug | 26–28 AWG, up the W board edge |
 
 Zip-tie every lead through its strain-relief slot.
 
@@ -426,14 +429,14 @@ Zip-tie every lead through its strain-relief slot.
 | Item | Value |
 |---|---|
 | Fab | PCBWay (sponsor), normal process with no advanced options (pcbway.com/capabilities.html, Advanced PCB table) |
-| Layers / thickness | 4 layers, 1.6 mm FR4 |
+| Layers / thickness | 4 layers, 1.6 mm FR4. Board Setup stackup matches: 70 µm outer, 35 µm inner, 0.21 mm prepreg, 0.95 mm core |
 | Copper | 2 oz outer, 1 oz inner |
 | Finish | ENIG |
 | Mask / silk | Green / white |
 | Vias | Tented |
 | Quantity | 5 |
 | Min trace / space | 0.18 / 0.205 mm (7 / 8 mil, the 2 oz outer-layer limit). Smallest routed track is 0.18 mm |
-| Vias used | 0.62/0.25 (autorouted signal), 0.7/0.3, 0.75/0.35, and 0.8/0.4 mm. Smallest ring 0.185 mm (≥ the 7 mil, 0.178 mm, limit) |
+| Vias used | 0.62/0.25 (autorouted signal), 0.64/0.25 (GND stitching), 0.7/0.3, 0.75/0.35, and 0.8/0.4 mm. Smallest ring 0.185 mm (≥ the 7 mil, 0.178 mm, limit) |
 | Plated component holes | 0.31 mm ring (12 mil on 2 oz) and 0.41 mm hole to hole |
 | Inner layers | 0.18 mm hole-to-copper isolation (7 mil on 4 layers) |
 | Rules | `guac.kicad_pro` and `guac.kicad_dru` hold these limits. KiCad DRC is clean against them |
@@ -442,7 +445,7 @@ Zip-tie every lead through its strain-relief slot.
 | Assembly | Top side only. `U1` (XIAO) is not placed; it is hand-soldered. `J1` has no part (bare lap pads). The assembly BOM comes from `hardware/scripts/pcbway_bom.py` |
 | Stencil | Stainless, ordered with the board |
 
-Independent check, made after the PCBWay reroute (`96137c3`): all 63 nets are connected, placement is identical to `244dd04`, and the outer VBUS↔VBAT_RAW gap is 1.0 mm. Repeat it after any layout change.
+After the v3.4g power move: KiCad DRC is clean against these rules with all nets connected, and the outer VBUS↔VBAT_RAW gap is at least 1.0 mm. Repeat after any layout change.
 
 ---
 
@@ -451,7 +454,7 @@ Independent check, made after the PCBWay reroute (`96137c3`): all 63 nets are co
 1. **`C21` part number.** The PCBWay BOM still lists it as TBD. Pick a real 100 µF / 25 V polymer tantalum in 7343-43 (≤ 4.3 mm). Two 47 µF in parallel are fine if 100 µF isn't stocked.
 2. **3S UVLO cutoff.** `R25` 75 kΩ cuts at about 8.85 V (2.95 V/cell), which can trip under spin-up sag on a 380 mAh pack. Changing `R25` to 66.5 kΩ moves the cutoff to about 8.0 V. Decide before ordering.
 3. **Pack capacity.** A 3-minute match at about 10 A average draws about 500 mAh, against 380 mAh. Either confirm the real average current with a bench soak, lower the ESC current limit, or move to a larger pack.
-4. **Bench soak.** Run 3 minutes at the ESC current limit and check copper and connector temperature. Re-measure the power-path resistance after the reroute.
+4. **Bench soak.** Run 3 minutes at the ESC current limit and check copper and connector temperature. The solve says 3.4 mΩ on the board; measure it.
 5. **TinySLED at 13.05 V.** The module is sold as 2–3S, which likely means 12.6 V max. Tiny's LEDs reportedly use a series resistor with no regulation, so 13.05 V pushes the current up by more than 3.5%. Either confirm with Tiny's or use the 3–6S version (tinysleds.com/products/3-6s-led). `Q1` (30 V) is fine either way.
 6. **Buck light-load check.** Scope the 5 V ripple at the real ~120 mA load to confirm the AP63301 choice.
 7. **Power integrity.** Scope VBUS, 5V, and 3V3 during spin-up, regen braking, and TinySLED strobes.
@@ -459,7 +462,7 @@ Independent check, made after the PCBWay reroute (`96137c3`): all 63 nets are co
 9. **Receiver pinout.** Confirm the physical receiver pads before building the `J5` pigtail.
 10. **IMU-fault blink.** The old 1 s on / 1 s off is 50% duty, over the 25% cap; firmware uses 400 ms every 2 s. Pick one. The table above follows the firmware.
 11. **LED maximum on-time.** This spec asks for a hard cap but gives no number. Firmware caps a single pulse at about 655 ms (and duty at 25%). Set the real limit from the TinySLED's thermal behaviour.
-12. **Through-hole tails.** Only `J6` and `J7` are through-hole (4 pins). Trim their tails flush over the Ø4 bottom-plate reliefs.
+12. **Through-hole tails.** Only `J6` and `J7` are through-hole (4 pins). Trim their tails flush over the Ø4 bottom-plate reliefs (v3.4g moves `J7`'s to the SW).
 13. **Rev A bodge.** On existing Rev A boards, lift or cut R6/R7/R8 pin 2 from MOSI and jumper them to D9 before IMU bring-up.
 14. **Firmware plant parameters.** Update them for 3S, the Ø42 wheel, and the v3.4f geometry.
 

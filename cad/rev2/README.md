@@ -22,6 +22,23 @@ From the chassis v3.4e `harness.js` (checker now tests U5 directly: 9.8 mm clear
 
 Note: the top-lead buffer touches the J2 plug zone at its NW corner (x −17.1…−17.0, y −9.7…−8.6); the lead is at z ≥ 4.65 there and ~0.25 mm W of the plug. The chassis checker passes it; worth a look on the first build.
 
+## v3.4g: J7 mirrors J6, J2 takes the old J7 spot (board done)
+
+A design review measured 10.2 mΩ of board copper in the ESC path, most of it the switch-loop detour up the E edge and across the N end, 0.6 mm from U6 and under the XIAO. J7 now mirrors J6 about x = 0, so the ESC current stays in the S end: 3.4 mΩ by the same DC solve (see `docs/spec.md`, Copper and current). The chassis side is in `holy_guacamole_v34g` (SW shelf window, NW window closed, ~85 mm twisted switch pigtail down the W corridor at z ≈ 24, LED leads up the W edge).
+
+| Part | Courtyard x | Courtyard y | Height | Notes |
+|---|---|---|---|---|
+| J7 switch XT30 (XT30UPB-F) | −16.6…−11.0 | −18.6…−8.0 | mated ≈ 21 | pin 1 VBUS (−13.8, −15.8), pin 2 VBAT_RAW (−13.8, −10.8); mirror of J6 |
+| J2 TinySLEDs GH-2 | −17.48…−10.52 | 23.0…29.4 | 4.25 | centre (−14.0, 26.2), opens S onto the plug zone (y 18.5…23.0) and Y-splice zone (y 15.4…18.5, ≤ 1.0) |
+| Q1 / R16 / R17 | −10.44…−6.56 | 23.9…29.85 | ≤ 1.2 | E of J2, N of the buck input caps |
+| L1 SRP6060FA | −19.8…−12.81 | 8.0…15.1 | 5.8 | centre (−16.3, 11.55), 3 mm S for the LED lead-in |
+| C4 / C5 (buck output) | −19.33…−17.27 | 15.2…22.2 | 1.3 | moved N of L1, out of the LED leads' jog at y 6.5…8 |
+| D2 SMAJ15CA | 12.56…19.64 | −5.2…−1.6 | 2.2 | centre (16.1, −3.4), 2.3 mm N so VBUS gets round J6's VBAT pin |
+
+Keepouts added: `LED_LEADS_0P3` (W board edge), `LED_SLOT_1P2` (x −12.4…−10.8, y 8…15.5, between L1 and the buck), `LED_SPLICE_1P0`, `LED_PLUG_0P0`. The old `LED_BOT_LEAD`, `LED_TOP_LEAD` and `LED_CORNER` are gone.
+
+IMU rotation scan against the v3.4g meshes: feasible 151…168°, 166° kept, 0.90 mm minimum clearance.
+
 ## v3.4e: J2 opens N (current; on top of the v3.4d harness review)
 
 The v3.4d harness put the Y-splice and the top-LED lead over U5 (0.35 / 0.55 mm above the chip). Moving the splice west was not enough: with J2 opening E its pigtail had to U-turn in a 0.57 mm gap under the battery corner. So J2 now opens **N**:
@@ -83,7 +100,7 @@ The chassis designer's v3.4c constraints are encoded in `scripts/build_rev2.py` 
 | XIAO | −2.17…15.61 | 7.86…28.82 | 3.2 (USB-C 4.3) | unchanged |
 | IMUs | | | ≈ 1 | 166° rotation still clear (window 163…168°) |
 
-Through-hole pins left (bottom-plate Ø4 reliefs, layer `BOTTOM_PLATE_THT_RELIEF`): J6 (13.8, −15.8), (13.8, −10.8); J7 (−13.8, 21.8), (−13.8, 26.8). J1's two reliefs can go.
+Through-hole pins left (bottom-plate Ø4 reliefs, layer `BOTTOM_PLATE_THT_RELIEF`): J6 (13.8, −15.8), (13.8, −10.8); J7 (−13.8, 21.8), (−13.8, 26.8) in v3.4f, (−13.8, −15.8), (−13.8, −10.8) from v3.4g. J1's two reliefs can go.
 
 LED lead route: from the SW channel mouth (x −20…−19, y −28.5…−25.5, z < 4) north under the S beam (1.5 mm clear between board top 2.5 and beam bottom 4.0, enough for two 28 AWG) to J2's plug at y ≈ −16. The channel mouth stays clear.
 

@@ -15,10 +15,11 @@ def fix(cls, w, c):
 fix('kicad_default', 180, 207); fix('Power_Heavy,Default', 400, 207); fix('Power_Light,Default', 250, 207); fix('Power_Main,Default', 600, 207); fix('GND,Default', 400, 207); fix('Analog,Default', 250, 207)
 # freerouting sees the 0.5 mm pitch pads of the 166-degree IMUs as violating 0.207 mm between each other (actual
 # gap 0.22 mm) and then gives up on every net touching them. Their signal pads are all escaped by power_rev2.py,
-# so the router never connects to them directly: shrink them in its copy only. KiCad DRC checks the real pads.
+# so the router never connects to them directly: narrow them (full length, so vias still keep off the pad
+# ends) in its copy only. KiCad DRC checks the real pads.
 for w, h in ((280, 600), (600, 280), (280, 680), (680, 280)):
     t=t.replace('(padstack Rect[T]Pad_%d.000000x%d.000000_um\n      (shape (rect F.Cu %d %d %d %d))' % (w, h, -w//2, -h//2, w//2, h//2),
-                '(padstack Rect[T]Pad_%d.000000x%d.000000_um\n      (shape (rect F.Cu %d %d %d %d))' % (w, h, -(100 if w == 280 else w//3), -(100 if h == 280 else h//3), 100 if w == 280 else w//3, 100 if h == 280 else h//3))
+                '(padstack Rect[T]Pad_%d.000000x%d.000000_um\n      (shape (rect F.Cu %d %d %d %d))' % (w, h, -(100 if w == 280 else w//2), -(100 if h == 280 else h//2), 100 if w == 280 else w//2, 100 if h == 280 else h//2))
 # drop the hand-routed power nets from the autorouter's netlist
 for net in ('VBUS', '"/Power Subsystem/VBAT_RAW"', '3V3', '5V'):
     i=t.find('    (net %s\n' % net); j=t.find('\n    )\n', i)
@@ -26,7 +27,7 @@ for net in ('VBUS', '"/Power Subsystem/VBAT_RAW"', '3V3', '5V'):
     t=t[:i]+t[j+7:]
 t=t.replace('(class Power_Main,Default "/Power Subsystem/VBAT_RAW" VBUS', '(class Power_Main,Default')
 t=t.replace('(class Power_Light,Default 3V3', '(class Power_Light,Default').replace('(class Power_Heavy,Default 5V ', '(class Power_Heavy,Default ')
-# strip the inner layers: freerouting must route on F.Cu/B.Cu only (In1/In2 are pours)
+# inner layers are pours: freerouting must route on F.Cu/B.Cu only
 import re as _re
 def drop_balanced(text, start_pat):
     out=[]; i=0
@@ -46,7 +47,8 @@ def drop_balanced(text, start_pat):
         if j<len(text) and text[j]=='\n': j+=1
         i=j
     return ''.join(out)
-t=drop_balanced(t, r'\(wire \(path In[12]\.Cu ')
+# In2 wires are the hand-placed signal tunnel lanes under the power band (power_rev2.py): they stay, as fixed
+# wiring, so the router knows each tunnel via is joined to its twin across the band
 t=_re.sub(r'(\(layer In[12]\.Cu\n\s*\(type )signal', r'\1power', t)
 assert t.count('(type power)')==2
 # everything already on the board was placed by the scripts: freerouting must not rip it up

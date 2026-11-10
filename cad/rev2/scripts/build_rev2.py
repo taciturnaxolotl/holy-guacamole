@@ -72,21 +72,22 @@ XIAO_DX = 0.0                                              # receptacle centred 
 PL = [
     ("U1_XIAO",   -2.17 + XIAO_DX, 15.61 + XIAO_DX, 7.86, 28.82, 3.2, "XIAO RP2350 module (shield top +3.19), USB-C to N"),
     ("U1_USBC",    2.25 + XIAO_DX, 11.19 + XIAO_DX, 23.60, 30.90, 4.3, "XIAO USB-C receptacle, mouth y 30.9 in the plug channel"),
-    ("J7_XT30_SW", -16.6, -11.0, 19.0, 29.6, None, "XT30UPB-F vertical, rotated 90 deg, pins (-13.8,21.8)/(-13.8,26.8); mated body per v3.4c"),
-    ("L1",        -19.35, -12.45, 11.0, 18.1, 5.8, "SRP6060FA, centre (-15.9,14.55)"),
+    ("J7_XT30_SW", -16.6, -11.0, -18.6, -8.0, None, "XT30UPB-F vertical, rotated 90 deg, pins (-13.8,-15.8)/(-13.8,-10.8); mirror of J6 about x = 0 (v3.4g)"),
+    ("L1",        -19.8, -12.81, 8.0, 15.1, 5.8, "SRP6060FA, centre (-16.3,11.55), 3 mm S for the LED lead-in (v3.4g)"),
+    ("C4C5_BUCKOUT", -19.33, -17.27, 15.2, 22.2, 1.3, "buck output caps C4/C5 in the W strip N of L1 (v3.4g)"),
     ("U2_BUCK",   -10.0, -2.7, 8.3, 22.1, 1.2, "AP63301 + Cin/Cout/boot/FB/EN divider, beside L1"),
     ("C21",        0.29, 9.21, -19.25, -14.35, 4.3, "100uF 25V polymer tantalum 7343-43 (<=4.3 mm), centre (4.75,-16.8), battery strip"),
     ("J6_XT30_BAT", 11.0, 16.6, -18.6, -8.0, None, "XT30UPB-M vertical, rotated 90 deg, pins (13.8,-15.8)/(13.8,-10.8); mated body per v3.4c"),
-    ("D2",        12.56, 19.64, -7.5, -3.9, 2.2, "SMAJ15CA (D_SMA) horizontal, centre (16.1,-5.7), in the key band (limit 4.0)"),
+    ("D2",        12.56, 19.64, -5.2, -1.6, 2.2, "SMAJ15CA (D_SMA) horizontal, centre (16.1,-3.4), in the key band (limit 4.0); 2.3 mm N in v3.4g so VBUS gets round J6"),
     ("J1_ESC_PWR", 13.35, 19.85, -29.6, -25.0, 0.5, "2x SMD lap pads 2.6x4.0 for 20AWG, VBUS (pad 1) x 16.9..19.5 on the E edge strip, GND (pad 2) x 13.7..16.3; south of the S beam"),
     ("J4_ESC_SIG", 3.73, 13.27, -29.6, -25.55, 4.25, "JST-GH 4p horizontal, centre (8.5,-26.4), opening S into the v34 groove: header body"),
     ("J4_REARPADS", 3.73, 13.27, -25.55, -23.2, 0.2, "J4 SMD mounting/signal pads behind the body (flat, under the S beam)"),
     ("J5_RX",     -5.88, 3.68, -29.6, -25.55, 4.25, "JST-GH 4p horizontal, centre (-1.1,-26.4), opening S, plug under the rx lead drop (x +-3): header body"),
     ("J5_REARPADS", -5.88, 3.68, -25.55, -23.2, 0.2, "J5 SMD pads behind the body (flat, under the S beam)"),
-    ("J2_LED",    -17.48, -10.52, -19.5, -13.1, 4.25, "JST-GH 2p horizontal, centre (-14.0,-16.3), opening N; back pads at y -19.5; both TinySLEDs on one plug, Y-spliced"),
-    ("J2_PLUG",   -17.0, -11.0, -13.1, -8.6, 4.25, "J2 mating plug + cable exit to the N; splice N of it at y ~-9.5 (under the L-key sweep, limit 4.0)"),
+    ("J2_LED",    -17.48, -10.52, 23.0, 29.4, 4.25, "JST-GH 2p horizontal, centre (-14.0,26.2), opening S, in the old NW J7 spot (v3.4g)"),
+    ("Q1_LEDDRV",  -10.44, -6.56, 23.9, 29.85, 1.2, "Q1/R16/R17 heading-LED driver E of J2, N of the buck input caps (v3.4g)"),
 ]
-THT = [(13.8, -15.8), (13.8, -10.8), (-13.8, 21.8), (-13.8, 26.8)]   # J6, J7 through-hole pins (J1 is now SMD)
+THT = [(13.8, -15.8), (13.8, -10.8), (-13.8, -15.8), (-13.8, -10.8)]   # J6, J7 through-hole pins (J1 is now SMD)
 IMU_NOM = [("U4", 12.0, 0.0), ("U5", 18.0, 90.0), ("U6", 18.0, 210.0)]   # (ref, r, angle) = firmware imu_geom.c
 IMU_HALF = 2.0                                                          # 3x3 LGA + 0.5 courtyard
 
@@ -144,15 +145,16 @@ K = {
     f"S_GROOVE_WIRES_{tag(L16['groove'])}": R_(SGROOVE_V34[0], SGROOVE_V34[1], Y0, -LEDGE_Y0),
     "BOTTOM_FLUSH_PADS_ONLY": R_(X0, X1, Y0, Y1),
     "XT30_BAT": R_(11.0, 16.6, -18.6, -8.0),
-    "XT30_SW": R_(-16.6, -11.0, 19.0, 29.6),
+    "XT30_SW": R_(-16.6, -11.0, -18.6, -8.0),
     "ESC_EDGE": R_(4.27, 19.7, -29.6, -23.2),
     "USB_CHIMNEY": unary_union([R_(USB_X[0], USB_X[1], 28.82, Y1), R_(NX0, NX1, NY, Y1)]),
-    "LED_CORNER": R_(-18.0, -10.0, -19.5, -8.6),
     "RX_ENTRY": R_(RX_GROOVE[0], RX_GROOVE[1], -29.9, -23.2),
-    # chassis v3.4e harness (harness.js, collision-checked against U5 in the chassis model): LED leads + Y-splice
-    f"LED_BOT_LEAD_{tag(0.3)}": LineString([(-20.0, -26.95), (-19.9, -26.6), (-19.4, -24.0), (-19.4, -12.0), (-19.0, -7.5), (-16.4, -3.7), (-13.35, -3.9), (-13.35, -5.8)]).buffer(0.8),
-    f"LED_TOP_LEAD_{tag(1.2)}": LineString([(-17.9, -10.5), (-17.8, -9.4), (-17.2, -6.8), (-15.6, -5.0), (-14.65, -5.0), (-14.65, -5.8)]).buffer(0.8),
-    f"LED_SPLICE_{tag(1.0)}": R_(-15.0, -13.0, -8.6, -5.6),
+    # v3.4g: both LED leads run N along the W board edge, jog E N of U4 and run N between L1 and the buck to
+    # the splice and J2's plug in the NW (routing from the chassis harness model)
+    f"LED_LEADS_{tag(0.3)}": LineString([(-20.0, -26.95), (-19.7, -24.0), (-19.6, -12.0), (-19.6, 7.0)]).buffer(0.8),
+    f"LED_SLOT_{tag(1.2)}": R_(-12.4, -10.8, 8.0, 15.5),
+    f"LED_SPLICE_{tag(1.0)}": R_(-17.0, -11.0, 15.4, 18.5),
+    f"LED_PLUG_{tag(0.0)}": R_(-17.0, -11.0, 18.5, 23.0),
 }
 for k, v in K.items():
     g = v.intersection(BOARD)
