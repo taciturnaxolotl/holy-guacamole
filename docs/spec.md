@@ -154,8 +154,8 @@ Geometry is derived from chassis v33 rev B and confirmed against v34 (`holy_guac
 | Mounting | 4 × M2 into 3 mm heat-sets in the end ledges: (±16.6, +34.5), (±17.0, −34.5) (south holes moved out in v34 for a 1.9 mm wall to the groove). 2.2 mm drill, 4.5 mm keepout |
 | Board bottom | z 0.9 (unchanged from v33) |
 | Underside | Nothing but flush bottom-copper test pads (nothing taller than solder mask). The gap to the bottom plate is 0.32 mm; no foam |
-| Layers | 2 |
-| Finish | ENIG (LGA pads; change `project.toml` from HASL at order time) |
+| Layers | 4 |
+| Finish | ENIG (LGA pads need flat pads) |
 
 ### Chassis changes this outline needs
 
@@ -388,11 +388,15 @@ Zip-tie every lead through its strain-relief slot.
 
 | Item | Value |
 |---|---|
-| Layers | 2 |
+| Layers | 4 |
 | Thickness | 1.6 mm |
-| Copper | 2 oz both layers |
+| Copper | 2 oz outer, 1 oz inner |
 | Finish | ENIG |
-| Min trace / space | 0.15 / 0.15 mm (2 oz makes 0.1 mm impractical; check the LGA fanout) |
+| Fab process | PCBWay normal process, no advanced options (pcbway.com/capabilities.html, Advanced PCB table) |
+| Min trace / space | 0.18 / 0.205 mm (7 / 8 mil, the 2 oz outer-layer limit) |
+| Vias | 0.7 / 0.3 mm or larger (7 mil ring on 2 oz); autorouted signal vias 0.62 / 0.25 mm |
+| Plated component holes | 0.31 mm ring (12 mil on 2 oz); 0.41 mm hole to hole |
+| Rules | `guac.kicad_pro` and `guac.kicad_dru` hold these limits; KiCad DRC is clean against them |
 | Assembly | Paste and reflow or hot air for the LGAs |
 | Stencil | Stainless, ordered with the board |
 

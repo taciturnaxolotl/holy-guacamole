@@ -146,22 +146,22 @@
       },
       "rules": {
         "max_error": 0.005,
-        "min_clearance": 0.15,
+        "min_clearance": 0.205,
         "min_connection": 0.0,
         "min_copper_edge_clearance": 0.5,
         "min_groove_width": 0.0,
         "min_hole_clearance": 0.25,
-        "min_hole_to_hole": 0.25,
+        "min_hole_to_hole": 0.3,
         "min_microvia_diameter": 0.2,
         "min_microvia_drill": 0.1,
         "min_resolved_spokes": 1,
         "min_silk_clearance": 0.0,
         "min_text_height": 0.8,
-        "min_text_thickness": 0.08,
-        "min_through_hole_diameter": 0.3,
-        "min_track_width": 0.15,
-        "min_via_annular_width": 0.1,
-        "min_via_diameter": 0.5,
+        "min_text_thickness": 0.15,
+        "min_through_hole_diameter": 0.25,
+        "min_track_width": 0.18,
+        "min_via_annular_width": 0.18,
+        "min_via_diameter": 0.6,
         "solder_mask_to_copper_clearance": 0.005,
         "use_height_for_length_calcs": true
       },
@@ -214,10 +214,9 @@
       ],
       "track_widths": [
         0.0,
-        0.05,
-        0.1,
-        0.15,
+        0.18,
         0.2,
+        0.25,
         0.3
       ],
       "tuning_pattern_settings": {
@@ -261,7 +260,7 @@
       "internal_id": "",
       "mfg": "",
       "mpn": "",
-      "sch_revision": "1.4a"
+      "sch_revision": "2.0-draft"
     },
     "layer_pairs": [],
     "layer_presets": [],
@@ -491,6 +490,7 @@
       "pin_to_pin": "warning",
       "power_pin_not_driven": "error",
       "same_local_global_label": "warning",
+      "same_local_global_power": "warning",
       "similar_label_and_power": "warning",
       "similar_labels": "warning",
       "similar_power": "warning",
@@ -517,7 +517,7 @@
     "classes": [
       {
         "bus_width": 12,
-        "clearance": 0.15,
+        "clearance": 0.205,
         "diff_pair_gap": 0.25,
         "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.2,
@@ -530,56 +530,56 @@
         "schematic_color": "rgba(0, 0, 0, 0.000)",
         "track_width": 0.2,
         "tuning_profile": "",
-        "via_diameter": 0.5,
-        "via_drill": 0.3,
+        "via_diameter": 0.62,
+        "via_drill": 0.25,
         "wire_width": 6
       },
       {
-        "clearance": 0.15,
+        "clearance": 0.205,
         "name": "Analog",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "priority": 1,
         "schematic_color": "rgba(0, 0, 0, 0.000)",
         "track_width": 0.25,
         "tuning_profile": "",
-        "via_diameter": 0.6,
-        "via_drill": 0.3
+        "via_diameter": 0.62,
+        "via_drill": 0.25
       },
       {
-        "clearance": 0.15,
+        "clearance": 0.205,
         "name": "GND",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "priority": 0,
         "schematic_color": "rgba(0, 0, 0, 0.000)",
         "track_width": 0.5,
         "tuning_profile": "",
-        "via_diameter": 0.6,
+        "via_diameter": 0.7,
         "via_drill": 0.3
       },
       {
-        "clearance": 0.15,
+        "clearance": 0.205,
         "name": "Power_Heavy",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "priority": 3,
         "schematic_color": "rgba(0, 0, 0, 0.000)",
         "track_width": 0.6,
         "tuning_profile": "",
-        "via_diameter": 0.6,
+        "via_diameter": 0.7,
         "via_drill": 0.3
       },
       {
-        "clearance": 0.15,
+        "clearance": 0.205,
         "name": "Power_Light",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "priority": 2,
         "schematic_color": "rgba(0, 0, 0, 0.000)",
         "track_width": 0.4,
         "tuning_profile": "",
-        "via_diameter": 0.6,
+        "via_diameter": 0.7,
         "via_drill": 0.3
       },
       {
-        "clearance": 0.15,
+        "clearance": 0.205,
         "name": "Power_Main",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "priority": 4,
@@ -778,7 +778,7 @@
         "uuid": "5ff26309-9be7-4732-9683-b5a799424d79"
       }
     ],
-    "used_designators": "U11-12,JP1,R3-5,R9,R11,R15-28,C6,C8-11,C13-20,Q1,#PWR8,#PWR10,#PWR16-19,#PWR27,#PWR29-30,#PWR34,#PWR37,#PWR39-41,#PWR54-56,#PWR69-70,#PWR74-77,#PWR89,#PWR93,#PWR96,#PWR100,J2-3",
+    "used_designators": "#PWR8,#PWR10,#PWR16-19,#PWR27,#PWR29-30,#PWR34,#PWR37,#PWR39-41,#PWR54-56,#PWR69-70,#PWR74-78,#PWR89,#PWR93,#PWR96,#PWR100,C6,C8-11,C13-20,J2-3,JP1,Q1,R3-5,R9,R11,R15-28,U11-12",
     "variants": []
   },
   "sheets": [

@@ -8,10 +8,14 @@ This is a meltybrain style combat robot that's main weapon is simply its own spi
 
 The canonical repo for this is hosted on tangled over at [`dunkirk.sh/holy-guacamole`](https://tangled.org/dunkirk.sh/holy-guacamole)
 
+| | | | |
+|---|---|---|---|
+| ![front copper](https://l4.dunkirk.sh/i/B3zZRVosO1XD.webp) | ![back copper](https://l4.dunkirk.sh/i/vYjFfVZuXrg_.webp) | ![inner 1 copper](https://l4.dunkirk.sh/i/HOcu8oD0EThD.webp) | ![inner 2 copper](https://l4.dunkirk.sh/i/nMP7O4GS9EUh.webp) |
+
 | | |
 |---|---|
-| ![render 4](https://cdn.hackclub.com/019f4eda-2db4-7dd8-9762-24dfd36ea444/image.png) | ![render 3](https://cdn.hackclub.com/019f4eda-305d-7a86-9775-fdcb3db74794/image.png) |
-| ![render 2](https://cdn.hackclub.com/019f4eda-3440-7aef-b465-7150a531b8d4/image.png) | ![render 1](https://cdn.hackclub.com/019f4eda-3257-7faa-94a0-ff2371a20a71/image.png) |
+| ![top level schematic](https://l4.dunkirk.sh/i/9V5wneoi2zWS.svg) | ![power subsystem schematic](https://l4.dunkirk.sh/i/2hsbjTacNNWh.svg) |
+| ![imu array schematic](https://l4.dunkirk.sh/i/YgQP8xBYWs_f.svg) | ![status leds schematic](https://l4.dunkirk.sh/i/xx49w-yISmpK.svg) |
 
 <p align="center">
     <img src="https://raw.githubusercontent.com/taciturnaxolotl/carriage/main/.github/images/line-break.svg" />

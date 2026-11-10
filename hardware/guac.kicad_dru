@@ -7,3 +7,28 @@
   (layer outer)
   (condition "A.NetName == 'VBUS' && B.NetName == '/Power Subsystem/VBAT_RAW'")
   (constraint clearance (min 1.0mm)))
+
+# PCBWay normal process, 2 oz outer / 1 oz inner (pcbway.com/capabilities.html, Advanced PCB table).
+# The project-wide minimums (0.18 mm track, 0.21 mm clearance, 0.18 mm via ring) cover the 2 oz
+# outer layers; the rules below cover what a single global number cannot.
+
+# Component (plated, non-via) holes on 2 oz need a 12 mil ring.
+(rule "PTH pad ring, 2 oz"
+  (condition "A.Type == 'Pad' && A.Pad_Type == 'Through-hole'")
+  (constraint annular_width (min 0.31mm)))
+
+# Hole to hole: 11 mil between vias, 16 mil once a component hole is involved.
+(rule "Component hole to hole"
+  (condition "A.Type == 'Pad' && A.isPlated()")
+  (constraint hole_to_hole (min 0.41mm)))
+
+# Inner layers: hole to inner copper at least 7 mil on a 4-layer board.
+(rule "Inner isolation ring"
+  (layer inner)
+  (constraint hole_clearance (min 0.18mm)))
+
+# Silkscreen legend: 0.15 mm stroke, 0.8 mm tall.
+(rule "Legend size"
+  (layer "?.Silkscreen")
+  (constraint text_thickness (min 0.15mm))
+  (constraint text_height (min 0.8mm)))

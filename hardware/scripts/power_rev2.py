@@ -111,30 +111,30 @@ zone(VBUS, B, [rect(14.4, 16.45, -3.7, 22.8), rect(-15.3, 16.45, 20.5, 22.8), re
                rect(-15.3, 16.45, 16.0, 24.6), rect(16.9, 19.45, -29.3, -13.8)], "VBUS B", 3)
 for x in (14.9, 15.6, 16.3):
     for y in (-1.9, -2.6, -3.3):
-        via(x, y, VBUS, d=0.7, drill=0.35)
+        via(x, y, VBUS, d=0.75, drill=0.35)
 # J1 pad 1 is SMD on F.Cu, so all of the ESC current arrives there: the first stitches sit just N of the pad
 # edge (y -25.3), not in it, so they don't wick solder from the 20 AWG lap joint
 for y in (-14.6, -16.2, -19.6, -21.2, -22.8, -24.4):
-    via(18.6, y, VBUS, d=0.7, drill=0.35)
+    via(18.6, y, VBUS, d=0.75, drill=0.35)
 for y in (-14.6, -16.2, -22.8, -24.4):
-    via(17.4, y, VBUS, d=0.7, drill=0.35)
+    via(17.4, y, VBUS, d=0.75, drill=0.35)
 # J1 pad 2 (GND) reaches In1 through vias along its N edge, again outside the pad
 for x in (14.0, 16.0):
-    via(x, -24.6, GND, d=0.6, drill=0.3)
+    via(x, -24.6, GND, d=0.7, drill=0.3)
 # In2 doubles the narrow outer stretches: VBUS from the via field to just south of the XIAO (north of there
 # the XIAO's E pads leave no room for stitching vias) and from J1 to J6; VBAT_RAW from J6 pin 2 (THT, so it
 # lands in the pour directly) up the E edge to the first stitching via at y 9.6
 zone(VBUS, pcbnew.In2_Cu, [rect(14.4, 16.7, -3.9, 8.9), rect(16.9, 19.45, -29.3, -13.8)], "VBUS In2", 10, clearance=0.2)
 zone(VBAT, pcbnew.In2_Cu, [rect(17.2, 19.45, -12.6, 10.0), rect(13.0, 19.45, -12.6, -9.0)], "VBAT_RAW In2", 12, clearance=0.2)
 for x in (14.95, 15.75):
-    via(x, 8.4, VBUS, d=0.6, drill=0.3)
+    via(x, 8.4, VBUS, d=0.7, drill=0.3)
 # J1 pad 1 is SMD on F.Cu and already in the F.Cu strip; add vias so the B.Cu GND/pour side can carry current too
 # (not needed for VBUS). J7 pin 1 is THT and lands in the B.Cu strip directly.
 
 # 5V: via from the buck output node into the In2 5V pour; the pour reaches the XIAO 5V pad and J5
 track([(-18.3, 10.05), (-16.1, 10.05)], V5, F, 0.6)
 track([(-18.33, 14.55), (-18.33, 10.05)], V5, F, 0.6)
-via(12.6, 25.4, V5, d=0.6, drill=0.3)
+via(12.6, 25.4, V5, d=0.7, drill=0.3)
 track([(12.6, 25.4), (14.8, 25.96)], V5, F, 0.4)
 
 # VBUS branches too wide for the autorouter: C21 bulk cap (B.Cu, under the J6 pin 1 pad clearance) and the J2 LED feed
@@ -151,13 +151,13 @@ track([(-9.3, 16.4), (-8.7, 17.2), (-7.65, 17.2), (-7.65, 22.75)], VBUS, F, 0.6)
 via(-7.65, 21.6, VBUS, d=0.8, drill=0.4)
 track([(-11.7, 15.45), (-11.45, 16.4), (-10.98, 17.0)], GND, F, 0.4)
 track([(-10.98, 17.0), (-10.98, 17.95), (-9.55, 17.95), (-9.55, 22.75)], GND, F, 0.5)
-via(-3.52, 14.5, VBUS, d=0.6, drill=0.3)
+via(-3.52, 14.5, VBUS, d=0.7, drill=0.3)
 track([(-3.52, 13.2), (-3.52, 15.8)], VBUS, F, 0.4)
 track([(-3.52, 14.5), (-3.52, 20.8)], VBUS, B, 0.6)
 track([(-4.6, 25.52), (-4.6, 22.0)], VBUS, F, 0.4)
-via(-4.6, 22.0, VBUS, d=0.6, drill=0.3)
-track([(7.87, -18.0), (7.87, -21.0), (6.5, -21.6), (-12.6, -21.6), (-13.38, -21.1), (-13.38, -19.9)], VBUS, B, 0.5)
-via(-13.38, -19.9, VBUS, d=0.6, drill=0.3)
+via(-4.6, 22.0, VBUS, d=0.7, drill=0.3)
+track([(7.87, -18.0), (7.87, -21.0), (6.5, -21.75), (-12.6, -21.75), (-13.38, -21.1), (-13.38, -19.9)], VBUS, B, 0.5)
+via(-13.38, -19.9, VBUS, d=0.7, drill=0.3)
 track([(-13.38, -19.9), (-13.38, -18.15)], VBUS, F, 0.4)
 
 # inner layers: In1 solid GND, In2 split between 3V3 (centre) and 5V (W strip, N band, S band to J5)
@@ -166,7 +166,7 @@ I1, I2 = pcbnew.In1_Cu, pcbnew.In2_Cu
 zone(GND, I1, [rect(-20, 20, -38, 38)], "GND In1", 0, clearance=0.2, min_w=0.2)
 zone(V3, I2, [rect(-16.0, 19.45, -27.5, 23.4), rect(13.6, 19.45, 23.0, 29.9)], "3V3 In2", 1, clearance=0.2, min_w=0.25)
 zone(V5, I2, [rect(-19.45, -16.5, -30.0, 29.9), rect(-19.45, 13.3, 23.8, 29.9), rect(-19.45, 0.5, -30.0, -28.0), rect(-19.45, -6.6, 9.4, 11.3)], "5V In2", 2, clearance=0.2, min_w=0.25)
-via(-1.725, -29.0, V5, d=0.6, drill=0.3)
+via(-1.725, -29.0, V5, d=0.7, drill=0.3)
 track([(-1.725, -29.0), (-1.725, -24.55)], V5, F, 0.3)
 
 # plane fanout: every 3V3 / 5V SMD pad gets a via to the In2 pour. Pads are grouped per footprint edge and
@@ -174,8 +174,8 @@ track([(-1.725, -29.0), (-1.725, -24.55)], V5, F, 0.3)
 import math
 FANOUT_SKIP = {("J1", "2"), ("U1", "14"), ("U1", "12"), ("U1", "28"), ("J5", "2"), ("U6", "1"), ("U6", "14"), ("U6", "15"), ("C10", "1"),
                ("U6", "5"), ("C10", "2"), ("U4", "6"), ("D5", "2"), ("U6", "10"), ("U6", "12"), ("U6", "13"), ("U6", "16")}
-VIA_R = 0.3
-CLR = 0.17
+VIA_R = 0.35
+CLR = 0.22
 STUB_W = 0.25
 all_pads = []
 for fp in board.GetFootprints():
@@ -192,7 +192,7 @@ def in_strip(x, y, m=0.55):
 
 
 def clear(vx, vy, net, own, stubs):
-    if not (abs(vx) < 19.15 and abs(vy) < 37.0) or in_strip(vx, vy):
+    if not (abs(vx) < 19.45 - VIA_R and abs(vy) < 37.45 - VIA_R) or in_strip(vx, vy):
         return False
     vshape = pcbnew.SHAPE_CIRCLE(K(vx, vy), mm(VIA_R))
     sshapes = [pcbnew.SHAPE_SEGMENT(K(sx, sy), K(vx, vy), mm(STUB_W)) for sx, sy in stubs]
@@ -235,12 +235,12 @@ def escape(ref, num, length=0.9, via_net=True, width=0.2):
     ex, ey = px + ax[0] * length, py + ax[1] * length
     track([(px, py), (ex, ey)], pad.GetNet(), F, width)
     if via_net:
-        via(ex, ey, pad.GetNet(), d=0.5, drill=0.3)
-        placed_vias.append((ex, ey, 0.25))
+        via(ex, ey, pad.GetNet(), d=0.7, drill=0.3)
+        placed_vias.append((ex, ey, 0.35))
     return ex, ey
 
 
-for ref, num in (("U4", "13"), ("U5", "4"), ("U4", "1")):
+for ref, num in (("U5", "4"), ("U4", "1")):
     escape(ref, num)
 def padxy(ref, num):
     pad = next(p for p in board.FindFootprintByReference(ref).Pads() if p.GetNumber() == num)
@@ -253,26 +253,88 @@ u6 = {n: padxy("U6", n) for n in ("1", "4", "6", "7", "8", "14", "15")}
 XE = 19.15
 track([u6["14"], (XE, u6["14"][1]), (XE, 7.3), (u6["1"][0], 7.3), u6["1"]], V3, F, 0.2)
 track([u6["15"], (XE, u6["15"][1])], V3, F, 0.2)
-track([(u6["1"][0], 7.3), (16.5, 7.3), (16.5, 23.6), (16.75, 24.2)], V3, F, 0.3)
-via(16.75, 24.2, V3, d=0.6, drill=0.3)
-placed_vias.append((16.75, 24.2, 0.3))
+track([(u6["1"][0], 7.3), (16.75, 7.3), (16.75, 24.2)], V3, F, 0.3)
+via(16.75, 24.2, V3, d=0.7, drill=0.3)
+placed_vias.append((16.75, 24.2, 0.35))
 track([c10_1, (c10_1[0], -0.2), (13.6, -0.2)], V3, F, 0.25)
-via(13.6, -0.2, V3, d=0.5, drill=0.3)
-placed_vias.append((13.6, -0.2, 0.25))
-# U6 pad 5 (GND) is boxed in by the SCK/MOSI escapes: tie it to a via under the chip centre
-u6_5 = padxy("U6", "5")
-track([u6_5, (15.39, 6.13), (17.3, 4.96)], GND, F, 0.15)
-via(17.3, 4.96, GND, d=0.5, drill=0.3)
-placed_vias.append((17.3, 4.96, 0.25))
+via(13.6, -0.2, V3, d=0.7, drill=0.3)
+placed_vias.append((13.6, -0.2, 0.35))
+via(17.3, 4.96, GND, d=0.7, drill=0.3)
+placed_vias.append((17.3, 4.96, 0.35))
 SCK = board.FindNet("/SPI_SCK")
-track([u6["4"], (u6["4"][0], 6.9), (14.3, 6.9), (14.0, 6.6)], SCK, F, 0.2)
-via(14.0, 6.6, SCK, d=0.5, drill=0.3)
-placed_vias.append((14.0, 6.6, 0.25))
-escape("U6", "6", length=3.3, width=0.15)
-escape("U6", "7", length=2.5, width=0.15)
-escape("U6", "8", length=3.3, width=0.15)
+# leave pad 4 along its own (tilted) axis so the 0.2 mm track keeps the pad-to-pad gap to pad 3
+_s = math.radians(next(p for p in board.FindFootprintByReference("U6").Pads() if p.GetNumber() == "4").GetOrientation().AsDegrees())
+_sx, _sy = -math.sin(_s), math.cos(_s)
+if _sy < 0:
+    _sx, _sy = -_sx, -_sy
+_l = (6.9 - u6["4"][1]) / _sy
+track([u6["4"], (u6["4"][0] + _l * _sx, 6.9), (14.3, 6.9), (14.0, 6.6)], SCK, F, 0.2)
+via(14.0, 6.6, SCK, d=0.7, drill=0.3)
+placed_vias.append((14.0, 6.6, 0.35))
+# Three SPI pads in a row at 0.5 mm pitch are too close for three vias in a row: the middle pad escapes
+# straight out and the outer two step out 0.5 mm, then fan off at 45 degrees on either side of it
+def fan3(ref, mid, outer, diag=1.0):
+    fp = board.FindFootprintByReference(ref)
+    pm = next(p for p in fp.Pads() if p.GetNumber() == mid)
+    a = math.radians(pm.GetOrientation().AsDegrees())
+    sz = pm.GetSize()
+    nx, ny = (math.cos(a), math.sin(a)) if sz.x >= sz.y else (-math.sin(a), math.cos(a))
+    cx, cy = padxy(ref, mid)
+    fx, fy = fp.GetPosition().x / 1e6 - OX, OY - fp.GetPosition().y / 1e6
+    if nx * (cx - fx) + ny * (cy - fy) < 0:
+        nx, ny = -nx, -ny
+    for num in (mid,) + outer:
+        pad = next(p for p in fp.Pads() if p.GetNumber() == num)
+        px, py = padxy(ref, num)
+        if num == mid:
+            ex, ey = px + 1.6 * nx, py + 1.6 * ny
+            pts = [(px, py), (ex, ey)]
+        else:
+            side = 1 if (-ny * (px - cx) + nx * (py - cy)) > 0 else -1
+            kx, ky = px + 0.5 * nx, py + 0.5 * ny
+            ex, ey = kx + diag * 0.707 * (nx - side * ny), ky + diag * 0.707 * (ny + side * nx)
+            pts = [(px, py), (kx, ky), (ex, ey)]
+        track(pts, pad.GetNet(), F, 0.18)
+        via(ex, ey, pad.GetNet(), d=0.7, drill=0.3)
+        placed_vias.append((ex, ey, 0.35))
 
-escape("U4", "6", length=1.2)
+
+# U6's W side faces the B.Cu VBUS strip (x 14.4..16.45), so its vias have to land west of it. GND pad 5 (boxed
+# in by the SCK escape, and the chip interior is too tight for a 0.18 mm track) and SPI pads 6-8 run out as four
+# parallel lanes, each jogging 45 degrees to a 0.95 mm lane spacing so the 0.7 mm vias sit side by side.
+def lanes(ref, mid, reach, plan):
+    fp = board.FindFootprintByReference(ref)
+    pm = next(p for p in fp.Pads() if p.GetNumber() == mid)
+    a = math.radians(pm.GetOrientation().AsDegrees())
+    sz = pm.GetSize()
+    nx, ny = (math.cos(a), math.sin(a)) if sz.x >= sz.y else (-math.sin(a), math.cos(a))
+    cx, cy = padxy(ref, mid)
+    fx, fy = fp.GetPosition().x / 1e6 - OX, OY - fp.GetPosition().y / 1e6
+    if nx * (cx - fx) + ny * (cy - fy) < 0:
+        nx, ny = -nx, -ny
+    px_, py_ = -ny, nx
+    # lateral axis points from the middle pad toward the first pad in the plan
+    fx0, fy0 = padxy(ref, plan[0][0])
+    if (fx0 - cx) * px_ + (fy0 - cy) * py_ < 0:
+        px_, py_ = -px_, -py_
+    world = lambda n, p: (cx + n * nx + p * px_, cy + n * ny + p * py_)
+    for num, pt, jog in plan:
+        pad = next(p for p in fp.Pads() if p.GetNumber() == num)
+        x, y = padxy(ref, num)
+        n0, p0 = (x - cx) * nx + (y - cy) * ny, (x - cx) * px_ + (y - cy) * py_
+        pts = [(x, y), world(jog, p0), world(jog + abs(pt - p0), pt), world(reach, pt)]
+        track(pts, pad.GetNet(), F, 0.18)
+        ex, ey = pts[-1]
+        via(ex, ey, pad.GetNet(), d=0.7, drill=0.3)
+        placed_vias.append((ex, ey, 0.35))
+
+
+# (pad, lane offset from pad 7, where its 45 degree jog starts): the outer lane on each side jogs first
+lanes("U6", "7", 2.9, (("5", 1.6, 0.5), ("6", 0.65, 0.8), ("7", -0.3, 1.3), ("8", -1.25, 0.5)))
+fan3("U5", "7", ("6", "8"), diag=0.85)  # keeps the CS_B via off R7
+fan3("U4", "13", ("12", "14"))
+
+escape("U4", "6", length=1.1)
 escape("R22", "1", length=1.1)
 escape("D5", "2", length=1.5)
 
@@ -302,9 +364,12 @@ for (ref, netname, side), items in groups.items():
         own = {(p.GetParentAsString(), p.GetNumber()) for _, _, p in cl}
         mx, my = sum(x for x, _ in pts) / len(pts), sum(y for _, y in pts) / len(pts)
         base = math.radians(SIDE_ANG[side])
+        # on rotated parts (the IMUs) the pad axis is off the compass side; a stub along the true axis keeps
+        # the pad-to-pad gap to its neighbours
+        tilt = (board.FindFootprintByReference(ref).GetOrientationDegrees() + 45) % 90 - 45
         spot = None
-        for reach in (0.9, 1.1, 1.4, 1.8, 2.3, 2.8):
-            for da in (0, 25, -25, 50, -50, 75, -75, 100, -100, 130, -130):
+        for reach in (0.9, 1.1, 1.4, 1.8, 2.3, 2.8, 3.3):
+            for da in (0, tilt, 25, -25, 50, -50, 75, -75, 100, -100, 130, -130, 155, -155, 180):
                 ang = base + math.radians(da)
                 vx, vy = mx + reach * math.cos(ang), my + reach * math.sin(ang)
                 if clear(vx, vy, net, own, pts):
@@ -316,13 +381,13 @@ for (ref, netname, side), items in groups.items():
             print("no fanout spot for", ref, netname, side, pts)
             continue
         vx, vy = spot
-        via(vx, vy, net, d=0.6, drill=0.3)
+        via(vx, vy, net, d=0.7, drill=0.3)
         placed_vias.append((vx, vy, VIA_R))
         for x, y in pts:
             track([(x, y), (vx, vy)], net, F, STUB_W)
 
 # XIAO 3V3: edge pad 12 runs under the module between the underside pads to share a via with pad 28 (3V3_OUT)
-via(9.6, 23.1, V3, d=0.6, drill=0.3)
+via(9.6, 23.1, V3, d=0.7, drill=0.3)
 track([(7.99, 21.91), (9.6, 21.91), (9.6, 23.1)], V3, F, 0.3)
 track([(14.8, 20.88), (9.6, 20.88), (9.6, 21.91)], V3, F, 0.25)
 
@@ -376,8 +441,8 @@ SNS = board.FindNet("/VBAT_SNS")
 r9_2, r10_1, c12_1, tp10 = padxy("R9", "2"), padxy("R10", "1"), padxy("C12", "1"), padxy("TP10", "1")
 track([padxy("U1", "1"), (-3.6, 25.96), (-4.1, r9_2[1]), r9_2, r10_1, (c12_1[0], r10_1[1]), c12_1], SNS, F, 0.25)
 track([c12_1, (-6.5, c12_1[1]), (-6.5, 25.0)], SNS, F, 0.25)
-via(-6.5, 25.0, SNS, d=0.5, drill=0.3)
-placed_vias.append((-6.5, 25.0, 0.25))
+via(-6.5, 25.0, SNS, d=0.7, drill=0.3)
+placed_vias.append((-6.5, 25.0, 0.35))
 track([(-6.5, 25.0), tp10], SNS, B, 0.3)
 
 # edge keepout ring for the autorouter (KiCad's own 0.5 mm edge clearance is a DRC rule, not a routing obstacle)
@@ -405,15 +470,15 @@ o.AddHole(hole)
 board.Add(ring)
 
 # GND pours, both layers, lowest priority, thermals on SMD pads except the big power pads
-zone(GND, F, [rect(-20, 20, -38, 38)], "GND F", 0, clearance=0.2, min_w=0.2, thermal=False)
-zone(GND, B, [rect(-20, 20, -38, 38)], "GND B", 0, clearance=0.2, min_w=0.2, thermal=False)
+zone(GND, F, [rect(-20, 20, -38, 38)], "GND F", 0, clearance=0.21, min_w=0.2, thermal=False)
+zone(GND, B, [rect(-20, 20, -38, 38)], "GND B", 0, clearance=0.21, min_w=0.2, thermal=False)
 
 # stitching vias for the ESC return: J6 pin 1 <-> J1 pad 2 region, plus a sparse grid elsewhere
 for x, y in [(12.0, -24.5), (15.0, -24.5), (12.5, -17.5),
              (-18.5, 2.0), (-18.5, -5.0), (-18.5, -12.0), (-18.5, -22.0), (-18.5, 30.5), (18.5, 30.5),
              (-10.0, -31.0), (10.0, -31.0), (0.0, -31.0), (-17.0, 7.0), (0.0, -8.0), (-7.0, -4.0), (7.0, -4.0),
              (-12.0, -8.0), (9.0, 8.0)]:
-    via(x, y, GND, d=0.6, drill=0.3)
+    via(x, y, GND, d=0.7, drill=0.3)
 
 # chassis v3.4e harness: LED leads and Y-splice lie on/just above the board top. Bottom lead: no parts at all
 # (rule area); top lead and splice: low parts only (drawn on User.2 for reference, checked in cad/rev2).
@@ -476,7 +541,7 @@ for txt, x, y in (("DIO", 5.4, 10.6), ("CLK", 8.0, 9.4), ("GND", 10.6, 10.6), ("
     tx.SetMirrored(True)
     tx.SetPosition(K(x, y))
     tx.SetTextSize(pcbnew.VECTOR2I(mm(0.8), mm(0.8)))
-    tx.SetTextThickness(mm(0.12))
+    tx.SetTextThickness(mm(0.15))
     board.Add(tx)
 
 filler = pcbnew.ZONE_FILLER(board)
