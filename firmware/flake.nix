@@ -38,10 +38,9 @@
             shellHook = ''
               echo "Holy Guacamole firmware shell"
               echo "PICO_SDK_PATH=$PICO_SDK_PATH"
-              echo "firmware:  cmake -B build -DPICO_PLATFORM=rp2350 -DPICO_BOARD=pico2 && cmake --build build -j"
+              echo "firmware:  cmake -B build -DPICO_BOARD=seeed_xiao_rp2350 && cmake --build build -j"
               echo "tests:     cmake -B build-tests -S tests && ctest --test-dir build-tests"
               echo "sim:       cmake -B build-sim -S sim && cmake --build build-sim && ./build-sim/drive"
-              echo "esp32-c3:  firmware/sketches/{basestation,esp-rssi} are Arduino sketches - flash with the Arduino IDE / arduino-cli"
             '';
           };
         }

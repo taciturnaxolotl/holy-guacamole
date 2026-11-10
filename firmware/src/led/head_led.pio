@@ -1,0 +1,53 @@
+; TinySLED one-shot pulse generator.
+;
+; Each TX word is (on_ticks << 16) | delay_ticks, one tick = 10 us. The SM
+; waits delay_ticks, drives the pin high for on_ticks, then holds it low for
+; three times as long before taking the next word. The 16-bit counter caps
+; every pulse at 65536 ticks (~655 ms) and the forced off-time keeps duty
+; under 25%, whatever the CPU does. If firmware hangs, the SM drains its
+; FIFO and parks with the pin low.
+
+.program head_led
+
+.define public TICK_US 10
+
+    pull block
+    out x, 16
+delay:
+    jmp x-- delay
+    out x, 16
+    mov y, x
+    set pins, 1
+on:
+    jmp x-- on
+    set pins, 0
+    mov x, y
+off1:
+    jmp x-- off1
+    mov x, y
+off2:
+    jmp x-- off2
+    mov x, y
+off3:
+    jmp x-- off3
+
+% c-sdk {
+#include "hardware/clocks.h"
+
+static inline void head_led_program_init(PIO pio, uint sm, uint offset, uint pin) {
+    pio_sm_config c = head_led_program_get_default_config(offset);
+
+    sm_config_set_set_pins(&c, pin, 1);
+    sm_config_set_out_shift(&c, true, false, 32);
+    sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
+
+    /* One SM cycle per tick; every loop instruction is one cycle. */
+    sm_config_set_clkdiv(&c, (float)clock_get_hz(clk_sys) / (1000000.0f / head_led_TICK_US));
+
+    pio_sm_set_pins_with_mask(pio, sm, 0, 1u << pin);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+    pio_gpio_init(pio, pin);
+
+    pio_sm_init(pio, sm, offset, &c);
+}
+%}

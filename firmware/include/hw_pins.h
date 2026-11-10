@@ -1,25 +1,25 @@
 #pragma once
 
 /*
- * Holy Guacamole carrier PCB pin assignments.
- * Single source of truth matching circuit.py / spec.md pin table.
+ * Holy Guacamole carrier PCB (rev 2) pin assignments.
+ * Matches the pin table in docs/spec.md. GPIO numbers are for the
+ * Seeed XIAO RP2350 (RP2350A); see the SDK's boards/seeed_xiao_rp2350.h.
  */
 
-/* SPI bus (shared: IMUs + SN74HC595 latch + SK9822 buffer inputs) */
+/* SPI bus (shared: IMUs + SN74HC595 latch) */
 #define PIN_SPI_SCK   2   /* XIAO D8/GPIO2 */
 #define PIN_SPI_MOSI  3   /* XIAO D10/GPIO3 */
 #define PIN_SPI_MISO  4   /* XIAO D9/GPIO4 */
 #define SPI_INST      spi0
 
 /* SN74HC595 latch control */
-#define PIN_SEL_OE_N  42  /* XIAO D2/A2/GPIO42, active-low output enable */
-#define PIN_SEL_LAT   43  /* XIAO D3/A3/GPIO43, latch clock */
+#define PIN_SEL_OE_N  28  /* XIAO D2/A2/GPIO28, active-low output enable */
+#define PIN_SEL_LAT   5   /* XIAO D3/GPIO5, latch clock */
 
-/* Latch bit assignments (active-low outputs) */
+/* Latch bit assignments (active-low outputs); QD-QH are NC */
 #define LATCH_BIT_CS_A     0  /* QA / pin 15 -> CS_A */
 #define LATCH_BIT_CS_B     1  /* QB / pin 1  -> CS_B */
 #define LATCH_BIT_CS_C     2  /* QC / pin 2  -> CS_C */
-#define LATCH_BIT_LED_OE_N 3  /* QD / pin 3  -> LED_OE_N */
 
 /* Safe latch image: all outputs inactive (high) */
 #define LATCH_SAFE  0xFF
@@ -35,13 +35,8 @@
 #define CRSF_BAUD     420000
 
 /* Battery voltage sense */
-#define PIN_VBAT_ADC  40  /* XIAO A0/D0/GPIO40 */
-#define ADC_VBAT_CHAN 0   /* ADC channel for GPIO40 */
+#define PIN_VBAT_ADC  26  /* XIAO D0/A0/GPIO26 */
+#define ADC_VBAT_CHAN 0   /* ADC channel for GPIO26 */
 
-/* Heading LED MOSFET gate */
-#define PIN_HEAD_LED  41  /* XIAO A1/D1/GPIO41 */
-
-/* SWD debug (repurposed for ESP32 UART in first-rev bodge;
- * SWD not used in production. Heading LED GPIO41 is DNP.) */
-#define PIN_SWDIO     23   /* ESP32 TX -> RP2350 RX */
-#define PIN_SWDCK     24   /* ESP32 RX -> RP2350 TX */
+/* TinySLED heading/status LEDs: AO3402 Q1 gate, high = lit */
+#define PIN_HEAD_LED  27  /* XIAO D1/A1/GPIO27 */

@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.13)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+set(PICO_BOARD seeed_xiao_rp2350 CACHE STRING "Board type")
+
 include(${CMAKE_CURRENT_SOURCE_DIR}/../pico_sdk_import.cmake)
 
 project(chanmon C CXX ASM)

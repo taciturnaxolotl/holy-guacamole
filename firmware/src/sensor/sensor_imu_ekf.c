@@ -5,15 +5,11 @@
 
 #include "sensor/sensor_source.h"
 
-#include <stddef.h>
 #include "imu/imu_spi.h"
 #include "estimation/ekf.h"
 #include "app/control_loop.h"
 
 static ekf_t s_ekf;
-
-/* Expose EKF for auxiliary sensor fusion (e.g., RSSI heading updates). */
-ekf_t *sensor_imu_ekf_get_ekf(void) { return &s_ekf; }
 
 static bool imu_ekf_init(void) {
     if (!imu_init()) return false;
@@ -38,5 +34,4 @@ const sensor_source_t sensor_imu_ekf = {
     .name = "IMU+EKF",
     .init = imu_ekf_init,
     .tick = imu_ekf_tick,
-    .feed = NULL,
 };

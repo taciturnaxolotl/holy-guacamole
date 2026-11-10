@@ -2,7 +2,7 @@
 
 A **temporary tool firmware** that turns the XIAO RP2350 into a Betaflight-style
 serial passthrough bridge, so you can flash or configure the ELRS receiver
-wired to `uart0` using the **ExpressLRS Configurator** — no USB-to-serial
+wired to `uart0` using the **ExpressLRS Configurator**, with no USB-to-serial
 adapter, no transmitter, no WiFi.
 
 The receiver is the only thing on `uart0` (GPIO0 = TX → RX's RX, GPIO1 = RX ←
@@ -30,7 +30,7 @@ receiver's CRSF chatter can't corrupt the CLI handshake.
 # from repo root, inside the firmware nix shell
 nix develop ./firmware --command bash -c \
   'cmake -B firmware/passthrough/build -S firmware/passthrough \
-     -DPICO_PLATFORM=rp2350 -DPICO_BOARD=pico2 && \
+     -DPICO_BOARD=seeed_xiao_rp2350 && \
    cmake --build firmware/passthrough/build -j'
 ```
 

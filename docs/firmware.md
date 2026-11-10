@@ -1,4 +1,4 @@
-# Holy Guacamole — Firmware & Simulator (running doc)
+# Holy Guacamole: Firmware & Simulator (running doc)
 
 **Document type:** Running engineering doc for the *as-built* firmware and the
 SITL digital twin. Updated as code lands.
@@ -13,11 +13,7 @@ and the simulator fidelity model. For hardware see `spec.md` (carrier PCB) and
 
 ---
 
-## 0. System layout (three MCUs + the ELRS link)
-
-The robot is not one microcontroller. Three processors and one RC receiver
-each own a distinct job; getting the wiring picture right matters because it
-determines where things like ELRS configuration actually happen.
+## 0. System layout (one MCU + the ELRS link)
 
 ```
                           RF (2.4 GHz ELRS)
@@ -26,31 +22,17 @@ determines where things like ELRS configuration actually happen.
                                                       |  ELRS TX -> XIAO D7/RX (GPIO1)
                                                       |  ELRS RX -> XIAO D6/TX (GPIO0)
                                                       v
-   [ basestation ]                            [ RP2350  (XIAO RP2350) ]
-   ESP32-C3, stationary                        main flight controller
-       |                                        - estimation + control + safety
-       | ESP-NOW broadcast                      - DSHOT to ESCs
-       | (RF beacon, ch 1)                      - reads ELRS CRSF (uart0)
-       v                                        ^
-   [ robot ESP32-C3 (esp-rssi) ] --------------/
-   measures RSSI of each beacon packet       UART @ 115200 (uart1, pins 23/24)
-   as the robot spins, runs the heading      RSSI heading stats -> RP2350
-   pipeline, streams stats to the RP2350
+                                              [ RP2350  (XIAO RP2350) ]
+                                               main flight controller
+                                                - estimation + control + safety
+                                                - DSHOT to ESCs
+                                                - TinySLED heading/status LED
 ```
-
-**Who does what:**
 
 | Unit | Board | Job | Wiring |
 |---|---|---|---|
-| Basestation | ESP32-C3 (off-board) | Dumb RF beacon; broadcasts ESP-NOW packets as fast as the radio drains | Power + antenna only |
-| RSSI sensor | ESP32-C3 (`esp-rssi/`) | Receives beacon, measures per-packet RSSI, runs autocorr+PLL heading pipeline, sends stats to RP2350 | UART → RP2350 uart1 (115200) |
-| Flight controller | RP2350 (`firmware/`) | EKF + drift control + safety + DSHOT; consumes ELRS control input and the ESP32-C3 RSSI stats | ELRS on uart0 (GPIO0/1), ESP32-C3 on uart1 |
-| RC receiver | ELRS RX | Pilot control link (throttle/sticks) via CRSF | uart0 @ 420000 (see `hw_pins.h`) |
-
-The **ELRS receiver is wired to the RP2350's uart0**, not to either ESP32. The
-basestation has no receiver and no UART — it only transmits. The two ESP32-C3s
-are different roles on different boards (one off-robot beacon, one on-robot
-RSSI sensor).
+| Flight controller | Seeed XIAO RP2350 (`firmware/`) | EKF + drift control + safety + DSHOT + LED | Pins in `firmware/include/hw_pins.h`, matching the `spec.md` pin table |
+| RC receiver | ELRS RX | Pilot control link via CRSF | uart0 @ 420000 |
 
 ### Configuring / flashing the ELRS receiver
 
@@ -64,8 +46,9 @@ wire. **You don't need that.** Use the receiver's built-in WiFi instead:
 4. The web UI covers binding phrase, packet rate, TX power, telemetry ratio,
    **and** OTA firmware updates.
 
-That covers every setting a meltybrain build touches, with zero firmware work
-on the RP2350.
+That covers every setting a meltybrain build touches. If WiFi is not an
+option, the `passthrough` bench tool (section 2.1) bridges the receiver to
+the ExpressLRS Configurator over USB.
 
 ---
 
@@ -79,8 +62,9 @@ on the RP2350.
 | Control (`pid`, `drift`) | implemented; sinusoidal + square modulation |
 | Safety (`watchdog`, `rc_health`, `battery`) | implemented; dual-core spinlock watchdog |
 | App glue (`control_loop`) | implemented; shared by firmware and sim |
-| SITL sim | **hand-rolled plant (Box2D dropped), realistic IMU, scenario harness** — see §7 |
+| SITL sim | **hand-rolled plant (Box2D dropped), realistic IMU, scenario harness**, see §7 |
 | Drivers (`imu_spi`, `dshot`, `crsf`, `latch`) | in progress |
+| Heading/status LED (`head_led`) | implemented; PIO one-shot pulses, strobe + status codes (see section 3.1). Not yet bench-verified |
 
 ---
 
@@ -89,44 +73,46 @@ on the RP2350.
 All commands run inside the Nix dev shell.
 
 ```bash
-# Firmware (RP2350 / Pico 2)
+# Firmware (Seeed XIAO RP2350; the board is the CMake default)
 nix develop --command bash -c \
-  'cmake -B build -DPICO_PLATFORM=rp2350 -DPICO_BOARD=pico2 && cmake --build build -j'
+  'cmake -B build -DPICO_BOARD=seeed_xiao_rp2350 && cmake --build build -j'
 
 # Unit tests (host)
 nix develop --command bash -c \
-  'ctest --test-dir build-tests --output-on-failure'
+  'cmake -B build-tests -S tests && cmake --build build-tests && ctest --test-dir build-tests --output-on-failure'
 
 # Interactive SITL sim (raylib window)
 nix develop --command bash -c \
   'cmake -B build-sim -S sim && cmake --build build-sim'
 ```
 
-### ESP32-C3 boards (basestation + esp-rssi)
+Run these from `firmware/`. A build directory configured before the board
+switch still caches `PICO_BOARD=pico2`; delete it or pass the flag.
 
-These are **Arduino sketches** under `firmware/sketches/`, not part of the
-Nix/CMake build. Flash them with the Arduino IDE or `arduino-cli` using the
-ESP32 boards package (run from the repo root):
+### 2.1 Bench tools
+
+Standalone images for bring-up. Each is its own CMake project under
+`firmware/`, never runs the flight loop, and is flashed with
+`picotool load -x <uf2>`. Reflash `build/holy_guacamole.uf2` when done.
+
+| Tool | Purpose |
+|---|---|
+| `chanmon` | Prints all 16 CRSF channels live over USB CDC, to verify the `rc_map.h` channel map |
+| `motortest` | Spins each ESC over DSHOT at a capped throttle from keyboard commands on USB CDC, with a dead-man timeout. Remove the weapon first |
+| `passthrough` | Betaflight-style serial passthrough so the ExpressLRS Configurator can flash/configure the receiver (see `passthrough/README.md`) |
 
 ```bash
-# basestation (any recent ESP32 core)
-arduino-cli compile --fqbn esp32:esp32:esp32c3 firmware/sketches/basestation
-arduino-cli upload  --fqbn esp32:esp32:esp32c3 -p <PORT> firmware/sketches/basestation
-
-# esp-rssi (needs ESP32 Arduino core 3.0+ for per-packet RSSI)
-arduino-cli compile --fqbn esp32:esp32:esp32c3 firmware/sketches/esp-rssi
-arduino-cli upload  --fqbn esp32:esp32:esp32c3 -p <PORT> firmware/sketches/esp-rssi
+nix develop --command bash -c \
+  'cmake -B chanmon/build -S chanmon && cmake --build chanmon/build -j'
+nix develop --command bash -c \
+  'cmake -B motortest/build -S motortest && cmake --build motortest/build -j'
+nix develop --command bash -c \
+  'cmake -B passthrough/build -S passthrough && cmake --build passthrough/build -j'
 ```
 
-`firmware/sketches/esp-rssi/` keeps the ported RSSI pipeline
-(`rssi_heading.c`, `edge_pll.c`, `rssi_interp.c`) in the sketch folder so
-Arduino compiles them automatically.
-
-
-
 Tests live in `firmware/tests/`: `test_linalg`, `test_ekf`, `test_drift`,
-`test_sim_convergence`, and `test_scenarios` (closed-loop digital-twin
-scenarios). All build with the host compiler under `-Wall -Wextra -Werror`.
+`test_sim_convergence`, `test_accel_cal`, and `test_scenarios` (closed-loop
+digital-twin scenarios). All build with the host compiler under `-Wall -Wextra -Werror`.
 
 ---
 
@@ -150,9 +136,11 @@ firmware/src/
     watchdog.{c,h}       dual-core spinlock watchdog
     rc_health.{c,h}      link-alive tracking
     battery.{c,h}        VBAT EMA + warn/halt thresholds
+  sensor/ sensor_imu_ekf     IMU + EKF behind the sensor_source_t interface
   imu/    imu_spi, latch     SPI + SN74HC595 chip-select latch
   dshot/  dshot + PIO        bidir DSHOT600
   crsf/   crsf               ELRS RC input
+  led/    head_led + PIO     TinySLED heading strobe + status codes
 
 firmware/sim/
   plant.{c,h}            physics plant (rigid disc, arena)
@@ -162,11 +150,9 @@ firmware/sim/
 
 firmware/tests/
   test_scenarios.c       closed-loop assert-based scenarios (wired to CTest;
-                         there is no sim/scenario.c — it lives here)
+                         there is no sim/scenario.c; it lives here)
 
-firmware/sketches/         ESP32-C3 Arduino sketches (flashed separately)
-  basestation/           RF beacon (ESP-NOW broadcast)
-  esp-rssi/              robot RSSI receiver + heading pipeline -> UART to RP2350
+firmware/chanmon/ motortest/ passthrough/   bench tools (section 2.1)
 ```
 
 **Key architectural rule:** the estimator + controller live in
@@ -175,9 +161,39 @@ split across two cores) and the sim. The sim never reimplements control logic;
 it only supplies sensor readings and consumes motor throttles. This is what
 makes the twin meaningful.
 
+### 3.1 Heading and status LED (`led/head_led`)
+
+The two TinySLEDs hang off `PIN_HEAD_LED` (XIAO D1/GPIO27) through the AO3402
+`Q1`. Firmware never drives the pin directly: `head_led.pio` runs on `pio1`
+and turns each FIFO word (`on << 16 | delay`, 10 us ticks) into one pulse.
+After every pulse the state machine holds the pin low for three times the
+on-time before it pulls the next word, so the hardware caps duty at 25% and
+any single pulse at about 655 ms (16-bit counter). If either core hangs the
+FIFO drains and the LED stays dark; `R17` keeps the gate low before init.
+
+- **Spinning** (fresh estimate, `|omega| > 10 rad/s`): one 400 us strobe
+  per revolution, centred on the reference heading. Core 1 extrapolates the
+  heading and queues the strobe with a PIO delay up to 2 ms ahead, so jitter
+  in the 0.5 ms control loop does not smear the dot.
+- **Stationary**: the spec's status codes, picked in `main.c`
+  (`led_status`, highest priority first):
+
+| Status | Condition | Pattern |
+|---|---|---|
+| IMU fault | `sensor_primary.init()` failed (arming is locked out) | 400 ms on every 2 s (spec asks 1 s on / 1 s off, which breaks the 25% duty cap) |
+| RC failsafe | link timed out or `rc_health` stale after a good frame | 3 x 50 ms, 200 ms apart, every 1.5 s |
+| No link | no valid CRSF frame since boot | 50 ms every 2 s |
+| Low battery | `battery_low()` | 40 ms at 5 Hz |
+| Armed | `is_safe_to_arm()` true | 2 x 50 ms, 200 ms apart, at 1 Hz |
+| Disarmed | link up, arm switch off | 50 ms at 1 Hz |
+
+Other modules can override with `head_led_set_status()`; the main loop sets
+it every iteration. On USB power with no pack, `battery_low()` is true, so
+an idle linked board shows the low-battery code.
+
 ---
 
-## 4. Estimation — as-built vs aspirational
+## 4. Estimation: as-built vs aspirational
 
 **As-built (code today):** a reduced EKF with state `x = [theta, omega, alpha]`
 (`meas_model.h`). Heading is dead-reckoned from `omega`; it is *not* directly
@@ -244,7 +260,7 @@ time.
 | H3LIS outer | 18 mm | 147 g | 322 g | fits ±400 g (0.98·400=392) |
 
 The mounting radii are chosen so the **accelerometers never rail during normal
-play** — saturation only bites on impact spikes or overspin.
+play**: saturation only bites on impact spikes or overspin.
 
 ---
 
@@ -269,7 +285,7 @@ play** — saturation only bites on impact spikes or overspin.
    With the realistic sensor model, the ~5% full-scale droop biases omega
    enough that heading walks a full 180° in 3 s (2700 rpm). Noise alone
    (nonlinearity removed) gives ~13° drift at 2700 rpm, ~54° at 4500 rpm over
-   the same window. So `accel_cal` is not optional — the nonlinearity curve is
+   the same window. So `accel_cal` is not optional: the nonlinearity curve is
    the single biggest determinant of heading hold. Wired: the sim rails the
    gyro at ±4000 dps and `meas_saturation_flags` now drops a railed gyro
    (inflates R), so the EKF leans on the accel centripetal channel at speed
@@ -285,9 +301,9 @@ play** — saturation only bites on impact spikes or overspin.
 The sim composes the **real** `app_` estimator/controller with a physics plant
 and a synthetic IMU. Two front-ends share one plant + one sensor model:
 
-- `robot_sim.c` — headless pure-angular kinematics (deterministic filter tests).
-- `drive.c` — interactive raylib top-down view (hand-driving, watch heading lock).
-- `tests/test_scenarios.c` — scripted assert-based regression scenarios → CTest.
+- `robot_sim.c`: headless pure-angular kinematics (deterministic filter tests).
+- `drive.c`: interactive raylib top-down view (hand-driving, watch heading lock).
+- `tests/test_scenarios.c`: scripted assert-based regression scenarios → CTest.
 
 ### 7.2 Decision: hand-rolled plant (Box2D dropped)
 
@@ -313,7 +329,7 @@ are modelled as point contacts. A fast-spinning tab striking a wall applies the
 full rigid-body impulse (translation + rotation coupled through the lever arm),
 so the robot is thrown off the wall and bleeds spin. Consequence: a **spinning**
 bot driven into a wall gets flung clear (tabs bite, then it skitters away),
-while a **dead** bot just pins and rests — it can't sit against the wall while
+while a **dead** bot just pins and rests; it can't sit against the wall while
 the weapon is live, matching the real robot. (A perfectly balanced bot placed
 exactly grazing at rest is the one idealized case that still sits; real driving
 never lands there.)
@@ -332,7 +348,7 @@ Defaults: `e_wall=0.35`, `μ_wall=0.5`, 2 tabs 180° apart.
   translation is strong and roughly flat across 1000–4000 rpm.
 - First-order **ESC lag** on commanded → applied throttle; spin-up time
   constant ~0.7 s (~1 s to 3000 rpm).
-- Floor friction is **Coulomb** (`μ·m·g`), not linear viscous — this is why the
+- Floor friction is **Coulomb** (`μ·m·g`), not linear viscous; this is why the
   arrow-key response feels less springy than the old Box2D build, and is the
   more realistic behaviour.
 
@@ -348,7 +364,7 @@ Defaults: `e_wall=0.35`, `μ_wall=0.5`, 2 tabs 180° apart.
 
 Two emergent (correct) behaviours the twin now reproduces for free:
 
-- **Constant asymmetric throttle produces zero translation** — a melty only
+- **Constant asymmetric throttle produces zero translation**: a melty only
   drifts when the asymmetry is modulated in sync with heading. The plant
   enforces this; you cannot cheat drift open-loop.
 - **ESC lag phase-shifts the drift direction** (~40° at cruise from
@@ -362,7 +378,7 @@ Two emergent (correct) behaviours the twin now reproduces for free:
 
 - **Gyro saturation at ±4000 dps** (new shared `GYRO_FULL_SCALE`). The EKF
   finally faces a railed gyro during spin.
-- **Gyro bias + in-run random walk** — the heading killer; stresses the filter.
+- **Gyro bias + in-run random walk**: the heading killer; stresses the filter.
 - **Per-sensor accel noise + quantization** (outer ≈2.5 m/s² + 1.91 LSB, inner
   ≈0.3 m/s² + 0.096 LSB) instead of one flat σ.
 - **Accel scale-factor / misalignment / zero-g offset** + mounting radius/angle
@@ -384,16 +400,16 @@ amplitude-dependent bias no longer trims out).
 controller, runs headless, and asserts on emergent behaviour. Wired into CTest
 (`test_scenarios`), deterministic (seeded). Current scenarios, all passing:
 
-1. **Spin-up** — full throttle reaches 3700–4100 rpm, EKF omega tracks within
+1. **Spin-up**: full throttle reaches 3700–4100 rpm, EKF omega tracks within
    5%, and the gyro is confirmed pinned at its rail.
-2. **Cruise drift** — commanding a stick direction at ~2700 rpm translates the
+2. **Cruise drift**: commanding a stick direction at ~2700 rpm translates the
    robot (>0.1 m) while omega stays locked within 3% (calibrated sensor).
-3. **Wall skitter** — a spinning disc coasted into a wall bounces (v_n reverses),
+3. **Wall skitter**: a spinning disc coasted into a wall bounces (v_n reverses),
    skitters along it (tangential velocity appears from spin with motors off),
    and bleeds RPM.
-4. **Nonlinearity matters** — uncorrected H3LIS nonlinearity walks heading far
+4. **Nonlinearity matters**: uncorrected H3LIS nonlinearity walks heading far
    worse than the calibrated case; guards that `accel_cal` is mandatory.
-5. **Burst saturation** — at overspeed the gyro and both outer H3LIS radials
+5. **Burst saturation**: at overspeed the gyro and both outer H3LIS radials
    rail while the inner LSM6 accel stays in-spec (the mixed-radius payoff).
 
 Deferred: per-sensor ODR sample-and-hold / dropped samples (H3LIS 1 kHz, no
@@ -454,20 +470,11 @@ build) latent warnings. Decide per item: **wire it or delete it.**
   deps until DMA lands, and note in the braindump that capture is currently
   polled.
 - **CRSF `link_quality` / `rssi_dbm` are parsed but never read.** Arming uses
-  only link-alive timeout + `rc_health` + battery. Fine to keep for future
-  telemetry/LED use, but nothing consumes them yet.
+  only link-alive timeout + `rc_health` + battery + IMU init. Fine to keep
+  for future telemetry use, but nothing consumes them yet.
+- **`ekf_update_heading` has no caller.** It fuses an absolute heading
+  measurement; its only source was the removed ESP32 RSSI experiment.
 - **eRPM telemetry is decoded but not fused.** `dshot_read_telemetry` runs and
   `rpm` is printed in the status line, but the EKF has no eRPM measurement row
   (consistent with the 3-state filter). This is expected today; listed so the
   gap is explicit when the 7-state / eRPM-fusion work starts.
-
-### Firmware not yet started (braindump requires, no code exists)
-
-Called out so the braindump's "firmware requirement" language isn't mistaken
-for as-built:
-
-- **Heading LED strobe** (braindump §11.3b). `PIN_HEAD_LED` is defined in
-  `hw_pins.h` but nothing drives it. The mandated PIO hard pulse-width cap
-  (fire-safety) is unimplemented.
-- **SK9822 status LED + `LED_OE_N` gating** (braindump §11.2). `LATCH_BIT_LED_OE_N`
-  is defined but never asserted; no LED frame is ever clocked.

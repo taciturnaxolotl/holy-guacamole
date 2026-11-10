@@ -35,12 +35,26 @@ typedef struct {
 static shared_estimate_t shared_est;
 static spin_lock_t *est_lock;
 static app_config_t app_cfg;
+static volatile bool sensor_ok;
+
+static bool rc_link_ok(const crsf_state_t *rc) {
+    return crsf_link_alive(rc, CRSF_LINK_TIMEOUT_MS) && rc_health_ok();
+}
 
 static bool is_safe_to_arm(const crsf_state_t *rc) {
-    return crsf_link_alive(rc, CRSF_LINK_TIMEOUT_MS)
-        && rc_health_ok()
+    return sensor_ok
+        && rc_link_ok(rc)
         && battery_ok()
         && rc_switch_high(rc->channels[RC_CH_ARM]);
+}
+
+static head_led_status_t led_status(const crsf_state_t *rc, bool armed) {
+    if (!sensor_ok) return HEAD_LED_IMU_FAULT;
+    /* rc->valid latches on the first good frame, so a dead link after
+     * that is a failsafe rather than "never connected". */
+    if (!rc_link_ok(rc)) return rc->valid ? HEAD_LED_FAILSAFE : HEAD_LED_NO_LINK;
+    if (battery_low()) return HEAD_LED_LOW_BATTERY;
+    return armed ? HEAD_LED_ARMED : HEAD_LED_DISARMED;
 }
 
 /* ---- Core 1: Control (DSHOT + CRSF) ---- */
@@ -113,11 +127,6 @@ static void core1_control_loop(void) {
         uint32_t now = to_ms_since_boot(get_absolute_time());
         if (now - last_print > STATUS_PRINT_INTERVAL_MS) {
             last_print = now;
-#if defined(SENSOR_SOURCE_RSSI)
-            const char *esp = rssi_link_alive(300) ? " ESP-OK" : " ESP-STALE";
-#else
-            const char *esp = "";
-#endif
             printf("hdg=%6.1f° w=%7.1f RPM=%lu/%lu a/b=%.2f/%.2f %s%s%s%s\n",
                    (double)(est.heading * RAD_TO_DEG), (double)est.omega,
                    (unsigned long)esc1.telemetry.rpm,
@@ -126,9 +135,10 @@ static void core1_control_loop(void) {
                    cmd.armed ? "LINK" : "NO-LINK",
                    battery_low() ? " LOW-BAT" : "",
                    !rc_health_ok() ? " STALE-RC" : "",
-                   esp);
+                   !sensor_ok ? " IMU-FAULT" : "");
         }
 
+        head_led_set_status(led_status(&rc, cmd.armed));
         head_led_tick(time_us_32());
 
         watchdog_feed_core1();
@@ -149,19 +159,10 @@ int main(void) {
 
     battery_init();
 
-    /* Primary sensor must init first (owns EKF in fusion mode). */
-    if (!sensor_primary.init()) {
-        printf("%s init failed\n", sensor_primary.name);
-        while (1) tight_loop_contents();
-    }
-
-    /* Auxiliary sensor (e.g., RSSI fusion into IMU EKF). */
-    if (sensor_aux) {
-        if (!sensor_aux->init())
-            printf("%s aux init failed (continuing without)\n", sensor_aux->name);
-        else
-            printf("Aux sensor: %s\n", sensor_aux->name);
-    }
+    /* On failure keep running with arming locked out, so core 1 can
+     * blink the IMU-fault code instead of the board going dark. */
+    sensor_ok = sensor_primary.init();
+    if (!sensor_ok) printf("%s init failed, arming disabled\n", sensor_primary.name);
 
     watchdog_start(2000);
     multicore_launch_core1(core1_control_loop);
@@ -173,13 +174,15 @@ int main(void) {
         float dt = (float)(t - last_us) * 1e-6f;
         last_us = t;
 
-        heading_estimate_t est = sensor_primary.tick(dt);
+        if (sensor_ok) {
+            heading_estimate_t est = sensor_primary.tick(dt);
 
-        uint32_t irq = spin_lock_blocking(est_lock);
-        shared_est.est = est;
-        shared_est.timestamp_us = t;
-        shared_est.ready = true;
-        spin_unlock(est_lock, irq);
+            uint32_t irq = spin_lock_blocking(est_lock);
+            shared_est.est = est;
+            shared_est.timestamp_us = t;
+            shared_est.ready = true;
+            spin_unlock(est_lock, irq);
+        }
 
         battery_sample();
         watchdog_feed();

@@ -55,7 +55,7 @@ float ekf_alpha(const ekf_t *e);
 /* Wrap heading into [0, 2*pi). */
 float ekf_heading_wrapped(const ekf_t *e);
 
-/* Fuse an external heading measurement (e.g., from RSSI edge PLL).
+/* Fuse an external absolute heading measurement.
  * r_theta is the measurement noise variance in rad^2; use a large
  * value when confidence is low. This directly observes ST_THETA,
  * which is otherwise unobservable from IMU-only measurements. */
