@@ -135,9 +135,9 @@ PLACE = {
     # heading LED: J2 in the old NW J7 spot, opening S onto its plug and Y-splice zones (chassis v3.4g);
     # its driver just E of it, N of the buck input caps
     "J2": (-14.0, 26.2, 0, "F"),
-    "Q1": (-8.5, 25.9, 90, "F"),
-    "R16": (-9.85, 28.85, -90, "F"),
-    "R17": (-8.2, 28.85, 90, "F"),
+    "Q1": (-8.5, 25.75, 90, "F"),
+    "R16": (-9.85, 28.7, -90, "F"),
+    "R17": (-8.2, 28.7, 90, "F"),
     # S edge connectors, opening S into the groove
     "J4": (8.5, -26.4, 0, "F"),
     "J5": (-1.1, -26.4, 0, "F"),
