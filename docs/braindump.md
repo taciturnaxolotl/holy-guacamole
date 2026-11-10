@@ -2,8 +2,8 @@
  
 **Robot:** Holy Guacamole — 1lb meltybrain antweight, MRCA full-combat ruleset  
 **Document type:** Running knowledge dump — research, design decisions, hardware, firmware architecture  
-**Target event:** Buckeye Bot Bash 2, Bellefontaine OH, Aug 29 2026  
-**Status:** Pre-build, PCB spec complete, chassis design in progress
+**Target event:** none set (Buckeye Bot Bash 2, Aug 29 2026, has passed)  
+**Status:** Chassis v3.4f and rev-2 carrier (`96137c3`, routed for PCBWay) designed; MJF frame, PCB order and bench bring-up next. Hardware numbers here are refreshed to v3.4f; `spec.md` (Rev B 2.1) is the authority where they differ.
  
 ---
  
@@ -36,7 +36,7 @@ This is fundamentally a state estimation problem wrapped around a control proble
  
 ### Why it's interesting
  
-A well-tuned meltybrain is simultaneously a full-body spinner (kinetic energy in the rotating mass) and a controlled mobile robot. The chassis IS the weapon. At 4,000 RPM and 75mm radius the tip speed is approximately 70 mph. Combined with metal weapon tabs, this is a meaningful combat machine.
+A well-tuned meltybrain is simultaneously a full-body spinner (kinetic energy in the rotating mass) and a controlled mobile robot. The chassis IS the weapon. At 4,000 RPM the tooth tips (r 90 mm) move at ~84 mph and the body stores ~120 J. With a steel ring, this is a meaningful combat machine.
  
 The autonomous sensing extension (Holy Guacamole II) exploits the spinning geometry in a novel way: IR sensors spinning at 4,000 RPM scan the arena 67 times per second, building a polar reflectance map that can locate opponents without any external tracking infrastructure. This is impossible on a stationary robot and is one of the genuinely novel things this platform enables.
  
@@ -46,26 +46,28 @@ The autonomous sensing extension (Holy Guacamole II) exploits the spinning geome
  
 **Name:** Holy Guacamole  
 "Holy Guacamole" — chaotic energy, memorable pit presence.
-"II" implies a lineage. Holy Guacamole II adds IR spinning lidar for autonomous opponent tracking.
+"II" implies a lineage. Holy Guacamole II adds opponent sensing (originally a spinning IR lidar; the firmware now also has an ESP32-C3 RSSI-beacon heading source, see firmware.md §0).
  
 **Design philosophy:**
 - Holy Guacamole is a proof-of-platform. Manual RC control, validate the heading algorithm, prove the mechanical design survives combat.
-- Holy Guacamole II upgrades the IMU fusion algorithm and adds spinning IR opponent detection.
-- Keep the build achievable before the August 2026 deadline. Don't over-engineer Rev 1.
+- Holy Guacamole II upgrades the IMU fusion algorithm and adds opponent detection.
+- Data-driven redesign after v1: the PLA+ v1 chassis worked okay-ish but shattered, its weapon tabs broke out of their pockets, and it was too heavy. v3.x is sized from FEA, modal and fit checks.
+
 **Combat strategy:**
-- Spin up to 4,000 RPM before engaging
+- Spin up to tracking RPM before engaging, punch to strike RPM on contact
 - Translate toward opponent using drift control
-- Weapon tabs at N/S, motors at E/W — weapon axis is perpendicular to drive axis
+- Two-tooth steel ring; motors on the E/W axis, perpendicular to the teeth
 - Full invertibility — symmetric top/bottom design means being flipped is not a loss condition
----
  
+---
+
 ## 3. Ruleset constraints (MRCA full antweight)
  
 | Rule | Detail |
 |---|---|
 | Weight limit | 1.00 lb / 454g for wheeled robots |
 | Materials | No restrictions — metal, UHMW, Delrin, carbon fiber all permitted |
-| Active weapon | Meltybrain legality must be confirmed with each event organizer. MRCA ruleset lists "rolling (wheels, tracks, or the whole robot)" as permitted mobility and does not explicitly ban translational drift. **Confirm with Buckeye Bot Bash EO before committing to build.** |
+| Active weapon | Meltybrain legality must be confirmed with each event organizer. MRCA ruleset lists "rolling (wheels, tracks, or the whole robot)" as permitted mobility and does not explicitly ban translational drift. **Confirm with the EO of each event before entering.** |
 | Spindown | Full stop within 60 seconds of power removal, self-contained braking. Active ESC braking satisfies this. |
 | Failsafe | Radio must failsafe all motion (drive + weapon) on signal loss |
 | Battery | LiPo permitted. Must be fully enclosed. Uncontained battery = automatic KO. |
@@ -73,72 +75,70 @@ The autonomous sensing extension (Holy Guacamole II) exploits the spinning geome
 | Match duration | 2 minutes |
 | Pinning limit | 5 seconds max |
  
-**Key note:** This is full-combat antweight, NOT plastic ant. Metal weapon tabs, UHMW chassis reinforcement, and carbon fiber are all permitted. Design accordingly.
+**Key note:** This is full-combat antweight, NOT plastic ant. Steel weapons, UHMW chassis reinforcement, and carbon fiber are all permitted. Design accordingly.
  
 ---
  
-## 4. Chassis design
- 
+## 4. Chassis design (v3.4f)
+
+Source of truth: `concept_v33.py` (v3.4f) and the `holy_guacamole_v34f` package (STEP parts, assembly, viewer, checks). Design history and sims: `claude/v2-frame-design.md`.
+
 ### Form factor
- 
-Flat disc, 150mm OD, ~22mm max height at centre, flat puck profile. NOT lenticular/tapered — flat puck maximises wall count for structural strength and is trivially printable on a standard FDM printer.
- 
-### Weapon geometry
- 
-Two symmetric wedge tabs at 180° apart (N/S), protruding radially outward beyond the main disc radius in the horizontal plane only. Each tab has:
-- Hard leading face approximately 90° to tangent — maximum impact energy transfer
-- Smooth trailing taper back to disc radius over ~40° of arc — reduces drag and deflection
-- Symmetric top/bottom for full invertibility
-Metal tab inserts (Ti-6Al-4V titanium preferred, steel acceptable) bolted through from chassis body. Full-combat ruleset means no reason to use printed tabs.
- 
-### Print strategy
- 
-| Parameter | Value |
+
+Flat puck: Ø145 × 29 mm frame inside a Ø156 steel ring, Ø180 over the two teeth. Keeps v1's "avocado" duotone (dark green body and plates, lime rim).
+
+### Frame
+
+| Item | Value |
 |---|---|
-| Printer | Bambu A1 Mini (180×180mm bed, 0.4mm nozzle → 0.42mm extrusion width) |
-| Material | Overture Super PLA+ — ductile failure mode, bends before breaking |
-| Avoid | Duramic PLA+ — more brittle, worse for impact |
-| Orientation | Flat on bed (disc face down) — layer lines horizontal, impacts load in tension/compression not delamination |
-| Wall strategy | Maximum perimeters in multiples of 0.42mm. Wall count matters more than infill percentage. |
-| Infill | ~80% gyroid |
-| Seam placement | Away from battery pocket locations |
-| Supports | None needed for flat disc geometry |
- 
-### Battery pockets
- 
-Two rectangular pockets at 180° (N/S), at ~55mm radius from centre. Batteries oriented with flat face tangential to rotation — centrifugal force compresses cell layers together, not apart. Pockets fully enclosed, batteries epoxy-potted in place. Must not eject under any loading condition.
- 
-### Motor mounting
- 
-Motors mount E/W (perpendicular to weapon tab axis N/S). This is a deliberate choice from Project Liftoff experience — motors at E/W prevent the robot from sliding sideways like a hockey puck when the weapon tabs face N/S. Drive axis perpendicular to weapon axis.
- 
-Hub motor architecture: the rotating motor bell/can is the wheel hub. Custom wheel hub attaches directly to the spinning can via 3× M2 holes on a 12mm bolt circle. Stator backplate bolts to chassis (fixed). This eliminates a dedicated axle and keeps mass close to the wheel.
- 
-One outboard R2ZZ bearing (1/8" ID × 3/8" OD) at each motor shaft tip, press-fit into a printed chassis arm extending to 75mm radius. Eliminates shaft flex from the ~45mm wheel overhang.
+| Material | MJF PA11, two halves split at the ring top (z 16.9), made by an outside manufacturer |
+| Plates | Top and bottom MJF PA11 0.8 mm in 0.6 mm pockets, 4 × M2.5 each (Tegris dropped: too expensive) |
+| Tolerancing | v3.4f pass: every unintended face opened to ≥ 0.3 mm (MJF ±0.3), J1 middle wall 1.0 mm, USB shelves 2.6 mm deep. No access to fit coupons, so the clearances are designed in |
+| Mass | 446 g CAD (limit 454); expect +1–3% from MJF density. 2.4 g trim at r44 for CoM |
+
+### Weapon ring
+
+AR550 3/16" (4.76 mm), Ri 73 / Ro 78, two teeth, 126 g. Six inward ears at 60° spacing (30°, 90°, … 330°) take Ti M3 × 20 button-head screws with Ø7 washers into M3 × 5.7 brass heat-sets in the upper half, 0.3 N·m. TPU ear liners (printed at home, three fits: 0.30 / 0.15 / 0.05 mm ear clearance) sit between ear and frame; use the snuggest set so the ear bears on the liner before the bolts. A full steel ring replaced v1's bolted tabs (bad bolt placement, tabs pulled out of their pockets).
+
+### Structural results
+
+| Check | Result |
+|---|---|
+| 11 kN tooth hit, static FEA | 33.6 MPa bolts-only, 30.1 MPa ring-supported, both at (47, 25, 22); FoS 1.55 on 52 MPa |
+| Modal, free-free | lowest 286 Hz (battery ribs); no frame-vs-ring mode below 951 Hz; wheel-rev excitation 200 Hz at 4500 rpm |
+| Skin poke, 300 N on 6 mm | first yield at 50–90 N; gussets didn't help, not adopted |
+| Ring-ear joint | ear bolts bear before the liner engages unless a tighter liner is used; insert pull-out marginal under a big vertical hit |
+| Assembly / service / tool access | all clear, 0 trapped cavities |
+
+### Battery
+
+Single GNB 3S 380 HV pack (55 × 17 × 20, 32 g) on the spin axis at x ±8.5, y −23.2…+31.6, z 7.2–27.2, leads and balance plug out of the S end, on ribs over the carrier board. On-axis, so it sees almost no centrifugal load (unlike v1's 55 mm-radius pockets).
+
+### Motor mounting and wheels
+
+Motors on the E/W axis, perpendicular to the teeth (prevents hockey-puck sliding). PBB D2822 1100KV, 1/8" shaft, ~70 mm leads to 2 mm bullets. Wheels Ø42 × 9 mm at r ≈ 56 mm: PA11 hub with a cast VytaFlex 40 tread (printed moulds), outboard MR128 bearing (seat reamed to 12 mm).
  
 ---
- 
+
 ## 5. Operating parameters
  
+Numbers for v3.4f: I ≈ 1.39e-3 kg·m² (CAD), wheel Ø42 at r 56 (chassis rpm = 0.375 × motor rpm without slip), 3S HV.
+
 | Parameter | Value |
 |---|---|
-| Target chassis RPM | 4,000 RPM (tunable 3,500–4,500) |
-| Motor throttle at 4,000 RPM | ~65% — healthy thermal margin |
-| Tip speed at 4,000 RPM, 75mm radius | ~70 mph |
-| G at 12mm radius (inner IMU), 4,000 RPM | ~216G |
-| G at 20mm radius (outer IMUs), 4,000 RPM | ~360G |
-| G at 55mm radius (battery), 4,000 RPM | ~990G |
-| G at 75mm radius (chassis edge), 4,000 RPM | ~1,350G |
-| H3LIS331DL limit | ±400G hard ceiling |
-| RPM ceiling (outer IMU at 20mm) | ~4,300 RPM before hitting 400G |
-| Kinetic energy | ~400–600 mJ depending on final mass distribution |
- 
-**Why 4,000 RPM (revised upward from 1,800 RPM):**
-- Motors run more efficiently at 65% throttle vs 30%
-- Full-combat ruleset permits metal tabs — more damage at higher tip speed
-- H3LIS331DL at 20mm radius has margin up to ~4,300 RPM before hitting G ceiling
-- eRPM telemetry provides secondary RPM anchor independent of IMU
-- Community data point: arithebiker runs D2822 1100KV at 4,200+ RPM successfully — validates motor choice empirically
+| Target chassis RPM | ~3,000 tracking / ~4,000 strike |
+| No-load chassis RPM, 3S | ~4,700 at 11.4 V, ~5,400 at 13.05 V (1100 KV × V × 0.375). Real loaded figure needs the bench; 2S estimates were 2,200–2,850 |
+| Tip speed at 4,000 RPM, r 90 (tooth tip) | 37.7 m/s ≈ 84 mph (ring OD r 78: 32.7 m/s) |
+| G at 12 mm (U4), 4,000 RPM | ~215 g |
+| G at 18 mm (U5/U6), 4,000 RPM | ~322 g |
+| G at ring centreline r 75.5, 4,000 RPM | ~1,350 g |
+| H3LIS331DL ceiling (392 g usable at 18 mm) | ~4,400 RPM |
+| LSM6DSV320X accel ceiling (313 g at 12 mm) | ~4,800 RPM |
+| LSM6DSV320X gyro ceiling (±4,000 dps) | **~667 RPM** — railed at any combat speed |
+| Kinetic energy | ~69 J at 3,000 RPM, ~122 J at 4,000 RPM (½Iω²) |
+
+The earlier "~400–600 mJ" figure was wrong by ~200×.
+
 **Two operational modes (community-validated "pounce" strategy):**
  
 | Mode | RPM | Purpose |
@@ -148,13 +148,13 @@ One outboard R2ZZ bearing (1/8" ID × 3/8" OD) at each motor shaft tip, press-fi
  
 Community consensus (jbk9925, frugez, others): translation works best at 2,000–3,500 RPM. Above 3,500 RPM heading stability degrades with naive integrators. At 5,000+ RPM translation becomes unreliable. The EKF approach should extend the reliable translation window higher than OpenMelt-style integrators, but two-mode operation remains the right combat strategy.
  
-Strike mode RPM ceiling: 4,300 RPM (outer IMU G limit). IMU-A (inner, 12mm) stays in-spec up to ~5,500 RPM — it becomes the primary sensor during high-RPM bursts when IMU-B/C approach their limit.
+Strike mode RPM ceiling: ~4,400 RPM (outer H3LIS limit). IMU-A's accel (inner, 12 mm) stays in-spec to ~4,800 RPM, so it becomes the primary centripetal sensor during high-RPM bursts.
  
 **Control loop rate requirement (community rule):**  
-Minimum ~8 DSHOT updates per chassis revolution for translation. At 4,000 RPM (66.7 Hz): minimum 533Hz. At 4,300 RPM: 573Hz minimum. Our 1kHz loop rate on core 0 is comfortable at both operating points with ~15 update opportunities per revolution at 4,000 RPM.
+Minimum ~8 DSHOT updates per chassis revolution for translation. At 4,000 RPM (66.7 Hz): minimum 533 Hz. At 4,300 RPM: 573 Hz minimum. The 1 kHz loop gives ~15 updates per revolution at 4,000 RPM.
  
 ---
- 
+
 ## 6. Control theory research
  
 This section documents the academic literature we identified as relevant to the heading estimation and control problem. The meltybrain community has largely not engaged with this literature — there is real opportunity here.
@@ -182,7 +182,7 @@ Treats the problem as a dynamical system where accelerometer readings are simult
  
 **Key paper: arXiv:1509.06494** — Cramér-Rao bound for accelerometer arrays
  
-Establishes a fundamental limit: for purely gyroscope-free IMUs there is no unbiased finite-variance estimator for small angular velocities. Practically: your heading algorithm cannot work at very low RPM, and no amount of algorithmic sophistication changes this. There is a physical floor set by sensor noise and lever arm length. For Holy Guacamole this is fine — the centrifugal signal at 4,000 RPM at 20mm radius is ~360G, well above noise. The bound matters during spinup below ~500 RPM where the signal is marginal.
+Establishes a fundamental limit: for purely gyroscope-free IMUs there is no unbiased finite-variance estimator for small angular velocities. Practically: your heading algorithm cannot work at very low RPM, and no amount of algorithmic sophistication changes this. There is a physical floor set by sensor noise and lever arm length. For Holy Guacamole this is fine — the centrifugal signal at 4,000 RPM at 18mm radius is ~322G, well above noise. The bound matters during spinup below ~500 RPM where the signal is marginal.
  
 **GFSINS literature** (gyroscope-free strapdown inertial navigation systems)
  
@@ -265,7 +265,7 @@ Translation works best at 2,000–3,500 RPM. Multiple builders confirm independe
 - zenith_parsec: achieved translation at ~300 RPM with low-range accelerometer and good filtering
 Above ~3,500 RPM naive integrators lose heading lock (visible as heading indicator becoming a full circle rather than a point). This is not a fundamental limit — it's an integrator quality limit. The EKF approach targets maintaining heading lock through the 4,000+ RPM range where naive integrators fail.
  
-**Minimum viable RPM for translation:** ~300–800 RPM depending on sensor quality. At 300 RPM, 20mm radius: 2.6G centrifugal — below noise floor for H3LIS331DL at 400G range. The tangential-axis spinup strategy (using α×r signal) handles this regime.
+**Minimum viable RPM for translation:** ~300–800 RPM depending on sensor quality. At 300 RPM, 18mm radius: 1.8G centrifugal — below noise floor for H3LIS331DL at 400G range. The tangential-axis spinup strategy (using α×r signal) handles this regime.
  
 ### 7.3 The pounce strategy
  
@@ -289,22 +289,22 @@ Drift = (Accuracy Coefficient) × (Power) × (Wheel Path / Wheel Diameter)
  
 **Melty Ratio = Wheel Path / Wheel Diameter:**
 ```
-Wheel path = 2π × chassis_radius = 2π × 75mm = 471mm per revolution
-Melty ratio at 20mm wheel = 471 / 20 = 23.6
-Melty ratio at 25mm wheel = 471 / 25 = 18.8
+Wheel path = 2π × wheel radius from centre = 2π × 56mm = 352mm per revolution
+Melty ratio, v3.4f Ø42 wheel = 352 / 42 = 8.4
+(old 75 mm / 20 mm concept: 471 / 20 = 23.6)
 ```
  
 Higher ratio = more motor rotations per chassis rotation = more DSHOT update opportunities per revolution = finer translation authority. This is a real argument for smaller wheels. At 1kHz loop rate and 4,000 RPM: ~15 update points per revolution regardless of wheel diameter — the ratio affects how much ground is covered per update, not the update frequency itself. Smaller wheels = finer positional authority per update.
  
-**Wheel diameter decision:** err toward smaller once motors are in hand and clearance is confirmed.
+**Wheel diameter decision:** Ø42 for v3.4f, set by motor height, floor clearance and the cast tread. Smaller wheels would raise the ratio but need a lower motor.
  
 ### 7.5 Spinup time
  
-tedster: "fast spin up is everything." Most 3lb melties reach full speed in 2–3 seconds with good traction per remzakmij's data. With D2822 1100KV on 2S and estimated inertia, spinup to 3,000 RPM should be under 2 seconds. Tracking mode RPM reached before opponent engages — important for match opening.
+tedster: "fast spin up is everything." Most 3lb melties reach full speed in 2–3 seconds with good traction per remzakmij's data. With D2822 1100KV on 3S and I ≈ 1.39e-3 kg·m², spinup to 3,000 RPM should be under 2 seconds (the SITL twin, with older plant numbers, reaches 3,000 RPM in ~1 s). Tracking mode RPM reached before opponent engages — important for match opening.
  
 ### 7.6 H3LIS331DL nonlinearity warning
  
-remzakmij discovered through years of testing that apparent CoR distance changed nonlinearly with RPM due to sensor nonlinearity. He built piecewise linear calibration models to compensate. Plan for this: do not assume H3LIS331DL reads linearly across its 400G range. Characterise each sensor across the RPM range (500, 1000, 2000, 3000, 4000 RPM) during bench testing and store calibration curves as firmware constants. This is more important for IMU-B/C at 20mm (operating at 90% of full scale at 4,000 RPM) than IMU-A at 12mm (54% of full scale).
+remzakmij discovered through years of testing that apparent CoR distance changed nonlinearly with RPM due to sensor nonlinearity. He built piecewise linear calibration models to compensate. Plan for this: do not assume H3LIS331DL reads linearly across its 400G range. Characterise each sensor across the RPM range (500, 1000, 2000, 3000, 4000 RPM) during bench testing and store calibration curves as firmware constants. This is more important for IMU-B/C at 18mm (~81% of full scale at 4,000 RPM) than IMU-A at 12mm (~67%). The SITL twin shows uncorrected nonlinearity walks heading 180° in ~3 s at 2,700 RPM, so `accel_cal` is mandatory.
  
 ### 7.7 ESC response time limit
  
@@ -339,10 +339,13 @@ Three H3LIS331DL at r=20mm, angular positions 0°/90°/210°.
 ### Generation 4: Three sensors, mixed radii, asymmetric angles — hybrid parts (current design)
  
 Three IMUs:
-- IMU-A (U4): **LSM6DSV320X**, r=12mm, 0° — accel ±320G + gyro ±4,000 dps
-- IMU-B (U5): **H3LIS331DL**, r=~18mm, 90° — accel ±400G
-- IMU-C (U6): **H3LIS331DL**, r=~18mm, 210° — accel ±400G
-**Why LSM6DSV320X at the inner position:** The gyro channel (±4,000 dps = ~38,200 RPM equivalent) does not saturate at any planned operating speed. At 12mm radius the accel ceiling is ~5,500 RPM — well clear. The gyro provides direct ω integration from rest, replacing the spinup dead zone feedforward model with real data, and adds a third independent ω source to the EKF alongside the accelerometer array and eRPM. The LSM6DSV320X would saturate its accelerometer around 3,990 RPM at 18mm radius — too marginal for the outer positions, which is why H3LIS331DL ±400G stays there.
+- IMU-A (U4): **LSM6DSV320X**, r=12mm, 0° nominal — accel ±320G + gyro ±4,000 dps
+- IMU-B (U5): **H3LIS331DL**, r=18mm, 90° nominal — accel ±400G
+- IMU-C (U6): **H3LIS331DL**, r=18mm, 210° nominal — accel ±400G
+
+**As placed on rev 2:** the whole array is rotated 166° CCW to clear the XIAO (only 164–168° works): U4 (−11.64, 2.90) at 166°, U5 (−4.35, −17.47) at 256°, U6 (17.30, 4.96) at 16°. Firmware adds 166° to each nominal angle, then replaces them with measured positions.
+
+**Why LSM6DSV320X at the inner position:** its gyro covers spin-up from rest, where the centripetal signal is absent, and acts as an impact anchor. **Correction:** ±4,000 dps is only ~667 RPM, so the gyro rails early in spin-up and is not an ω source at combat speed (the SITL twin found this; firmware drops a railed gyro). At 12 mm the accel ceiling is ~4,800 RPM. The LSM6DSV320X would saturate its accelerometer around 3,990 RPM at 18mm radius — too marginal for the outer positions, which is why H3LIS331DL ±400G stays there.
  
 **SPI compatibility:** Both H3LIS331DL and LSM6DSV320X support SPI modes 0 and 3. Run shared bus at mode 0 (CPOL=0, CPHA=0) — SCK idles low, preventing deselected H3LIS331DL from misinterpreting bus traffic as I2C when CS is high.
  
@@ -354,13 +357,13 @@ Three IMUs:
 | IMU-B | H3LIS331DL | ~18mm | ~322G (81%) | ~372G (93%) | ✓ within spec |
 | IMU-C | H3LIS331DL | ~18mm | ~322G (81%) | ~372G (93%) | ✓ within spec |
  
-**Axis orientation convention:** Each chip mounted with X axis pointing radially outward, Y axis pointing tangentially. This makes the measurement model clean: radial axis gives centrifugal + CoR linear, tangential axis gives αr + tangential linear. Verify against H3LIS331DL datasheet before PCB layout.
+**Axis orientation (rev 2 as routed):** the chips do **not** share one convention. From the footprint rotations the radial-outward axis is **+X on U4, +Y on U5, −X on U6**; the tangential axis is the other in-plane axis on each. Firmware needs a per-chip axis/sign map (see firmware.md §9) and a bench spin to confirm signs.
  
 ---
  
 ## 9. Electronics hardware
  
-### 8.1 Compute: Seeed XIAO RP2350
+### 9.1 Compute: Seeed XIAO RP2350
  
 Chosen over custom RP2040 PCB from original handoff. The XIAO handles all finicky microcontroller routing (crystal, flash, USB, decoupling) — the carrier is a simple routing board.
  
@@ -387,204 +390,101 @@ Chosen over custom RP2040 PCB from original handoff. The XIAO handles all finick
 - Hardware FPU — EKF matrix math runs in hardware float, roughly 5× faster than RP2040 soft-float
 - This meaningfully expands how complex a filter can run at 1kHz without missing deadlines
 - Cortex-M33 also has DSP extensions useful for signal processing
-### 8.2 IMU array: hybrid — 1× LSM6DSV320X + 2× H3LIS331DL
+### 9.2 IMU array: hybrid — 1× LSM6DSV320X + 2× H3LIS331DL
  
 Rev A uses a hybrid IMU array. The inner sensor (IMU-A, 12mm) is a LSM6DSV320X for its gyro channel. The outer sensors (IMU-B/C, ~18mm) are H3LIS331DL ±400G — the only practical part at that radius.
  
-**IMU-A: LSM6DSV320X** — LGA-14 2.5×3mm, LCSC C26633007, 198 units in stock. Accel ±320G, gyro ±4,000 dps. Gyro does not saturate at any planned operating speed (4,300 RPM = 25,800 °/s, well under the 38,200 °/s ceiling). At 12mm radius accel ceiling is ~5,500 RPM. Adds direct ω during spinup and a third independent EKF ω source.
+**IMU-A: LSM6DSV320X** — LGA-14 2.5×3mm, LCSC C26633007. Accel ±320G, gyro ±4,000 dps. The gyro rails at ~667 RPM (4,300 RPM = 25,800 °/s, 6.5× over range), so it covers spin-up from rest and impact detection only; at combat speed ω comes from the accelerometers and eRPM. At 12mm radius the accel ceiling is ~4,800 RPM.
  
-**IMU-B/C: H3LIS331DL** — LGA-16L 3×3mm, LCSC C2655074, 22 units in stock — **order extras immediately.** ±400G fixed range. Only viable option for outer positions at ~18mm radius.
+**IMU-B/C: H3LIS331DL** — LGA-16L 3×3mm, LCSC C2655074 (Digi-Key 497-13903-1-ND, Mouser 511-H3LIS331DL). ±400G fixed range. Only viable option for outer positions at 18mm radius.
  
 **SPI bus:** Both parts support modes 0 and 3. Run shared bus at mode 0 (CPOL=0, CPHA=0) throughout — SCK idles low so deselected H3LIS331DL sensors don't see phantom I2C clocks. Shared MISO with 33Ω isolation resistors; one CS low at a time.
  
-Placement geometry documented in Section 7.
+Placement geometry and the rev-2 axis map are in Section 8.
  
-### 8.3 Motors: Palm Beach Bots D2822 1100KV
+### 9.3 Motors: Palm Beach Bots D2822 1100KV
  
 | Parameter | Value |
 |---|---|
-| Source | palmbeachbots.com, $14.99 each |
+| Source | palmbeachbots.com |
 | KV | 1100 KV |
-| Voltage | 2S–3S (7.4V–11.1V) |
+| Voltage | 2S–3S |
 | Max power | 102W |
 | Max current | 9.9A |
 | Resistance | 0.192Ω |
 | Mass | 44g |
 | Diameter | 28mm |
-| Connectors | 3.5mm female bullet connectors |
+| Shaft | 1/8" |
+| Leads | ~70 mm silicone, 2 mm bullets to the ESC leads |
  
-**Hub motor architecture:** Rotating bell/can has 3× M2 holes on 12mm bolt circle for direct wheel hub attachment. Stator backplate fixed to chassis. No separate axle.
+**Drive:** shaft-driven Ø42 wheel with an outboard MR128 bearing (no hub-on-bell mount). Chassis rpm ≈ 0.375 × motor rpm. No-load motor rpm on 3S: ~12,500 (11.4 V) to ~14,400 (13.05 V).
  
-**No-load RPM:** 1100 KV × 7.4V = 8,140 RPM. At 65% throttle: ~4,000 RPM chassis spin.
+**Motor orientation:** E/W, perpendicular to the teeth. Prevents lateral sliding instability per Project Liftoff experience.
  
-**Motor orientation:** E/W (perpendicular to N/S weapon tabs). Prevents lateral sliding instability per Project Liftoff experience.
+### 9.4 ESC: Repeat AM32 dual
  
-**Outboard bearing:** One R2ZZ (1/8" ID × 3/8" OD) per motor at shaft tip. Press-fit into chassis arm at 75mm radius. Eliminates shaft flex from ~45mm wheel overhang.
+**Chosen:** one Repeat AM32 dual ESC (28 × 20 mm, ~6 g, AT32F421, profile `AM32_RR_ROBOT_DUAL_ESC_F421`), standing on edge against the S bay wall with BAT/GND on the E side. Battery feed comes off the carrier's `J1` lap pads (20 AWG); signal on `J4` (JST-GH: GND, DSHOT1 white, DSHOT2 yellow, GND). BEC stays isolated.
  
-### 8.4 ESCs
+Settings: DSHOT600 bidirectional with EDT (DSHOT300 only on the bench — bidirectional halves the effective command rate), active braking on (60 s spindown rule), current limit 4–5 A per channel, correct pole count.
  
-**Community finding:** Multiple community members (jbk9925 and others) explicitly recommend against BLHeli_S. AM32 is strongly preferred — actively developed, native bidirectional DSHOT, better low-speed torque control. Project Liftoff uses AM32.
+**Why AM32:** community (jbk9925 and others) recommends against BLHeli_S; AM32 is actively developed, has native bidirectional DSHOT and better low-speed torque control. AM32 can't be flashed onto BLHeli_S (8-bit EFM8) hardware; for those, Bluejay is the fallback.
  
-**The core constraint:** BLHeli_S runs on 8-bit EFM8 (SiLabs) MCUs. AM32 targets ARM-based 32-bit MCUs (STM32F051, STM32G071, AT32F421). These are incompatible silicon — you cannot flash AM32 onto a BLHeli_S ESC. Attempting this bricks the ESC.
+### 9.5 Radio: ExpressLRS
  
-**Preferred option: Repeat Micro AM32 ESC (×2)**
- 
-| Parameter | Value |
-|---|---|
-| Source | palmbeachbots.com or repeat-robotics.com, $19.99 each |
-| Firmware | AM32, pre-flashed and combat-tuned for brushless drive |
-| Dimensions | 12×18mm — smallest AM32 ESC on market |
-| Mass | ~3-4g estimated (no connectors) |
-| Current | Rated for 1lb/3lb drive |
-| BEC | None |
-| Connectors | Solder pads only — solder motor leads direct |
-| Bidirectional DSHOT | Native, no configuration needed |
- 
-Pre-programmed for smooth bidirectional movement, should work with D2822 with minimal tuning. Check stock before ordering — goes in and out.
- 
-**Fallback option: Repeat AM32 35A single ESC (×2)**
- 
-| Parameter | Value |
-|---|---|
-| Source | palmbeachbots.com, $24.99 each |
-| Dimensions | 25×13×5mm |
-| Mass | ~5g |
-| Current | 35A continuous — 3.5× motor max, runs very cool |
- 
-Larger and heavier than Micro but more current headroom and more consistently in stock.
- 
-**If using existing PBB 20A BLHeli_S ESCs: flash Bluejay**
- 
-Bluejay is open-source firmware for EFM8-based BLHeli_S ESCs that unlocks bidirectional DSHOT and RPM filtering. Drop-in replacement, no hardware change. Flash via esc-configurator.com in Chrome. Fully functional for Rev 1 if AM32 ESCs are unavailable.
- 
-Bluejay configuration (same as BLHeli_S was, now via ESC Configurator web tool):
-- Bidirectional DSHOT: enabled
-- Protocol: DSHOT300
-- Motor timing: Medium-High
-- Active braking: Enabled (60-second spindown rule)
-- Startup beep: Disabled
-- PWM frequency: 48kHz (Bluejay supports higher than stock BLHeli_S)
-### 8.5 Radio: ExpressLRS
- 
-CRSF protocol, single UART to XIAO RP2350. Lower latency than FlySky iBUS — important for drift control loop timing.
- 
-Any ELRS receiver under ~3g. EP1, EP2, TCXO variants all work. Mount off-PCB on chassis wall for antenna clearance; fly-lead to carrier PCB.
+BetaFPV ELRS Lite 2.4 GHz, flat antenna (ESP8285, 11 × 10 × 3 mm), on a tray in the S pocket with the antenna outward, clear of the battery. CRSF at 420 kbaud non-inverted on the XIAO's uart0 through `J5` (JST-GH: GND, 5V, CRSF_RX, CRSF_TX). Configure over its own WiFi AP (10.0.0.1).
  
 Telemetry back channel: RPM, heading error, battery voltage, current draw — log during test runs for tuning.
  
 **Critical:** Configure ELRS failsafe to zero throttle on signal loss before any powered testing.
  
-### 8.6 Battery: 2S LiPo 300–450mAh 75C+
+### 9.6 Battery: GNB 3S 380 mAh HV
  
-**Capacity requirement calculation (2-minute match):**
+55 × 17 × 20 mm, 32 g, 13.05 V full / 11.4 V nominal, XT30 (female on the pack, `J6` male on the board). Mounted on the spin axis over the carrier.
  
-| Phase | Duration | Current | mAh |
-|---|---|---|---|
-| Spinup | 10s | ~15A avg | ~42 |
-| Steady state | 90s | ~7A | ~175 |
-| Impact recovery | 20s | ~12A | ~67 |
-| Logic | 120s | 0.3A | ~10 |
-| Subtotal | | | ~294 |
-| +20% safety | | | +59 |
-| +20% voltage sag | | | +59 |
-| **Required** | | | **~420mAh** |
+**Capacity check (open):** a 2-minute match was budgeted at ~420 mAh on 2S (spin-up ~15 A for 10 s, ~7 A steady, ~12 A impact recovery, +20% margin, +20% sag). A rough 3S estimate at ~10 A average over 3 minutes is ~500 mAh, against 380. Measure real average current on the bench soak; lower the ESC current limit or move to a larger pack if it's short.
  
-**C rating:** Peak ~20A / 0.35Ah = 57C minimum. Choose 75C+ rated cells.
+UVLO: `JP1` 2-3 cuts at ~8.85 V (2.95 V/cell); `R25` 66.5k would move it to ~8.0 V. Firmware low-battery halt must sit above the hardware cutoff.
  
-**Recommended cells:**
+### 9.7 Power switch: Fingertech Mini Power Switch
  
-| Cell | Capacity | C rating | Mass | Notes |
-|---|---|---|---|---|
-| GNB 2S 300mAh 80C | 300mAh | 80C | ~20g | Compact, tight on capacity |
-| Dogcom 2S 350mAh 100C | 350mAh | 100C | ~22-25g | Sweet spot |
-| Tattu 2S 450mAh 75C | 450mAh | 75C | ~29g | Most margin, physically large |
+12.7×12.7×6.35mm, 2.15g, 40A rated / 100A burst. Allen key (3/32") activation — cannot back out under vibration. Satisfies MRCA manual disconnect requirement. Sits in its frame socket on a short XT30 pigtail into `J7` (switch loop: VBAT_RAW out, VBUS back).
  
-Physical limits: max 60×30×15mm. Epoxy-potted in chassis pocket. XT30 connector (NOT JST — vibration loosens crimp contacts). At 55mm radius: ~990G centrifugal. Cell layers compressed together tangentially — safe orientation.
+### 9.8 Wheels: cast urethane tread
  
-### 8.7 Power switch: Fingertech Mini Power Switch
+Ø42 × 9 mm. PA11 hub (MJF) with a VytaFlex 40 tread cast in printed moulds (`wheel_mould` package), MR128 outboard bearing. Earlier options (EVA foam + rubber cement + latex, BaneBots T61) are superseded.
  
-12.7×12.7×6.35mm, 2.15g, 40A rated / 100A burst. Allen key (3/32") activation — cannot back out under vibration. Satisfies MRCA manual disconnect requirement. Place accessible from outside chassis via recessed pocket.
- 
-### 8.8 Wheels: EVA foam + rubber cement + latex
- 
-Target diameter: determined by motor mount height. Wheel radius = mount height above floor + 3-4mm clearance. Likely 20–25mm. Finalise once motor is in hand.
- 
-**Grip coating procedure:**
-1. Clean foam with isopropyl alcohol, dry completely
-2. Two coats Elmer's rubber cement, dry between coats
-3. Two coats liquid latex, dry overnight each
-Rubber cement is essential primer — without it latex peels adhesively. With it, latex fails cohesively (takes foam with it, much stronger bond).
- 
-**Centrifugal concern:** At 4,000 RPM foam deforms outward, increasing effective wheel radius and changing floor clearance. Use high shore hardness EVA foam. Do a spin test before first event and check clearance hasn't changed.
- 
-**Meltybrain note:** Wheel grip is less critical than on a standard drive robot — the chassis is spinning and translating via differential thrust modulation. Excessive grip can actually interfere with the translational drift mechanism. Moderate grip is better than maximum grip.
+**Centrifugal concern:** at 4,000 RPM the tread sees ~1,000 g at r 56; spin-test before the first event and check floor clearance. Moderate grip is better than maximum grip for drift.
  
 ---
  
 ## 10. Carrier PCB specification
  
-Full detail in `spec.md` (current: v1.3c, matches `circuit.py` Rev A schematic). Summary here.
+Full detail in `spec.md` (Rev B 2.1, tracks `hardware/guac.kicad_sch`; board `96137c3`). Summary:
  
-### Role
+- 40 × 76 × 1.6 mm, 4 layers, 2 oz outer / 1 oz inner, ENIG, centred on the spin axis, clamped under the chassis end ledges with 4 × M2. Fabbed at PCBWay (normal process: 0.18 / 0.21 mm trace/space).
+- The carrier is also the power distribution board: battery on `J6` (XT30-M), switch loop on `J7` (XT30-F), ESC feed on `J1` lap pads; ~9 mΩ of board copper; outer VBUS↔VBAT_RAW kept 1 mm apart.
+- AP63301 5 V buck (forced PWM), JP1 UVLO select, SMAJ15CA TVS and 100 µF polymer bulk on VBUS.
+- SN74HC595 latch for the three IMU chip-selects (QD–QH NC). SK9822 chain and MCP23S17 are gone.
+- JST-GH for ESC signal (`J4`), receiver (`J5`), and both TinySLEDs on one Y-splice (`J2`, Q1 AO3402 low-side).
+- Flush bottom-copper debug pads only (SWD, UART, VBAT, VBUS, GND); nothing else on the underside (0.32 mm to the bottom plate).
+- Rev A had R6/R7/R8 on MOSI instead of MISO; fixed in rev 2.
  
-Routing board for the XIAO RP2350 module. The XIAO provides compute, flash, crystal, USB, and 3.3V regulation. The carrier provides:
- 
-- 7.4V → 5V buck conversion (AP63205 fixed-5V, TSOT-23-6)
-- SPI-loaded SN74HC595 latch for IMU chip-selects and SK9822 output-enable gating
-- IMU SPI routing to one LSM6DSV320X + two H3LIS331DL
-- Two bidirectional DSHOT/EDT signal lines to Repeat AM32 Dual ESC (one board, two channels)
-- CRSF UART to ELRS receiver
-- Battery voltage sense (resistor divider → ADC)
-- Dedicated meltybrain heading LED driver: external orange TinySLED module via single AO3402 MOSFET low-side switch (Q1) from XIAO D1/A1
-- SK9822 status LED (2×2mm, SPI via AHCT level-shift buffers, gated by SN74HC595 QD)
-- Test points on all signals
-### Key architectural decisions (Rev A)
- 
-**AP63205 fixed-5V buck (replaces AP63203):** Fixed-output variant — no feedback resistors, simpler layout, one fewer tuning error mode. Same SOT package family, same inductor.
- 
-**SN74HC595 SPI-loaded latch:** XIAO edge pads are pin-limited. The latch provides IMU CS lines (QA/QB/QC) and SK9822 `LED_OE_N` gate (QD), consuming only shared SPI MOSI/SCK plus two direct GPIO controls (`SEL_OE_N` and `SEL_LAT`). Critical firmware requirement: `LED_OE_N` must be deasserted during all IMU SPI transactions. Latch update protocol: blank outputs (`SEL_OE_N` high) → shift byte on SPI → pulse `SEL_LAT` → enable outputs (`SEL_OE_N` low) for selected target only.
- 
-**Dedicated heading LED driver (simplified in v1.3):** The meltybrain heading strobe uses a single AO3402 MOSFET (Q1) low-side switch driven from XIAO D1/A1 (edge pad — no underside pad dependency). External orange TinySLED module (Tiny's LEDs, 2-3S rated) powered from switched VBUS (7.4V nominal). Module has onboard current limiting — no series resistor on carrier. Orange chosen for maximum contrast against green chassis filament. Heading LED current loop runs from VBUS directly — route like a battery wire, not a logic trace.
- 
-Previous v1.2 design used three MOSFETs (Q1/Q2/Q3) and a common-anode RGB LED on D1/D11/D12. Simplified to single MOSFET + fixed-colour orange module after confirming D11/D12 are underside pads not accessible without assembly complexity.
- 
-**D11/D12 confirmed NC:** XIAO RP2350 underside pads — unused in Rev A. All runtime IO on edge/castellated pads D0–D10 only.
- 
-**DSHOT600 (required):** At 4,300 RPM strike mode, bidirectional DSHOT halves effective command rate. DSHOT300 → 500 effective Hz (marginal). DSHOT600 → 1,000 effective Hz (required). Use DSHOT600.
- 
-**INA180 / shunt removed (Rev A):** AM32 EDT provides per-channel current telemetry over the DSHOT wire. INA180 deferred to Rev B if EDT latency proves insufficient.
- 
-**ESC BEC deliberately isolated:** BEC current rating unconfirmed. Rev A keeps AP63205 buck. Rev B may eliminate it if BEC is confirmed ≥500mA and clean under load. Add solder jumper pads in Rev A to enable zero-rework Rev B change.
- 
-**Board dimensions: 40×50mm rectangular:** Provides ample clearance for IMU radii (inner 12mm, outer 18mm) with room for solder mask, routing, and connector pads. Board center at (20, 25) is the rotation reference point.
- 
-### Physical
- 
-- Shape: 40×50mm rectangular with rounded corners
-- Thickness: 1.0mm preferred
-- XIAO: castellated SMD pads, soldered flat, epoxy corner fillet
-- Fabrication: JLCPCB, ENIG, 2-layer, 0.1mm min trace/space
-- Assembly: LGA-16L IMUs require paste + reflow; hand-soldering not feasible
-### Pin assignment (Rev A)
+### Pin assignment (unchanged from Rev A)
  
 | XIAO pad | Signal | Notes |
 |---|---|---|
-| D0/A0/GPIO40 | `VBAT_SNS` | Battery voltage divider ADC |
-| D1/A1/GPIO41 | `HEAD_LED` | Orange TinySLED MOSFET gate drive |
-| D2/A2/GPIO42 | `SEL_OE_N` | SN74HC595 output enable (active-low) |
-| D3/A3/GPIO43 | `SEL_LAT` | SN74HC595 latch clock |
-| D4/SDA/GPIO6 | `DS1_IO` | AM32 Ch1 DSHOT/EDT bidir |
-| D5/SCL/GPIO7 | `DS2_IO` | AM32 Ch2 DSHOT/EDT bidir |
-| D6/TX/GPIO0 | `CRSF_TX` | UART TX to ELRS |
-| D7/RX/GPIO1 | `CRSF_RX` | UART RX from ELRS |
-| D8/SCK/GPIO2 | `SPI_SCK` | IMUs + SN74HC595 + SK9822 buffers |
-| D9/MISO/GPIO4 | `SPI_MISO` | IMU data return only |
-| D10/MOSI/GPIO3 | `SPI_MOSI` | IMUs + SN74HC595 + SK9822 buffers |
-| D11 | NC | Underside pad, unused in Rev A |
-| D12 | NC | Underside pad, unused in Rev A |
-| SWDIO/SWDCLK | debug | Test pads |
- 
-⚠ **D11/D12 confirmed NC:** XIAO RP2350 underside pads — unused in Rev A. All runtime IO on edge/castellated pads D0–D10 only.
+| D0/A0/GPIO40 | `VBAT_SNS` | 120k / 33.2k divider |
+| D1/A1/GPIO41 | `HEAD_LED` | TinySLED MOSFET gate |
+| D2/A2/GPIO42 | `SEL_OE_N` | Latch output enable (active-low) |
+| D3/A3/GPIO43 | `SEL_LAT` | Latch clock |
+| D4/GPIO6 | `DS1_IO` | AM32 ch1 DSHOT/EDT |
+| D5/GPIO7 | `DS2_IO` | AM32 ch2 DSHOT/EDT |
+| D6/TX/GPIO0 | `CRSF_TX` | To receiver |
+| D7/RX/GPIO1 | `CRSF_RX` | From receiver |
+| D8/SCK/GPIO2 | `SPI_SCK` | IMUs + latch, 100k pull-down |
+| D9/MISO/GPIO4 | `SPI_MISO` | IMU data return |
+| D10/MOSI/GPIO3 | `SPI_MOSI` | IMUs + latch |
+| SWDIO/SWDCLK | debug | Bottom pads `TP13`/`TP14` |
  
 ### Heading LED timing reference
  
@@ -593,14 +493,11 @@ Previous v1.2 design used three MOSFETs (Q1/Q2/Q3) and a common-anode RGB LED on
 1° of arc  = 41.7µs
 300µs pulse = 7.2° arc   ← start here
 500µs pulse = 12.0° arc
-100µs pulse = 2.4° arc   ← minimum useful width
 ```
- 
-Phase-lock the orange strobe to the EKF heading estimate. Start at 300µs and tune for arena visibility.
  
 ### Sensors
 
-All sensing is through the three-IMU array and AM32 EDT telemetry. No dedicated impact sensor in Rev A.
+All sensing is through the three-IMU array and AM32 EDT telemetry (plus the optional ESP32-C3 RSSI source). No dedicated impact sensor; the piezo was dropped.
  
 ---
  
@@ -617,7 +514,7 @@ IMU SPI DMA @ 1kHz              CRSF decode (PIO or UART)
   ↓                                  ↓
 Raw accel samples                RC stick inputs
   ↓                                  ↓
-Piezo event monitor              Drift controller
+Saturation flags                 Drift controller
   ↓                                  ↓
 Heading EKF                      DSHOT600 output (PIO, bidir)
   ↓                                  ↓
@@ -625,7 +522,7 @@ Heading EKF                      DSHOT600 output (PIO, bidir)
   ↓                                  ↓
 θ estimate ──────────────────→   Thrust modulator
                                  Heading LED strobe (phase-locked)
-                                 SK9822 status LED (gated)
+                                 TinySLED status codes (idle)
                                  CRSF telemetry tx
 ```
  
@@ -635,9 +532,9 @@ Inter-core communication via RP2350 hardware FIFO. Core 0 writes `{accel, gyro, 
  
 ### 11.2 IMU DMA and SPI bus management
  
-One LSM6DSV320X + two H3LIS331DL on a shared SPI bus (shared MISO via 33Ω isolation resistors R6/R7/R8). CS lines driven by SN74HC595 latch (QA/QB/QC). DMA-driven burst reads — no CPU involvement in data capture. At 1kHz ODR with 3 sensors: 6 axis readings per millisecond. DMA completes → interrupt → core 0 wakes, processes batch, sleeps.
+One LSM6DSV320X + two H3LIS331DL on a shared SPI bus (shared MISO via 33Ω isolation resistors R6/R7/R8). CS lines driven by SN74HC595 latch (QA/QB/QC). Target design: DMA-driven burst reads → interrupt → core 0 processes the batch. **As built:** blocking SPI in a `busy_wait`-paced 1 kHz loop (firmware.md §8); DMA is future work.
  
-**Rev A constraint — one IMU selected at a time:** Because U4/U5/U6 share a single MISO net, firmware must assert exactly one CS line low during each SPI data transaction. Do not assert multiple CS lines simultaneously — all three IMUs would drive the shared MISO net simultaneously, causing bus contention. The 33Ω resistors limit contention current but do not make the data valid. Simultaneous CS assert is electrically invalid on Rev A hardware.
+**Constraint — one IMU selected at a time (Rev A and rev 2):** Because U4/U5/U6 share a single MISO net, firmware must assert exactly one CS line low during each SPI data transaction. Do not assert multiple CS lines simultaneously — all three IMUs would drive the shared MISO net simultaneously, causing bus contention. The 33Ω resistors limit contention current but do not make the data valid. Simultaneous CS assert is electrically invalid.
  
 **Sequential read timing budget:**
  
@@ -661,7 +558,7 @@ One LSM6DSV320X + two H3LIS331DL on a shared SPI bus (shared MISO via 33Ω isola
  
 **Internal ADC synchronisation caveat:** Even parallel MISO would not fully eliminate sensor-to-sensor skew, because the three H3LIS331DL chips have independent internal ADC clocks with no common external sample trigger. The INT1/INT2 data-ready pins (unused in Rev A) could be used in a future revision to synchronise internal ADC sampling — a separate improvement from parallel MISO.
  
-**SK9822 gating:** The SK9822 status LED shares the IMU SPI SCK/MOSI nets but is isolated by AHCT level-shift buffers with output-enable `LED_OE_N` controlled by SN74HC595 QD. Firmware must keep `LED_OE_N` deasserted during all IMU and latch SPI transactions. SK9822 update procedure: complete current IMU DMA cycle → latch LED_OE_N low → clock SK9822 24-bit frame at 1MHz (~24µs) → latch LED_OE_N high → resume IMU DMA.
+**SK9822 gating:** no longer applies; rev 2 deleted the SK9822 chain and `U11` QD is NC.
  
 ### 11.3 Heading EKF
  
@@ -692,7 +589,7 @@ With 3 sensors × 2 axes = 6 measurement equations and 7 state variables (overde
 **eRPM and gyro fusion:** Bidirectional DSHOT600 returns electrical RPM from each ESC. Convert eRPM → mechanical RPM → ω in rad/s. Independent of accelerometers. The LSM6DSV320X gyro Z axis provides a direct ω measurement at 1kHz, also independent of accelerometers. In the EKF, eRPM is one measurement equation and gyro Z is another — giving three independent ω sources total (accelerometer array, eRPM, gyro). AM32 EDT also provides voltage, current, and temperature — log for post-match analysis.
  
 **Impact detection and recovery (Rev A — gyro + eRPM + accel residual):**
-1. Gyro Z sudden Δω → flag potential impact (fast path, ~1ms)
+1. Gyro Z sudden Δω → flag potential impact (fast path, ~1ms; only below ~667 RPM, where the gyro isn't railed)
 2. Accelerometer residual spike in EKF → confirm (~1–2ms)
 3. eRPM sudden change → independent check
 4. On confirmed impact: inflate process noise on `{θ, ω}`, increase weight on eRPM and gyro measurements (both remain valid during impact when accelerometers saturate)
@@ -701,7 +598,7 @@ The gyro is particularly valuable during impact recovery — unlike the accelero
  
 ### 11.3b Heading LED strobe
  
-The meltybrain heading indicator is a phase-locked strobe on the orange TinySLED module (J2, driven by Q1 from XIAO D1/A1). Separate from the SK9822 status LED. Orange against green chassis filament provides maximum arena contrast.
+The meltybrain heading indicator is a phase-locked strobe on the orange TinySLED module (J2, driven by Q1 from XIAO D1/A1). Two TinySLEDs (top and bottom) in parallel on one Y-spliced harness; at rest they also blink status codes (spec.md). Orange against the green chassis provides maximum arena contrast. **As built:** `led/head_led.c` drives a 20° software window with a 2 Hz idle heartbeat; the hardware on-time cap below is not implemented yet.
  
 **Timing:** Core 1 maintains a predicted heading angle from core 0's EKF output. At each revolution the strobe fires when the predicted heading matches the configured indicator direction (default: forward / 0° in body frame).
  
@@ -720,9 +617,9 @@ The meltybrain heading indicator is a phase-locked strobe on the orange TinySLED
  
 **Spinup phases:**
  
-1. **Full gyro coverage (0–~500 RPM):** LSM6DSV320X gyro Z provides direct ω integration from rest. No dead zone — the gyro works at 0 RPM where centrifugal signal is completely absent. This replaces the previous feedforward/tangential-axis approach for the low-speed regime entirely. The gyro is the primary ω source during spinup.
-2. **Gyro + centrifugal blend (~500–1,500 RPM):** centrifugal signal on the H3LIS331DL outer sensors rises above noise floor (~10G at 500 RPM at 18mm). EKF blends in centrifugal-derived ω as confidence rises with SNR. Gyro weight decreases as centrifugal weight increases. eRPM joins as a third measurement channel.
-3. **Full EKF steady state (~1,500+ RPM):** all three ω channels active — gyro, accelerometer array, eRPM. Gyro remains useful as a cross-check and impact recovery anchor even at operating RPM.
+1. **Gyro coverage (0–~650 RPM):** LSM6DSV320X gyro Z integrates ω from rest and fixes the sign of ω, where the centripetal signal is absent. It rails at ±4,000 dps ≈ 667 RPM.
+2. **Hand-off (~500–1,500 RPM):** the centripetal signal rises (~5G at 500 RPM at 18mm; cleaner on the inner LSM6 accel). Firmware drops the railed gyro (inflated R) and the EKF runs on the accel array; eRPM joins as a second channel once fused.
+3. **Full EKF steady state (~1,500+ RPM):** accelerometer array (+ eRPM when fused). The gyro is only a rail/saturation flag at speed; impact recovery leans on eRPM and the accel residual.
 4. **RPM PID (~90% of target):** switch from full throttle to RPM PID. Setpoint: tracking mode (~3,000 RPM) or strike mode (~4,000 RPM).
 **Note on gyro noise integration:** Gyros accumulate drift over time (integral of noise). At 1,000 Hz ODR the LSM6DSV320X gyro noise is low, but over a 2-minute match some drift is expected. The accelerometer-derived ω and eRPM channels continuously correct gyro drift through EKF measurement updates — this is the standard MEMS fusion approach and is why having all three channels matters.
  
@@ -763,7 +660,7 @@ Transmitter momentary switch toggles between modes. EKF handles RPM transition b
  
 In strike mode, reduce max drift authority (A ≤ 0.5) to limit CoR shift at high RPM — heading is already more stressed and large A compounds the problem.
  
-**IMU-A as high-RPM fallback:** During strike mode, IMU-B/C (20mm, 360G at 4,000 RPM) approach their ceiling. EKF automatically reduces measurement weight on IMU-B/C as their readings approach saturation and shifts weight to IMU-A (12mm, 216G at 4,000 RPM, well in-spec) and eRPM. This is a natural consequence of the mixed-radius design — IMU-A has 46% margin remaining where IMU-B/C have only 10%.
+**IMU-A as high-RPM fallback:** During strike mode, IMU-B/C (18mm, ~322G at 4,000 RPM) approach their ceiling. EKF reduces measurement weight on IMU-B/C as their readings approach saturation and shifts weight to IMU-A's accel (12mm, ~215G, in-spec to ~4,800 RPM) and eRPM.
  
 **RC stick → drift direction:**
 - Stick gives desired world-frame translation vector (X, Y)
@@ -775,80 +672,42 @@ Before first event, on bench:
  
 1. **IMU axis verification:** Spin at low RPM (~500), confirm each IMU's radial axis shows centrifugal acceleration outward, tangential axis shows zero (at constant ω). If signs are wrong, fix axis orientation in firmware constants.
 2. **IMU position calibration:** Measure actual IMU centroid positions (r_i, φ_i) post-assembly. Store as firmware constants. Small placement errors map directly to heading errors.
-3. **H3LIS331DL nonlinearity characterisation:** Spin at 500, 1000, 2000, 3000, 4000 RPM. At each RPM record centrifugal reading vs expected (ω²r/g). Build piecewise linear correction curve per sensor. Critical for IMU-B/C at 20mm operating near 90% of full scale — nonlinearity is worst near saturation. remzakmij discovered this over years of tuning; do it early.
+3. **H3LIS331DL nonlinearity characterisation:** Spin at 500, 1000, 2000, 3000, 4000 RPM. At each RPM record centrifugal reading vs expected (ω²r/g). Build piecewise linear correction curve per sensor. Critical for IMU-B/C at 18mm operating at ~81% of full scale — nonlinearity is worst near saturation. remzakmij discovered this over years of tuning; do it early.
 4. **CoR offset calibration:** Spin at known RPM, check if CoR estimate is zero (should be, with no drift input). If nonzero, apply trim correction.
 5. **Battery imbalance trim:** Static imbalance from single-pocket battery placement detected as persistent CoR offset. Apply stored trim correction to heading algorithm.
 6. **Spindown test:** Verify active braking achieves full stop within 60 seconds from 4,000 RPM.
 7. **ELRS failsafe test:** Power robot, establish RC link, kill transmitter, verify motors stop within 1 second.
 ---
  
-## 12. Mass budget
+## 12. Mass budget (v3.4f CAD)
  
-### Electronics
+| Item | g |
+|---|---:|
+| Lower frame half (MJF PA11) | 66.8 |
+| Upper frame half (MJF PA11) | 51.1 |
+| AR550 ring | 125.8 |
+| Top + bottom plates (MJF PA11 0.8) | 18.8 |
+| TPU ear liners | 0.8 |
+| Motors (2 × D2822) | 88.0 |
+| Wheels + hubs + bearings | 16.0 |
+| Battery (GNB 3S 380 HV) | 32.0 |
+| Carrier PCB, populated | 12.0 |
+| ESC (Repeat AM32 dual) | 6.0 |
+| XT30s | 3.0 |
+| Switch | 2.15 |
+| USB-C extension | 1.5 |
+| Receiver + LEDs | 1.3 |
+| Wire | 6.5 |
+| Fasteners, inserts, washers, foam | 15.3 |
+| **Total** | **446** |
+| Limit | 454 |
+| Margin | 8 g (before MJF density spread of +1–3%, i.e. ~4–13 g) |
  
-| Component | Qty | Mass each (g) | Total (g) |
-|---|---|---|---|
-| D2822 motor | 2 | 44 | 88.0 |
-| Repeat AM32 Dual ESC (one board, two channels) | 1 | 6.0 | 6.0 |
-| 2S 450mAh 75C LiPo (Tattu) | 1 | ~29 | ~29.0 |
-| XIAO RP2350 module | 1 | 3.0 | 3.0 |
-| LSM6DSV320X IMU (IMU-A, LGA-14) | 1 | 0.05 | 0.05 |
-| H3LIS331DL IMU (IMU-B/C, LGA-16L) | 2 | 0.05 | 0.10 |
-| SN74HC595 latch + passives | 1 | ~0.1 | 0.1 |
-| Carrier PCB substrate (40×50mm, 1mm) | 1 | ~3.2 | 3.2 |
-| AP63205 buck + inductor + passives | 1 | ~0.5 | 0.5 |
-| SK9822 LED + AHCT buffers | 1 | ~0.1 | 0.1 |
-| Heading LED MOSFET + resistors (Q1) | 1 set | ~0.05 | 0.05 |
-| External orange TinySLED module + wires | 1 | ~1.0 | 1.0 |
-| ELRS receiver | 1 | ~2 | 2.0 |
-| R2ZZ bearings | 2 | 0.7 | 1.4 |
-| Fingertech Mini Switch | 1 | 2.15 | 2.15 |
-| XT30 connector pair | 1 | ~3 | 3.0 |
-| 16 AWG silicone wire | — | — | ~5.0 |
-| 28 AWG silicone wire | — | — | ~1.0 |
-| M3 fasteners + inserts | — | — | ~5.0 |
-| M2 fasteners (wheel hub) | — | — | ~1.0 |
-| Loctite + misc | — | — | ~2.0 |
-| EVA foam wheels | 2 | ~2 | ~4.0 |
-| Wheel coating | — | — | ~1.0 |
-| **Electronics subtotal** | | | **~158.1** |
- 
-### Chassis
- 
-| Item | Mass (g) |
-|---|---|
-| PLA+ chassis body | ~292 |
-| Ti-6Al-4V weapon tabs (×2) | TBD |
-| **Chassis subtotal** | **~292 + tabs** |
- 
-### Total
- 
-| | g |
-|---|---|
-| Electronics | ~158.4 |
-| Chassis (excl. tabs) | ~295 |
-| **Subtotal** | **~453.4** |
-| Target | 454 |
-| Margin | ~0.6g |
- 
-The margin is still very tight. Switching to Repeat Micro AM32 ESCs saves ~10g vs PBB 20A ESCs but the Tattu 450mAh battery adds ~6g vs the Dogcom 350mAh. Net ~4g saved. Weapon tab mass (TBD) remains the main risk. Community feedback strongly recommends the Tattu 450mAh over 350mAh due to uncertain actual current draw — validate on bench early.
- 
----
+2.4 g of trim at r44 balances the CoM (x −0.23, y −0.05 before trim).
  
 ## 13. Event calendar
  
-| Event | Location | Date | Notes |
-|---|---|---|---|
-| SEMO Brawl at the Mall | Peoria IL | Jul 18 2026 | Too soon for build completion |
-| River City Rumble | Jeffersonville IN | Aug 1 2026 | Possibly achievable as shakedown |
-| **Buckeye Bot Bash 2** | Bellefontaine OH | **Aug 29 2026** | **Primary target. Registration opens Jun 26 2026** |
-| Midwest Robot Rumble | Grandville MI | Sep 19 2026 | Second event |
- 
-Check robotcombatevents.com for current registration status.
- 
-**Action item:** Contact Buckeye Bot Bash EO to confirm meltybrain qualifies as active weapon under their antweight rules. MRCA ruleset does not explicitly ban it but EO confirmation is required before build commitment.
- 
----
+Buckeye Bot Bash 2 (Bellefontaine OH, Aug 29 2026) has passed and is no longer the target. No next event is set; check robotcombatevents.com and confirm meltybrain legality with each EO before entering.
  
 ## 14. Reference builds
  
@@ -868,31 +727,37 @@ Check robotcombatevents.com for current registration status.
  
 ## 15. Open questions
  
-### Blocking (must resolve before PCB fab)
+### Before the PCBWay order
  
-1. **EO confirmation** — Contact Buckeye Bot Bash organizer to confirm meltybrain qualifies as active weapon under MRCA antweight rules. Do not commit to build without this.
-2. **H3LIS331DL stock — order immediately** — LCSC stock was 22 units at sensor survey. Order 10+ extras before starting PCB layout.
-3. **LSM6DSV320X footprint verification** — LGA-14 2.5×3mm is a different footprint from H3LIS331DL LGA-16L 3×3mm. Verify both footprints exist and are correct in KiCad before ordering PCB. Check LSM6DSV320X axis orientation separately from H3LIS331DL — different pin-1 location and axis convention.
-4. **LSM6DSV320X bring-up:** disable I3C on first SPI transaction (write `I2C_I3C_disable=1` to `IF_CFG 0x03`), verify WHO_AM_I, configure accel ±320G + gyro ±4,000 dps at 1,000 Hz ODR. Verify SPI mode 0 works for all three sensors on shared bus.
-5. **TinySLED module selection** — Confirm orange 2-3S variant, verify 8.4V tolerance, confirm onboard current limiting.
-6. **CRSF inversion** — Check specific ELRS receiver firmware. Non-inverted CRSF preferred. If not, implement in RP2350 PIO.
-### Pre-event (must resolve before first match)
+1. **`C21` part number** — still TBD in the PCBWay BOM (100 µF / 25 V polymer tantalum, 7343-43, ≤ 4.3 mm).
+2. **3S UVLO cutoff** — keep `R25` 75k (~8.85 V) or change to 66.5k (~8.0 V).
+3. **TinySLED at 13.05 V** — confirm the 2–3S module tolerates it, or use the 3–6S version.
  
-7. **Wheel diameter** — Measure motor mount height once D2822 is in hand. Wheel radius = mount height + 3-4mm floor clearance. Err toward smaller diameter for better melty ratio per Andrew's Rules.
-8. **Weapon tab geometry** — Ti-6Al-4V tab protrusion distance, leading face geometry, attachment method (M3 countersunk through tab into chassis body). Design, source, and machine before chassis print is finalised.
-9. **Repeat AM32 Dual physical placement** — 28×20×5mm board needs a home in the chassis that isn't the central electronics zone or battery pocket. Model in CAD before finalising chassis print.
-10. **Spindown verification** — Bench test active ESC braking from 4,000 RPM. Verify full stop within 60 seconds.
-11. **H3LIS331DL nonlinearity characterisation** — Multi-RPM bench calibration per Section 11.6 step 3. Do before any heading algorithm tuning.
-12. **Two-mode RPM validation** — Confirm stable heading at tracking mode (~3,000 RPM), acceptable heading at strike mode (~4,000 RPM). Tune EKF process noise inflation during mode transitions.
-13. **Heading LED strobe tuning** — Bench-tune pulse width (start 300µs), phase offset. Verify timing with oscilloscope before arena use.
-14. **Power integrity check** — Scope 5V and 3V3 rails during heading LED strobes, DSHOT traffic, and motor spinup. Verify LED pulses don't corrupt IMU reads or reset the XIAO. If noise is seen, add bulk capacitance near the LED MOSFET drain returns.
-### Future / Rev 2
+### Bring-up and bench
  
-15. **Spinning IR lidar (Holy Guacamole II)** — 1-2 phototransistor + 940nm IR LED pairs at chassis edge. Reserve D0 GPIO on carrier for IR ADC input.
-16. **INA180 / shunt (Rev B consideration)** — If EDT current telemetry latency proves insufficient, add INA180 + inline shunt in a future revision.
-17. **ESC BEC characterisation (Rev B consideration)** — Measure BEC voltage, current, and noise under motor load. If confirmed ≥500mA and clean, the AP63205 buck can be removed/DNP'd in Rev B, saving ~0.5g.
-18. **EKF tuning constants** — EKF process and measurement noise matrices need empirical tuning. Log IMU and eRPM data during bench sessions, replay in simulation, tune offline.
-19. **Impact detection tuning** — EKF impact recovery thresholds need real data. Strike fixed target at known speeds, record gyro/eRPM/accel responses, set thresholds empirically.
+4. **First power-up** on a current-limited supply; check 5V/3V3, then IMU WHO_AM_I over Mode 0. LSM6: set `IF_CFG.I2C_I3C_disable`, ±320G + ±4,000 dps at 1 kHz.
+5. **IMU axis/sign map and positions** — implement the per-chip map (+X U4, +Y U5, −X U6 radial) and measure positions (§11.6 steps 1–2).
+6. **Bench soak** — 3 minutes at the ESC current limit; copper/connector temperature, real average current vs the 380 mAh pack.
+7. **Real chassis RPM on 3S** — validate against the ~4,700 RPM no-load estimate; update firmware plant parameters (firmware.md §9).
+8. **H3LIS331DL nonlinearity characterisation** — multi-RPM curves per sensor (§11.6 step 3) before heading tuning.
+9. **Spindown** — active braking to a stop within 60 s from strike RPM.
+10. **Heading LED** — hardware-capped one-shot strobe; tune pulse width and phase with a scope.
+11. **Power integrity** — scope VBUS, 5V, 3V3 during spin-up, regen braking, and strobes.
+12. **Two-mode RPM validation** — stable heading at tracking, acceptable at strike; tune EKF noise inflation on mode changes.
+ 
+### Mechanical (no coupons available)
+ 
+13. **First MJF parts** — check the fit against the v3.4f audit on arrival (ring slot, bearing seats, battery ribs, plate pockets).
+14. **Ear liner fit** — pick the snuggest of the three TPU fits that slides on.
+ 
+### Future
+ 
+15. **Opponent sensing (Holy Guacamole II)** — IR lidar and/or the ESP32-C3 RSSI beacon (needs a connector on a later board; rev 2 only has bottom SWD pads).
+16. **INA180 / shunt** — if EDT current telemetry latency proves insufficient.
+17. **ESC BEC characterisation** — measure under load before ever tying it to the carrier 5 V.
+18. **ESC on the carrier** — dual AM32 on the 4-layer board; saves ~6 g, large project.
+19. **EKF tuning constants and 7-state filter** — log bench data, replay in the SITL twin, tune offline; then CoR / jerk / eRPM fusion.
+20. **Impact detection tuning** — strike a fixed target at known speeds and set thresholds from gyro/eRPM/accel data.
 ---
  
-*Last updated: v1.4 — SN74HC595 latch replaces MCP23S17; board is 40×50mm rectangular; heading LED simplified to single orange TinySLED + Q1; piezo impact sensor removed entirely; impact detection uses gyro + eRPM + accel residual only; pin table matches circuit.py Rev A.*
+*Last updated: v2.0 (2026-11-10) — refreshed to chassis v3.4f and the rev-2 carrier (`96137c3`): MJF PA11 frame, AR550 ring, 3S HV 380, AM32 dual, Ø42 cast wheels, 40×76 4-layer PDB carrier for PCBWay; gyro-rail correction (~667 RPM); KE recomputed; rev-2 IMU rotation and axis map; mass budget from CAD. v1.4: SN74HC595 replaced MCP23S17, piezo removed.*
