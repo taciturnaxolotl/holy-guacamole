@@ -182,3 +182,16 @@ Today was mostly just wheels wheels wheels. I worked on the hub design which wen
 I also did a bunch of looking into a concept for detecting rotation using the antenna deadzone on an esp32 from [Trevor](https://github.com/TGower/rotation_sensing). It's a brilliant idea that blast esp now packets at a esp on the bot and when the bot spins there is a drop in rssi right as it passes the antenna deadzone. You can fit a little PLL to it and you have rotation! It's a brilliant idea and one I definetly want to steel for my full bot and even more importantly in the case that my pcb doesn't arrive in time it would still let me drive my bot.
 
 ![wheels in the hole saw](https://cdn.hackclub.com/019f6703-8899-7a2d-946f-a3681dfe5261/image.png)
+
+### Day who knows what: November 10th
+
+I haven't been able to do much with this for the past few months (uni has been quite fun but also takes up quite a bit of free time). I have been working for the past 2 weeks to redesign the bot for a v2. When I took the bot to opensauce I unfortunately wasn't able to test the v1 pcb as it didn't arrive in time but I was able to bodge together a perfboard that got the job kinda done in time. I ended up assembling the bot the night before my flight and getting half of it put together and then I assembled the rest of it in my room after I got to SF.
+
+Taking my bot to opensauce I was able to barely squeak into registration and safety as our train got super delayed but the amazing volunteers let me in which was amazing. Everyone was super kind teaching me how a comp works and bearing with me through my lack of knowledge. One thing that ended up coming up was needing a proper interlock for when I was on the field. I will probably end up getting a c-clamp and using that but temporarily I was able to use a roll of ducktape which worked okayish.
+
+Since the competition was a 3lb weightclass and my bot was designed for 1lb it got brutally murdered as expected and the side pocket holding the spike in shattered. I pretty quickly realized that PLA+ was not a good choice for this bot which led into a proper redesign with stress sims and material analysis.
+
+I ended up settling on a MJF PA11 inner frame with a solid outer AR550 ring and ran a whole bunch of FEA analysis on it to minimize how much frame was needed and optimize weight. In order to add a bit of cushion I am adding a tpu liner that sits between the ring tabs and the inner frame which should help provide a bit of stress relief and dampen harder hits. The whole thing has been designed to have about 1.6x of force anlysis headroom so the design doesn't shatter or just rip itself apart.
+
+I also redesigned the pcb so that it brings in the power distribution block so it doesn't have to be an extra part to solder together. What I found from assembly was the less wires you have to worry about cutting to the right length and properly crimping the absolute better. Using proper XT-30 connectors for attaching stuff to the pcb should also help quite a bit with ease of assembly.
+
