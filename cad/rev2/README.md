@@ -101,11 +101,11 @@ $U python scripts/build_rev2.py      # board_outline.dxf, keepout.dxf, overview 
   - one layer per keepout region; height limits are in the layer name, for a 1.6 mm board;
   - `PLACEMENT_*` layers with one courtyard rectangle per proposed part;
   - `REF_*` layers with v33b/v34 features.
-- `sections/`:
+- `sections/` (generated, not tracked; run the two commands under "Regenerate"):
   - `v33b_z±NN.NN.{dxf,png}`: lower/upper/plate sections at 19 heights from z 0.1 to 28.8, one DXF layer per part.
   - `solid_*.wkt`: the same sections as shapely WKT.
   - `rev2_overview_{bay_z+01.50,lower_z+04.50,ribs_z+20.00}.png`: board, keepouts and placements over the chassis.
-- `scripts/`: `slice_v33b.py`, `build_rev2.py` (all geometry checks and the IMU rotation scan; results in `build_rev2_checks.txt`), `bboxes.py`, `pcbcomp.py` (Rev A component heights).
+- `scripts/`: `slice_v33b.py`, `build_rev2.py` (all geometry checks and the IMU rotation scan; results in the generated, untracked `build_rev2_checks.txt`), `bboxes.py`, `pcbcomp.py` (Rev A component heights).
 
 ## Board outline [D, checked M]
 - **40.0 × 76.0**, x ±20, y ±38, corner R1.5, centred on the spin axis.

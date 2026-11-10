@@ -15,7 +15,7 @@ The canonical repo for this is hosted on tangled over at [`dunkirk.sh/holy-guaca
 | | |
 |---|---|
 | ![top level schematic](https://l4.dunkirk.sh/i/9V5wneoi2zWS.svg) | ![power subsystem schematic](https://l4.dunkirk.sh/i/2hsbjTacNNWh.svg) |
-| ![imu array schematic](https://l4.dunkirk.sh/i/YgQP8xBYWs_f.svg) | ![status leds schematic](https://l4.dunkirk.sh/i/xx49w-yISmpK.svg) |
+| ![imu array schematic](https://l4.dunkirk.sh/i/YgQP8xBYWs_f.svg) | ![heading led schematic](https://l4.dunkirk.sh/i/xx49w-yISmpK.svg) |
 
 <p align="center">
     <img src="https://raw.githubusercontent.com/taciturnaxolotl/carriage/main/.github/images/line-break.svg" />

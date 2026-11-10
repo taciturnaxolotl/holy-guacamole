@@ -2336,16 +2336,6 @@
 		)
 		(uuid "4b9f7860-01ab-421b-821b-c4f7cf6da720")
 	)
-	(label "CRSF_TX"
-		(at 26.67 124.46 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "4f2226f0-938a-4e9e-9261-7307e636bac2")
-	)
 	(label "SWDCK"
 		(at 153.67 40.64 0)
 		(effects
@@ -2366,6 +2356,26 @@
 		)
 		(uuid "514cfec1-8339-4081-8116-dae5e27bd4a5")
 	)
+	(label "CRSF_TX"
+		(at 29.21 127 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "51f88d1c-83b5-4bbc-b71c-ce7dc0a3847f")
+	)
+	(label "CRSF_RX"
+		(at 26.67 124.46 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "5694364f-dafa-4f70-90e2-c351b45c174f")
+	)
 	(label "SEL_LAT"
 		(at 53.34 63.5 0)
 		(effects
@@ -2385,16 +2395,6 @@
 			(justify right bottom)
 		)
 		(uuid "5d46d0a0-c55b-4bf0-967e-1f5ac289a191")
-	)
-	(label "CRSF_RX"
-		(at 29.21 127 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "76e80ea7-98f0-47a3-91ed-f5e63756a423")
 	)
 	(label "HEAD_LED"
 		(at 53.34 95.25 0)

@@ -5459,7 +5459,7 @@
 			(uuid "a62742a3-701e-4795-a1df-8df8b51e7433")
 		)
 		(embedded_fonts no)
-		(model "${KIPRJMOD}/libs/3DModels/XIAO RP2350_.step"
+		(model "${KIPRJMOD}/libs/3DModels/XIAO_RP2350.step"
 			(offset
 				(xyz -1.6 -6 0)
 			)

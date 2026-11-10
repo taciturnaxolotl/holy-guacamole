@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Build the PCBWay assembly BOM from the board's top-side placement file.
 
-Manufacturer part numbers come from hardware/procurement/ where the part is
-listed there; parts added in rev 2 are listed in EXTRA below. The board is the
-source of truth for which references exist.
+Manufacturer part numbers come from hardware/procurement/bom_rev2.csv. The board is the source of truth for which
+references exist; any reference missing from the BOM is reported and listed as TBD.
 """
 
 import csv
@@ -12,21 +11,7 @@ from collections import OrderedDict
 from pathlib import Path
 
 HW = Path(__file__).resolve().parent.parent
-PROCUREMENT = [
-    HW / "procurement" / "digikey_upload_3boards.csv",
-    HW / "procurement" / "mouser_user_confirmed_3boards.csv",
-]
-
-EXTRA = {
-    "D5": ("onsemi", "ESD5B5.0ST1G", "Bidirectional 5V ESD diode SOD-523"),
-    "D6": ("onsemi", "ESD5B5.0ST1G", "Bidirectional 5V ESD diode SOD-523"),
-    "J2": ("JST", "SM02B-GHS-TB(LF)(SN)", "JST-GH 2-pin SMD right-angle header"),
-    "J4": ("JST", "SM04B-GHS-TB(LF)(SN)", "JST-GH 4-pin SMD right-angle header"),
-    "J5": ("JST", "SM04B-GHS-TB(LF)(SN)", "JST-GH 4-pin SMD right-angle header"),
-    "J6": ("AMASS", "XT30UPB-M", "XT30 male vertical PCB connector, through-hole"),
-    "J7": ("AMASS", "XT30UPB-F", "XT30 female vertical PCB connector, through-hole"),
-    "C21": ("TBD", "TBD", "100uF 25V polymer tantalum, EIA 7343-43, max 4.3 mm tall"),
-}
+BOM = HW / "procurement" / "bom_rev2.csv"
 
 NOT_PLACED = {
     "U1": "Do not place: customer hand-solders the XIAO RP2350 module",
@@ -38,17 +23,15 @@ NO_PART = {"J1"}
 
 def procurement_mpns():
     mpns = {}
-    for path in PROCUREMENT:
-        with path.open(newline="") as f:
-            for row in csv.DictReader(f):
-                for ref in row["Customer Reference"].split():
-                    mpns[ref] = (row["Manufacturer"], row["Manufacturer Part Number"], row["Description"])
+    with BOM.open(newline="") as f:
+        for row in csv.DictReader(f):
+            for ref in row["Designators"].split():
+                mpns[ref] = (row["Manufacturer"], row["Manufacturer Part Number"], row["Description"])
     return mpns
 
 
 def main(positions, out):
     known = procurement_mpns()
-    known.update(EXTRA)
     groups = OrderedDict()
     missing = []
     with open(positions, newline="") as f:

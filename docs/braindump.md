@@ -1,4 +1,6 @@
 # Holy Guacamole — Full Project Braindump
+
+> **Superseded for hardware by [`spec.md`](spec.md) (rev 2).** This braindump describes the Rev A carrier (JLCPCB, 2 layers, SK9822 status LEDs, on-board receiver). Treat its PCB sections as history; the rev 2 board, pin map and fab rules live in `spec.md`.
  
 **Robot:** Holy Guacamole — 1lb meltybrain antweight, MRCA full-combat ruleset  
 **Document type:** Running knowledge dump — research, design decisions, hardware, firmware architecture  
@@ -523,7 +525,7 @@ Rubber cement is essential primer — without it latex peels adhesively. With it
  
 ## 10. Carrier PCB specification
  
-Full detail in `spec.md` (current: v1.3c, matches `circuit.py` Rev A schematic). Summary here.
+Rev A summary. The current board is rev 2; see `spec.md`.
  
 ### Role
  
@@ -569,10 +571,10 @@ Previous v1.2 design used three MOSFETs (Q1/Q2/Q3) and a common-anode RGB LED on
  
 | XIAO pad | Signal | Notes |
 |---|---|---|
-| D0/A0/GPIO40 | `VBAT_SNS` | Battery voltage divider ADC |
-| D1/A1/GPIO41 | `HEAD_LED` | Orange TinySLED MOSFET gate drive |
-| D2/A2/GPIO42 | `SEL_OE_N` | SN74HC595 output enable (active-low) |
-| D3/A3/GPIO43 | `SEL_LAT` | SN74HC595 latch clock |
+| D0/A0/GPIO26 | `VBAT_SNS` | Battery voltage divider ADC |
+| D1/A1/GPIO27 | `HEAD_LED` | Orange TinySLED MOSFET gate drive |
+| D2/A2/GPIO28 | `SEL_OE_N` | SN74HC595 output enable (active-low) |
+| D3/GPIO5 | `SEL_LAT` | SN74HC595 latch clock |
 | D4/SDA/GPIO6 | `DS1_IO` | AM32 Ch1 DSHOT/EDT bidir |
 | D5/SCL/GPIO7 | `DS2_IO` | AM32 Ch2 DSHOT/EDT bidir |
 | D6/TX/GPIO0 | `CRSF_TX` | UART TX to ELRS |
@@ -711,7 +713,7 @@ The meltybrain heading indicator is a phase-locked strobe on the orange TinySLED
 500µs pulse = 12.0° arc
 ```
  
-**Implementation:** PIO state machine or hardware timer interrupt on D1/A1 (GPIO41). Must not jitter — use hardware timer capture, not a software loop.
+**Implementation:** PIO state machine or hardware timer interrupt on D1/A1 (GPIO27). Must not jitter — use hardware timer capture, not a software loop.
  
 **Safety requirements:** TinySLED modules can get hot if left continuously on. Two-layer protection required:
 1. R17 (100kΩ gate pulldown) holds Q1 off at boot and firmware reset — hardware, no firmware dependency

@@ -1,6 +1,6 @@
 # Holy Guacamole: Carrier PCB Specification
 
-**Document status:** Rev B draft 2.0. Tracks the KiCad schematic `hardware/guac.kicad_sch` (rev `2.0-draft`). The KiCad schematic is the source of truth; `hardware/circuit.py` is a stale SKiDL sketch and no longer matches it.
+**Document status:** Rev B draft 2.0. Tracks the KiCad schematic `hardware/guac.kicad_sch` (rev `2.0-draft`). The KiCad schematic is the source of truth.
 **Robot:** Holy Guacamole, 1 lb meltybrain antweight, MRCA full combat
 **Previous revision:** Rev A (v1.3c, 40 × 50 mm, fly-lead pads, solder-down receiver). See git history for that text.
 
@@ -80,7 +80,7 @@ Runtime IO stays on the XIAO edge pads; underside XIAO pads are NC.
 | Switching frequency | 500 kHz ±6% spread spectrum in PWM; variable and load-dependent in PFM | Fixed 500 kHz |
 | Quiescent current | 22 µA | 280 µA |
 
-The carrier's 5 V load is about 100–150 mA (XIAO plus receiver), which would keep an AP63300 in PFM most of the time. That means 930 mA current bursts through `L1` at an irregular rate, next to three accelerometers, the VBAT ADC, and the CRSF line. The AP63301's fixed 500 kHz is easier to filter and to recognise on a scope. The extra 0.26 mA is about 0.07% of the 380 mAh pack per hour, so it doesn't matter. The AP63301 is what the procurement files already order (Mouser `621-AP63301WU-7`); the KiCad value now matches.
+The carrier's 5 V load is about 100–150 mA (XIAO plus receiver), which would keep an AP63300 in PFM most of the time. That means 930 mA current bursts through `L1` at an irregular rate, next to three accelerometers, the VBAT ADC, and the CRSF line. The AP63301's fixed 500 kHz is easier to filter and to recognise on a scope. The extra 0.26 mA is about 0.07% of the 380 mAh pack per hour, so it doesn't matter. The AP63301 is what the procurement BOM (`hardware/procurement/bom_rev2.csv`) orders (Mouser `621-AP63301WU-7`); the KiCad value now matches.
 
 Free refs from deletions: `R14`, `R15`, `R19`, `R20`, `R21`, `C14`–`C17`, `U7`–`U10`, `U12`, `J3`. Do not reuse them in this revision, so old BOMs and photos stay unambiguous.
 
@@ -349,22 +349,22 @@ All of these are flush pads on the **bottom** copper, so they are reachable with
 
 ## Pin assignment
 
-| XIAO pad | Signal | Notes |
-|---|---|---|
-| D0 / A0 | `VBAT_SNS` | Battery divider |
-| D1 / A1 | `HEAD_LED` | TinySLED MOSFET gate |
-| D2 / A2 | `SEL_OE_N` | Latch output enable |
-| D3 / A3 | `SEL_LAT` | Latch clock |
-| D4 | `DS1_IO` | AM32 ch 1 |
-| D5 | `DS2_IO` | AM32 ch 2 |
-| D6 / TX | `CRSF_TX` | To receiver |
-| D7 / RX | `CRSF_RX` | From receiver |
-| D8 / SCK | `SPI_SCK` | |
-| D9 / MISO | `SPI_MISO` | IMU data in |
-| D10 / MOSI | `SPI_MOSI` | IMUs and latch |
-| SWDIO / SWDCLK | SWD | Test pads |
-| 5V | 5V | From buck |
-| 3V3 | 3V3 | To IMUs and latch |
+| XIAO pad | RP2350 GPIO | Signal | Notes |
+|---|---|---|---|
+| D0 / A0 | GPIO26 | `VBAT_SNS` | Battery divider (ADC 0) |
+| D1 / A1 | GPIO27 | `HEAD_LED` | TinySLED MOSFET gate |
+| D2 / A2 | GPIO28 | `SEL_OE_N` | Latch output enable |
+| D3 | GPIO5 | `SEL_LAT` | Latch clock |
+| D4 | GPIO6 | `DS1_IO` | AM32 ch 1 |
+| D5 | GPIO7 | `DS2_IO` | AM32 ch 2 |
+| D6 / TX | GPIO0 | `CRSF_TX` | To receiver |
+| D7 / RX | GPIO1 | `CRSF_RX` | From receiver |
+| D8 / SCK | GPIO2 | `SPI_SCK` |  |
+| D9 / MISO | GPIO4 | `SPI_MISO` | IMU data in |
+| D10 / MOSI | GPIO3 | `SPI_MOSI` | IMUs and latch |
+| SWDIO / SWDCLK | | SWD | Test pads |
+| 5V | | 5V | From buck |
+| 3V3 | | 3V3 | To IMUs and latch |
 
 ---
 
@@ -397,6 +397,8 @@ Zip-tie every lead through its strain-relief slot.
 | Vias | 0.7 / 0.3 mm or larger (7 mil ring on 2 oz); autorouted signal vias 0.62 / 0.25 mm |
 | Plated component holes | 0.31 mm ring (12 mil on 2 oz); 0.41 mm hole to hole |
 | Rules | `guac.kicad_pro` and `guac.kicad_dru` hold these limits; KiCad DRC is clean against them |
+| Order files | `hardware/scripts/export_pcbway.sh` writes gerbers, drills, placement and BOM to `hardware/production/pcbway/` (not tracked) |
+| BOM | `hardware/procurement/bom_rev2.csv` (manufacturer and supplier part numbers) |
 | Assembly | Paste and reflow or hot air for the LGAs |
 | Stencil | Stainless, ordered with the board |
 
