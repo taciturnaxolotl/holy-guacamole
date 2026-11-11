@@ -6,15 +6,13 @@ from shapely.ops import unary_union
 from shapely import affinity
 import os
 _F = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts')
-FONTS = {'black': f'{_F}/InterDisplay-Black.otf', 'blacki': f'{_F}/InterDisplay-BlackItalic.otf', 'xbold': f'{_F}/InterDisplay-ExtraBold.otf'}
+FONTS = {'black': f'{_F}/InterDisplay-Black.otf', 'xbold': f'{_F}/InterDisplay-ExtraBold.otf'}
 _c = {}
 def _font(k):
     if k not in _c:
         f = TTFont(FONTS.get(k) or (k if os.path.isabs(k) else os.path.join(_F, k))); gs = f.getGlyphSet(); cm = f.getBestCmap()
-        cap = getattr(f['OS/2'], 'sCapHeight', 0) or 0
-        if not cap:  # measure H
-            from fontTools.pens.boundsPen import BoundsPen
-            bp = BoundsPen(gs); gs[cm[ord('H')]].draw(bp); cap = bp.bounds[3]
+        from fontTools.pens.boundsPen import BoundsPen   # measure H: some display fonts carry a wrong sCapHeight
+        bp = BoundsPen(gs); gs[cm[ord('H')]].draw(bp); cap = bp.bounds[3]
         _c[k] = (f, gs, cm, f['head'].unitsPerEm, cap)
     return _c[k]
 

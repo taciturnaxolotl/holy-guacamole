@@ -66,19 +66,21 @@ class Board:
     def __init__(s, path=PCB):
         B = parse(open(path).read()); s.B = B
         s.pads = {'F': [], 'B': []}; s.silk = {'F': [], 'B': []}; s.cu = {'F': [], 'B': []}; s.holes = []; s.court = {'F': [], 'B': []}
-        s.texts = {'F': [], 'B': []}; s.fps = []
+        s.texts = {'F': [], 'B': []}; s.fps = []; s.fp = {}
         for f in find(B, 'footprint'):
             at = one(f, 'at'); fx, fy = float(at[1]), float(at[2]); fr = float(at[3]) if len(at) > 3 else 0.
             a = math.radians(-fr)
             def xf(x, y, fx=fx, fy=fy, a=a): x, y = float(x), float(y); return T(fx + x*math.cos(a) - y*math.sin(a), fy + x*math.sin(a) + y*math.cos(a))
             ref = [p[2] for p in find(f, 'property') if p[1] == 'Reference'][0]
             s.fps.append((ref, T(fx, fy), fr, one(f, 'layer')[1]))
+            rec = s.fp[ref] = {'at': T(fx, fy), 'rot': fr, 'side': one(f, 'layer')[1][0], 'fab': [], 'crt': [], 'pads': {}, 'name': f[1]}
             for g in f:
                 if not (isinstance(g, list) and g and g[0] in ('fp_line', 'fp_arc', 'fp_circle', 'fp_rect', 'fp_poly')): continue
                 L = one(g, 'layer')[1]; sh = gshape(g, xf)
                 if sh is None: continue
                 if L in ('F.SilkS', 'B.SilkS'): s.silk[L[0]].append(sh)
-                if L in ('F.CrtYd', 'B.CrtYd'): s.court[L[0]].append(Polygon(sh.exterior) if sh.geom_type == 'Polygon' else sh)
+                if L in ('F.CrtYd', 'B.CrtYd'): rec['crt'].append(sh)
+                if L in ('F.Fab', 'B.Fab'): rec['fab'].append(sh)
             for t in find(f, 'fp_text') + [p for p in find(f, 'property')]:
                 L = one(t, 'layer'); hd = one(t, 'hide'); ef = one(t, 'effects')
                 if not L or L[1] not in ('F.SilkS', 'B.SilkS') or (hd and hd[1] == 'yes') or (ef and one(ef, 'hide')): continue
@@ -86,6 +88,7 @@ class Board:
                 s.texts[L[1][0]].append((txt, xf(ta[1], ta[2]), float(one(one(ef, 'font'), 'size')[1]), float(ta[3]) if len(ta) > 3 else 0))
             for p in find(f, 'pad'):
                 g, hole, lays, typ = pad_shape(p, fx, fy, fr)
+                rec['pads'].setdefault(p[1], []).append(g)
                 if hole[2] > 0: s.holes.append(hole)
                 for side in 'FB':
                     if f'{side}.Cu' in lays or '*.Cu' in lays: s.cu[side].append(g)
@@ -121,7 +124,13 @@ class Board:
             pts = [a] + pts[1:-1] + [b]; segs.append(LineString([(round(x, 4), round(y, 4)) for x, y in pts]))
         from shapely.ops import polygonize
         s.outline = max(polygonize(unary_union(segs)), key=lambda p: p.area)
+        for ref, rec in s.fp.items():   # filled courtyard / body outlines per footprint
+            for key in ('crt', 'fab'):
+                u = unary_union(rec[key]) if rec[key] else Polygon()
+                rec[key] = unary_union([Polygon(p.exterior) for p in getattr(u, 'geoms', [u]) if p.geom_type == 'Polygon']) if not u.is_empty else u
+            if rec['crt'] and not rec['crt'].is_empty: s.court[rec['side']].append(rec['crt'])
         for k in 'FB':
+            s.court[k] = unary_union(s.court[k])
             s.cu[k] = unary_union(s.cu[k]); s.pads[k] = unary_union(s.pads[k]); s.silk[k] = unary_union([g for g in s.silk[k] if g is not None])
         s.drills = unary_union([Point(h[0], h[1]).buffer(h[2]/2) for h in s.holes] + [Point(c).buffer(dr/2) for c, d, dr in s.vias])
 
