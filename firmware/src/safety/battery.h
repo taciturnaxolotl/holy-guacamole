@@ -11,7 +11,7 @@
  * Core 1 checks battery_ok() before commanding motors; if voltage is
  * critically low, motors are cut regardless of stick input.
  *
- * Thresholds are per-cell for a 2S pack (configurable). The alert level
+ * Thresholds are per-cell for the 3S HV pack (GNB 380, 4.35 V/cell full). The alert level
  * triggers a warning flag the LED/status system can display; the halt
  * level cuts motors immediately.
  */
@@ -19,7 +19,7 @@
 /* Per-cell voltage thresholds (volts). */
 #define BATTERY_WARN_V   3.75f
 #define BATTERY_HALT_V   3.60f
-#define BATTERY_CELLS    2       /* 2S pack */
+#define BATTERY_CELLS    3       /* 3S HV pack; the board is 3S-only (no UVLO jumper) */
 
 /* Initialize ADC and start background sampling. Call from core 0 init. */
 void battery_init(void);
