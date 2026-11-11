@@ -60,7 +60,7 @@ def _avoid(bd, labels, extra=()):
     pads = affinity.scale(bd.pads['B'], -1, 1, origin=(0, 0)).buffer(0.7)
     return unary_union([pads] + exist + [l.buffer(0.6) for l in labels] + list(extra))
 
-def bottom(bd, style='swoosh'):
+def bottom(bd, style='merged'):
     """returns geometry in BOARD coords for B.SilkS"""
     V = lambda x, y: (-x, y)                                     # board -> view
     G, labels = _common(bd, V)
@@ -76,34 +76,48 @@ def bottom(bd, style='swoosh'):
     elif style == 'clean':                                       # one big avocado, nothing else
         av, body = avocado(tilt=-8, pit_r=4.6, cross=False)
         G.append(affinity.scale(av, 1.08, 1.08, origin=(0, 0)))
-    elif style == 'blueprint':                                   # the sensor geometry as the hero
-        av, body = avocado(tilt=-8, pit_r=4.6, cross=False); b = affinity.scale(body, 0.42, 0.42, origin=(0, 0))
-        G += [b.exterior.buffer(0.2), Point(0, 0).buffer(1.9)]
+    elif style in ('blueprint', 'merged'):                     # the sensor geometry as the hero
+        av, body = avocado(tilt=-8, pit_r=4.6, cross=False)
+        if style == 'merged':                                    # the clean avocado, smaller, inside the r 12 ring
+            sc = 0.74; av = affinity.scale(av, sc, sc, origin=(0, 0)); body = affinity.scale(body, sc, sc, origin=(0, 0)); G.append(av)
+            cross = unary_union([LineString([(-1.2, 0), (1.2, 0)]).buffer(0.1), LineString([(0, -1.2), (0, 1.2)]).buffer(0.1)])
+            G[-1] = G[-1].difference(cross.buffer(0.12))         # spin-axis cross cut into the pit
+        else:
+            body = affinity.scale(body, 0.42, 0.42, origin=(0, 0)); G += [body.exterior.buffer(0.2), Point(0, 0).buffer(1.9)]
+        hole = body.buffer(0.7)                                  # lines stop short of the avocado
+        outline_v = affinity.scale(bd.outline, -1, 1, origin=(0, 0)).buffer(-0.5)
         ko = _avoid(bd, labels, [wordzone, oshw])
         lines = [ring((0, 0), 12.0, 0.15), ring((0, 0), 18.0, 0.15)]
-        for k in range(24):                                      # 15 deg ticks on r 18, long on the axes
-            a = math.radians(k*15); L = 1.4 if k % 6 == 0 else 0.7
+        for k in range(24):                                      # 15 deg ticks outside r 18, long on the axes
+            a = math.radians(k*15); L = 1.3 if k % 6 == 0 else 0.6
             lines.append(LineString([(18.3*math.cos(a), 18.3*math.sin(a)), ((18.3+L)*math.cos(a), (18.3+L)*math.sin(a))]).buffer(0.08))
-        lines += [LineString([(-19.5, 0), (-5.6, 0)]).buffer(0.08), LineString([(5.6, 0), (19.5, 0)]).buffer(0.08),
-                  LineString([(0, -19.5), (0, -6.6)]).buffer(0.08), LineString([(0, 7.2), (0, 19.5)]).buffer(0.08)]
+        for k in range(72):                                      # 5 deg minor ticks inside r 12
+            if k % 3 == 0: continue
+            a = math.radians(k*5); lines.append(LineString([(11.75*math.cos(a), 11.75*math.sin(a)), (11.35*math.cos(a), 11.35*math.sin(a))]).buffer(0.07))
+        lines += [LineString([(-20, 0), (20, 0)]).buffer(0.08), LineString([(0, -20), (0, 20)]).buffer(0.08)]
+        tags = []
+        chips = [Point(p).buffer(2.3) for p in imus.values()]
         for ref, (x, y) in imus.items():
             rot = -bd.fp[ref]['rot']                             # mirrored frame
             chip = affinity.rotate(box(-1.5, -1.25, 1.5, 1.25), rot, origin=(0, 0))
             G.append(affinity.translate(chip.exterior.buffer(0.09), x, y))
             G.append(affinity.translate(affinity.rotate(Point(-1.0, 0.75).buffer(0.25), rot, origin=(0, 0)), x, y))
-            lines.append(LineString([(0, 0), (x, y)]).difference(Point(0, 0).buffer(6.0)).difference(Point(x, y).buffer(2.2)).buffer(0.08))
-            r = math.hypot(x, y); lab = f'{ref}  r{r:.0f}'
-            g = _mid(text(lab, 0.8, 'xbold', track=0.04)[0]); a = math.atan2(y, x)
-            for d in (3.6, 4.4, 5.2):
-                cand = affinity.translate(g, x + d*math.cos(a), y + d*math.sin(a) + (1.4 if abs(math.sin(a)) < 0.3 else 0))
-                if not cand.intersects(ko) and bd.outline.buffer(-0.5).contains(affinity.scale(cand, -1, 1, origin=(0, 0))): labels.append(cand); break
-        for r, ang in ((12, 52), (18, 63)):
-            g = _mid(text(f'R{r}', 0.8, 'xbold')[0]); c = (r*math.cos(math.radians(ang)), r*math.sin(math.radians(ang)))
-            labels.append(affinity.translate(g, *c)); lines.append(Point(c).buffer(1.2))   # (cut below)
-        cut = _avoid(bd, [l for l in labels], [wordzone, oshw]).union(unary_union([Point(-12*math.cos(math.radians(-52)), 0).buffer(0)]))
-        geo = unary_union([l for l in lines if l.area < 50 or True])
-        R = unary_union([affinity.translate(_mid(text(f'R{r}', 0.8, 'xbold')[0]), r*math.cos(math.radians(a)), r*math.sin(math.radians(a))).buffer(0.35) for r, a in ((12, 52), (18, 63))])
-        G.append(geo.difference(cut).difference(R).difference(Point(0, 0).buffer(0)))
+            lines.append(LineString([(0, 0), (x, y)]).difference(Point(x, y).buffer(2.3)).buffer(0.1))
+            r = math.hypot(x, y); g = _mid(text(f'{ref} · r{r:.0f}', 0.85, 'xbold', track=0.04)[0])
+            for d in (3.3, 3.9, 4.6, 5.4):
+                hit = None
+                for k in range(16):
+                    t = math.atan2(y, x) + math.radians(k*22.5*(1 if k % 2 else -1)*0.5)
+                    c = affinity.translate(g, x + d*math.cos(t), y + d*math.sin(t))
+                    if outline_v.contains(c) and not c.buffer(0.3).intersects(ko) and not any(c.buffer(0.3).intersects(q) for q in tags + chips + [hole]):
+                        hit = c; break
+                if hit: tags.append(hit); break
+            else: print('  no tag for', ref)
+        for r, ang in ((12, 40), (18, 50)):                      # ring names sit in a gap in their ring
+            c = (r*math.cos(math.radians(ang)), r*math.sin(math.radians(ang))); tags.append(affinity.translate(_mid(text(f'R{r}', 0.85, 'xbold')[0]), *c))
+        geo = unary_union(lines).difference(hole)
+        G.append(geo.difference(unary_union([ko] + [q.buffer(0.35) for q in tags] + [Point(p).buffer(1.75) for p in imus.values()])))
+        labels += tags
     elif style == 'pattern':                                     # wallpaper of little avocados
         av, body = avocado(tilt=0, pit_r=4.6, cross=False)
         icon = lambda t: affinity.rotate(unary_union([affinity.scale(body, 0.16, 0.16, origin=(0, 0)).exterior.buffer(0.11), Point(0, 0).buffer(0.62)]), t, origin=(0, 0))
