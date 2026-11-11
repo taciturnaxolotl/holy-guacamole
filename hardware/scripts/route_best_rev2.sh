@@ -16,9 +16,14 @@ for i in $(seq 1 $N); do
 done
 cp /tmp/fr/best.kicad_pcb $PCB; rm -f ${PCB%.kicad_pcb}.prerouted.bak
 echo "best: $best"
-# join whatever freerouting left open and drop its one-sided vias
+# join whatever freerouting left open and drop its one-sided vias; a second pass catches an escape the first
+# pass's cleanup stranded, so repeat until nothing is left open (three passes at most)
 P=/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/Current/bin/python3
-$P $(dirname "$0")/bridge_rev2.py $PCB 2>/dev/null
+for i in 1 2 3; do
+  $P $(dirname "$0")/bridge_rev2.py $PCB 2>/dev/null
+  kicad-cli pcb drc --severity-error -o /tmp/fr/drc_bridge.rpt $PCB >/dev/null 2>&1
+  grep -q "unconnected_items" /tmp/fr/drc_bridge.rpt || break
+done
 # GND stitching grid
 $P $(dirname "$0")/stitch_rev2.py $PCB 2>/dev/null
 # silkscreen art (moves or drops stitching vias that end up under silk), then refill

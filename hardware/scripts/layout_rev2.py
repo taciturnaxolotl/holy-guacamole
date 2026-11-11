@@ -144,11 +144,13 @@ PLACE = {
     "D4": (10.6, -22.4, 0, "F"),
     "D5": (-1.7, -22.4, 0, "F"),
     "D6": (0.9, -22.4, 0, "F"),
-    # debug pads: bottom copper, flush, under the XIAO SWD pads / beside A0
-    "TP13": (5.4, 12.0, 0, "B"),
-    "TP14": (8.0, 12.0, 0, "B"),
-    "TP15": (10.6, 12.0, 0, "B"),
-    "TP10": (-6.5, 24.0, 0, "B"),
+    # debug pads: bottom copper, flush
+    # one row on the r 15 ring at 60 degrees, turned to follow it, so it sits inside the back-side blueprint art:
+    # DIO, CLK, GND, VBAT from the outer (E) end inward. The SWD pair comes down from the XIAO's underside pads.
+    "TP13": (4.2, 14.9, 60, "B"),
+    "TP14": (6.4, 13.63, 60, "B"),
+    "TP15": (8.6, 12.36, 60, "B"),
+    "TP10": (10.8, 11.09, 60, "B"),
 }
 
 # ---------------- netlist ----------------

@@ -483,14 +483,18 @@ for name, layers, (x0, x1, y0, y1) in (("VBAT_RAW B", (B,), grow(VBAT_BAND)), ("
         ko.Append(K(*pt))
     board.Add(ka)
 
-# battery sense divider: short F.Cu net plus the bottom-side test pad, hand routed
+# ESD clamp to connector pin, both connectors: four 2 mm hops the autorouter sometimes leaves open, so they are
+# drawn here: down out of the diode pad, across below the diode, down into the pin (1.25 mm pin pitch, 0.18 mm)
+for d, j, n in (("D5", "J5", "3"), ("D6", "J5", "4"), ("D3", "J4", "2"), ("D4", "J4", "3")):
+    dp = next(p for p in board.FindFootprintByReference(d).Pads() if p.GetNumber() == "1")
+    jp = next(p for p in board.FindFootprintByReference(j).Pads() if p.GetNumber() == n)
+    (dx, dy), (jx, jy) = padxy(d, "1"), padxy(j, n)
+    track([(dx, dy), (dx, dy - 1.0), (jx, dy - 1.0), (jx, jy)], dp.GetNet(), F, 0.18)
+
+# battery sense divider: the short F.Cu net is hand routed; the autorouter takes it on to the TP10 test pad
 SNS = board.FindNet("/VBAT_SNS")
-r9_2, r10_1, c12_1, tp10 = padxy("R9", "2"), padxy("R10", "1"), padxy("C12", "1"), padxy("TP10", "1")
+r9_2, r10_1, c12_1 = padxy("R9", "2"), padxy("R10", "1"), padxy("C12", "1")
 track([padxy("U1", "1"), (-3.6, 25.96), (-4.1, r9_2[1]), r9_2, r10_1, (c12_1[0], r10_1[1]), c12_1], SNS, F, 0.25)
-track([c12_1, (-6.5, c12_1[1]), (-6.5, 25.0)], SNS, F, 0.25)
-via(-6.5, 25.0, SNS, d=0.7, drill=0.3)
-placed_vias.append((-6.5, 25.0, 0.35))
-track([(-6.5, 25.0), tp10], SNS, B, 0.3)
 
 # edge keepout ring for the autorouter (KiCad's own 0.5 mm edge clearance is a DRC rule, not a routing obstacle)
 ring = pcbnew.ZONE(board)
@@ -537,12 +541,13 @@ for txt, x, y, size, rot in (("BAT", 10.1, -12.8, 1.0, 90), ("SW", -10.1, -12.8,
     tx.SetTextSize(pcbnew.VECTOR2I(mm(size), mm(size)))
     tx.SetTextThickness(mm(0.15))
     board.Add(tx)
-for txt, x, y in (("DIO", 5.4, 10.6), ("CLK", 8.0, 9.4), ("GND", 10.6, 10.6), ("VBAT", -6.5, 22.6)):
+for txt, x, y in (("DIO", 4.2, 14.9), ("CLK", 6.4, 13.63), ("GND", 8.6, 12.36), ("VBAT", 10.8, 11.09)):
     tx = pcbnew.PCB_TEXT(board)
     tx.SetText(txt)
     tx.SetLayer(pcbnew.B_SilkS)
     tx.SetMirrored(True)
-    tx.SetPosition(K(x, y))
+    tx.SetTextAngleDegrees(-30)
+    tx.SetPosition(K(x - 1.3 * math.cos(math.radians(60)), y - 1.3 * math.sin(math.radians(60))))
     tx.SetTextSize(pcbnew.VECTOR2I(mm(0.8), mm(0.8)))
     tx.SetTextThickness(mm(0.15))
     board.Add(tx)
