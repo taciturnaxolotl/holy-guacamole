@@ -24,61 +24,97 @@ def dashed_circle(c, r, w, dash, gap, phase=0):
         out.append(LineString(pts).buffer(w/2))
     return unary_union(out)
 
-def avocado(tilt=-14, pit_r=4.5):
+def avocado(tilt=-14, pit_r=4.5, cross=True):
     body = unary_union([Point(0, 9.4).buffer(5.0, 96), Point(0, -0.8).buffer(8.4, 128)]).convex_hull   # Hass egg            # close the waist into a gentle concave neck
     skin = body.difference(body.buffer(-0.85))
     flesh_line = body.buffer(-1.6).exterior.buffer(0.14)     # thin line where the flesh pales near the skin
     pit = Point(0, 0).buffer(pit_r, 96)
     hl = LineString([(pit_r*0.68*math.cos(math.radians(a)), pit_r*0.68*math.sin(math.radians(a))) for a in range(105, 166, 5)]).buffer(0.32)
-    cross = unary_union([LineString([(-1.4, 0), (1.4, 0)]).buffer(0.13), LineString([(0, -1.4), (0, 1.4)]).buffer(0.13), ring((0, 0), 0.75, 0.24)])
-    pit = pit.difference(hl).difference(cross)
+    cross_ = unary_union([LineString([(-1.4, 0), (1.4, 0)]).buffer(0.13), LineString([(0, -1.4), (0, 1.4)]).buffer(0.13), ring((0, 0), 0.75, 0.24)])
+    pit = pit.difference(hl)
+    if cross: pit = pit.difference(cross_)
     g = unary_union([skin, flesh_line.difference(Point(0, 0).buffer(pit_r+0.7)), pit])
     return affinity.rotate(g, tilt, origin=(0, 0)), affinity.rotate(body, tilt, origin=(0, 0))
 
-def bottom(bd):
-    """returns geometry in BOARD coords for B.SilkS"""
-    V = lambda x, y: (-x, y)                                     # board -> view
-    G = []
-    av, body = avocado(); G.append(av)
-    keep = body.buffer(1.2)
-    imus = {r: V(*p) for r, p, *_ in bd.fps if r in ('U4', 'U5', 'U6')}
-    # spin swooshes (no direction: the bot spins either way)
-    sw = [tapered_arc(16.4, -30, 30, 1.05), tapered_arc(15.0, 150, 206, 0.95), tapered_arc(13.0, 244, 298, 0.85)]
-    sw = [dfm(x, 0.15) for x in sw]; G += sw
-    # sensor map: dashed accel radii, ticks at each IMU
-    rings = unary_union([dashed_circle((0, 0), 12.0, 0.18, 0.7, 0.55), dashed_circle((0, 0), 18.0, 0.18, 0.7, 0.55)])
-    labels = []
-    clear = [keep] + [s.buffer(0.45) for s in sw] + [Point(p).buffer(2.4) for p in imus.values()]
-    for ref, (x, y) in imus.items():
-        a = math.atan2(y, x); r = math.hypot(x, y)
-        G.append(ring((x, y), 1.75, 0.18))
-        G.append(Point(x, y).buffer(0.32))
-        lab, w = text(ref, 0.85, 'xbold')
-        lx, ly = (x + 2.9*math.cos(a), y + 2.9*math.sin(a))
-        if ref == 'U6': lx, ly = x + 0.2, y + 2.6
-        if ref == 'U5': lx, ly = x + 2.9, y - 0.45
-        if ref == 'U4': lx, ly = x - 0.2, y + 2.55
-        labels.append(affinity.translate(lab, lx, ly - 0.42))
-    # XT30 solder-side labels (bottom of J6 = view x -13.8, J7 = +13.8)
+def _common(bd, V):
+    """bottom pieces every style shares (view frame): XT30 solder-side names, wordmark + credit, OSHW block"""
+    G, labels = [], []
     for vx, top, bot in ((-13.8, 'BAT+', 'GND'), (13.8, 'VBAT', 'VBUS')):
         for y, t in ((-10.8, top), (-15.8, bot)):
             g, w = text(t, 0.8, 'xbold', align='r' if vx > 0 else 'l')
-            labels.append(affinity.translate(g, vx - 2.35 if vx > 0 else vx + 2.35, y - 0.4))
-    exist = [Point(-tx, ty).buffer(sz*1.6) for txt, (tx, ty), sz, rot in bd.texts['B']]   # board labels (GND/CLK/DIO/VBAT), view frame
-    pads = affinity.scale(bd.pads['B'], -1, 1, origin=(0, 0)).buffer(0.7)
-    G += labels
-    G.append(rings.difference(unary_union(clear + [l.buffer(0.6) for l in labels] + exist + [pads])))
-    # wordmark
+            labels.append(affinity.translate(_mid(g), vx - 2.35 if vx > 0 else vx + 2.35, y))
     h, wh = text('HOLY', 4.8, CHICLE, track=0.02); G.append(affinity.translate(h, 0, -27.0))
     gm, wg = text('GUACAMOLE', 3.4, CHICLE, track=0.02); gm = affinity.scale(gm, min(1, 32/wg), min(1, 32/wg), origin=(0, 0)); G.append(affinity.translate(gm, 0, -31.4))
     l1, _ = text('1 LB MELTYBRAIN  ·  REV 2  ·  2026', 0.8, 'xbold', track=0.08); G.append(affinity.translate(l1, 0, -33.4))
     l2, _ = text('KIERAN KLUKAS  ·  dunkirk.sh/h/guac', 0.8, 'xbold', track=0.08); G.append(affinity.translate(l2, 0, -35.3))
-    # OSHW logo + licence, view NE of the notch (board NW corner)
     from oshw_logo import logo
     G.append(logo(7.2, (5.2, 32.6)))
     for k, t in enumerate(('OPEN', 'SOURCE', 'HARDWARE')):
         g, w = text(t, 0.85, 'xbold', track=0.06, align='l'); G.append(affinity.translate(g, 9.7, 34.1 - k*1.45))
     g, w = text('CERN-OHL-S-2.0', 0.8, 'xbold', track=0.04, align='l'); G.append(affinity.translate(g, 9.7, 29.15))
+    return G, labels
+
+def _avoid(bd, labels, extra=()):
+    """view-frame keep-outs: pads, board texts, our labels"""
+    exist = [Point(-tx, ty).buffer(sz*1.6) for txt, (tx, ty), sz, rot in bd.texts['B']]
+    pads = affinity.scale(bd.pads['B'], -1, 1, origin=(0, 0)).buffer(0.7)
+    return unary_union([pads] + exist + [l.buffer(0.6) for l in labels] + list(extra))
+
+def bottom(bd, style='swoosh'):
+    """returns geometry in BOARD coords for B.SilkS"""
+    V = lambda x, y: (-x, y)                                     # board -> view
+    G, labels = _common(bd, V)
+    imus = {r: V(*p) for r, p, *_ in bd.fps if r in ('U4', 'U5', 'U6')}
+    wordzone = box(-17, -37, 17, -21.5); oshw = box(0.5, 27.5, 19, 37.5)
+    if style == 'swoosh':                                        # the first draft: avocado, swooshes, dashed radii
+        av, body = avocado(); G.append(av); keep = body.buffer(1.2)
+        sw = [dfm(x, 0.15) for x in (tapered_arc(16.4, -30, 30, 1.05), tapered_arc(15.0, 150, 206, 0.95), tapered_arc(13.0, 244, 298, 0.85))]; G += sw
+        rings = unary_union([dashed_circle((0, 0), 12.0, 0.18, 0.7, 0.55), dashed_circle((0, 0), 18.0, 0.18, 0.7, 0.55)])
+        for ref, (x, y) in imus.items():
+            G += [ring((x, y), 1.75, 0.18), Point(x, y).buffer(0.32)]
+        G.append(rings.difference(unary_union([keep] + [q.buffer(0.45) for q in sw] + [Point(p).buffer(2.4) for p in imus.values()] + [_avoid(bd, labels)])))
+    elif style == 'clean':                                       # one big avocado, nothing else
+        av, body = avocado(tilt=-8, pit_r=4.6, cross=False)
+        G.append(affinity.scale(av, 1.08, 1.08, origin=(0, 0)))
+    elif style == 'blueprint':                                   # the sensor geometry as the hero
+        av, body = avocado(tilt=-8, pit_r=4.6, cross=False); b = affinity.scale(body, 0.42, 0.42, origin=(0, 0))
+        G += [b.exterior.buffer(0.2), Point(0, 0).buffer(1.9)]
+        ko = _avoid(bd, labels, [wordzone, oshw])
+        lines = [ring((0, 0), 12.0, 0.15), ring((0, 0), 18.0, 0.15)]
+        for k in range(24):                                      # 15 deg ticks on r 18, long on the axes
+            a = math.radians(k*15); L = 1.4 if k % 6 == 0 else 0.7
+            lines.append(LineString([(18.3*math.cos(a), 18.3*math.sin(a)), ((18.3+L)*math.cos(a), (18.3+L)*math.sin(a))]).buffer(0.08))
+        lines += [LineString([(-19.5, 0), (-5.6, 0)]).buffer(0.08), LineString([(5.6, 0), (19.5, 0)]).buffer(0.08),
+                  LineString([(0, -19.5), (0, -6.6)]).buffer(0.08), LineString([(0, 7.2), (0, 19.5)]).buffer(0.08)]
+        for ref, (x, y) in imus.items():
+            rot = -bd.fp[ref]['rot']                             # mirrored frame
+            chip = affinity.rotate(box(-1.5, -1.25, 1.5, 1.25), rot, origin=(0, 0))
+            G.append(affinity.translate(chip.exterior.buffer(0.09), x, y))
+            G.append(affinity.translate(affinity.rotate(Point(-1.0, 0.75).buffer(0.25), rot, origin=(0, 0)), x, y))
+            lines.append(LineString([(0, 0), (x, y)]).difference(Point(0, 0).buffer(6.0)).difference(Point(x, y).buffer(2.2)).buffer(0.08))
+            r = math.hypot(x, y); lab = f'{ref}  r{r:.0f}'
+            g = _mid(text(lab, 0.8, 'xbold', track=0.04)[0]); a = math.atan2(y, x)
+            for d in (3.6, 4.4, 5.2):
+                cand = affinity.translate(g, x + d*math.cos(a), y + d*math.sin(a) + (1.4 if abs(math.sin(a)) < 0.3 else 0))
+                if not cand.intersects(ko) and bd.outline.buffer(-0.5).contains(affinity.scale(cand, -1, 1, origin=(0, 0))): labels.append(cand); break
+        for r, ang in ((12, 52), (18, 63)):
+            g = _mid(text(f'R{r}', 0.8, 'xbold')[0]); c = (r*math.cos(math.radians(ang)), r*math.sin(math.radians(ang)))
+            labels.append(affinity.translate(g, *c)); lines.append(Point(c).buffer(1.2))   # (cut below)
+        cut = _avoid(bd, [l for l in labels], [wordzone, oshw]).union(unary_union([Point(-12*math.cos(math.radians(-52)), 0).buffer(0)]))
+        geo = unary_union([l for l in lines if l.area < 50 or True])
+        R = unary_union([affinity.translate(_mid(text(f'R{r}', 0.8, 'xbold')[0]), r*math.cos(math.radians(a)), r*math.sin(math.radians(a))).buffer(0.35) for r, a in ((12, 52), (18, 63))])
+        G.append(geo.difference(cut).difference(R).difference(Point(0, 0).buffer(0)))
+    elif style == 'pattern':                                     # wallpaper of little avocados
+        av, body = avocado(tilt=0, pit_r=4.6, cross=False)
+        icon = lambda t: affinity.rotate(unary_union([affinity.scale(body, 0.16, 0.16, origin=(0, 0)).exterior.buffer(0.11), Point(0, 0).buffer(0.62)]), t, origin=(0, 0))
+        ko = _avoid(bd, labels, [wordzone.buffer(0.6), oshw.buffer(0.4)]).union(bd.outline.buffer(-0.8).symmetric_difference(bd.outline.buffer(5)) if False else Polygon())
+        inside = affinity.scale(bd.outline.buffer(-1.0), -1, 1, origin=(0, 0))
+        k = 0
+        for j, y in enumerate(np.arange(-20.5, 37, 4.6)):
+            for x in np.arange(-19 + (2.6 if j % 2 else 0), 20, 5.2):
+                g = affinity.translate(icon(25 if (j + int(x)) % 2 else -25), x, y)
+                if inside.contains(g) and not g.intersects(ko): G.append(g); k += 1
+    G += labels
     g = unary_union(G)
     return affinity.scale(g, -1, 1, origin=(0, 0)), {}
 
@@ -115,12 +151,25 @@ class Placer:
         if any(g.distance(p) < 0.15 for p in s.placed): r.append('silk')
         return r
     def label(s, t, cands, cap=0.85, font='xbold', track=0.06, **kw):
-        g0, w = text(t, cap, font, track=track)
-        g0 = affinity.translate(g0, 0, -cap/2)              # centre vertically on the anchor
+        g0 = _mid(text(t, cap, font, track=track)[0])
         for (x, y) in cands:
             g = affinity.translate(g0, x, y)
             if s.put(g, **kw): return (x, y)
         print('  could not place', repr(t), s.why(affinity.translate(g0, *cands[0]))); return None
+
+    def row(s, items, ys, cap, font='black', track=0, **kw):
+        """tokens [(x, text)] on one shared midline: all placed at the same y, or none"""
+        gs = [(x, _mid(text(t, cap, font, track=track)[0])) for x, t in items]
+        for y in ys:
+            cand = [affinity.translate(g, x, y) for x, g in gs]
+            if all(s.free(g, **kw) for g in cand) and all(a.distance(b) >= 0.15 for i, a in enumerate(cand) for b in cand[i+1:]):
+                for g in cand: s.put(g, force=True)
+                return y
+        print('  could not place row', [t for _, t in items], s.why(affinity.translate(gs[0][1], gs[0][0], ys[0]))); return None
+
+def _mid(g):
+    """centre a glyph run on its own ink box, so + - and capitals share one midline"""
+    x0, y0, x1, y1 = g.bounds; return affinity.translate(g, 0, -(y0 + y1)/2)
 
 def _pad(bd, ref, num):
     return unary_union(bd.fp[ref]['pads'][num])
@@ -153,19 +202,19 @@ def top(bd):
         cx = sgn*13.8
         P.label(title, [(cx, -6.75), (cx, -6.95), (cx - sgn*0.6, -6.75)], cap=1.05, font='black', track=0.08)
         for y, t in zip((-10.8, -15.8), pins):
-            big = len(t) == 1; cap, fnt = (1.3, 'black') if big else (0.9, 'xbold')
+            big = len(t) == 1; cap, fnt = (1.1, 'black') if big else (0.9, 'xbold')
             w = text(t, cap, fnt, track=0.06)[1]
             P.label(t, [(cx - sgn*(2.75 + 0.45 + w/2), y), (cx - sgn*(2.95 + 0.45 + w/2), y), (cx - sgn*(3.3 + w/2), y + 0.4)], cap=cap, font=fnt)
     # GH pin rows under the S-facing plugs, then their names
     for pins, toks in (((-2.97, -1.72, -0.47, 0.78), ('−', '+', 'R', 'T')), ((6.62, 7.88, 9.12, 10.38), ('−', '1', '2', '−'))):
-        for x, t in zip(pins, toks): P.label(t, [(x, -30.6), (x, -30.8)], cap=0.95, font='black', track=0)
-    for x, t in ((-1.1, 'RX'), (8.5, 'ESC')): P.label(t, [(x, -32.0), (x, -32.2)], cap=0.9, font='black', track=0.12)
-    for x, t in ((15.0, '−'), (18.2, '+')): P.label(t, [(x, -30.6), (x, -30.8)], cap=1.1, font='black', track=0)
+        P.row(list(zip(pins, toks)), [-30.6, -30.8, -31.0], cap=0.95)
+    P.row([(15.0, '−'), (18.2, '+')], [-30.6, -30.8, -31.0], cap=0.95)
+    P.row([(-1.1, 'RX'), (8.5, 'ESC')], [-32.0, -32.2], cap=0.9, track=0.12)
     P.label('PWR', [(16.6, -32.0), (16.4, -32.0), (16.6, -32.2)], cap=0.9, font='black', track=0.12)
     # heading-LED plug: + / − behind its pins, name beside
-    for num, t in (('1', '+'), ('2', '−')):
-        c = _pad(bd, 'J2', num).centroid; P.label(t, [(c.x, 29.75), (c.x, 30.05), (c.x, 30.35)], cap=0.95, font='black', track=0)
-    P.label('LED', [(-17.5, 30.05), (-17.7, 30.25), (-10.4, 30.05)], cap=0.9, font='black', track=0.12)
+    xs = [_pad(bd, 'J2', n).centroid.x for n in ('1', '2')]
+    y = P.row([(xs[0], '+'), (xs[1], '−')], [29.75, 30.05, 30.35], cap=0.95)
+    P.label('LED', [(-17.5, y or 30.05), (-17.7, y or 30.05)], cap=0.9, font='black', track=0.12)
     # UVLO jumper: name each outer pad by the divider it selects
     for num, t in (('1', '3S'), ('3', '2S')):
         c = _pad(bd, 'JP1', num).centroid
@@ -202,7 +251,7 @@ def top(bd):
     h, wh = text('HOLY', 2.2, CHICLE, track=0.02); g2, wg = text('GUACAMOLE', 1.75, CHICLE, track=0.02)
     sc = min(1, 9.4/wg); h = affinity.scale(h, sc, sc, origin=(0, 0)); g2 = affinity.scale(g2, sc, sc, origin=(0, 0))
     P.put(affinity.translate(h, -4.9, 34.45), force=True); P.put(affinity.translate(g2, -4.9, 31.9), force=True)
-    l1, _ = text('REV 2', 0.8, 'xbold', track=0.1); P.put(affinity.translate(l1, -12.3, 30.35), force=True)
+    P.label('REV 2', [(-4.9, 30.5), (-4.9, 30.3), (-6.5, 30.5), (-3.3, 30.5)], cap=0.8, font='xbold', track=0.1)
     s2, _ = text('SWD + VBAT TEST PADS ON THE BOTTOM', 0.8, 'xbold', track=0.06); P.put(affinity.translate(s2, 0, -35.7), force=True)
     return unary_union(P.G)
 
