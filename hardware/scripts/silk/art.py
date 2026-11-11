@@ -115,18 +115,6 @@ def bottom(bd, style='merged'):
             else: print('  no tag for', ref)
         for r, ang in ((12, 40), (18, 50)):                      # ring names sit in a gap in their ring
             c = (r*math.cos(math.radians(ang)), r*math.sin(math.radians(ang))); tags.append(affinity.translate(_mid(text(f'R{r}', 0.85, 'xbold')[0]), *c))
-        # "Guac Facts": a nutrition label in the free NW (view) corner, saying what the rings and boxes are
-        x0, y0, x1, y1 = -18.6, 19.7, -1.6, 28.8
-        G.append(box(x0, y0, x1, y1).exterior.buffer(0.1))
-        hdr, _ = text('Guac Facts', 1.55, CHICLE, track=0.02, align='l'); G.append(affinity.translate(hdr, x0 + 0.55, y1 - 2.0))
-        G.append(box(x0 + 0.45, y1 - 2.75, x1 - 0.45, y1 - 2.35))                       # the heavy rule
-        rows = pcb_facts(bd)
-        for k, (l, v) in enumerate(rows):
-            y = y1 - 3.75 - k*1.17
-            gl, _ = text(l, 0.78, 'black', track=0.02, align='l'); gv, _ = text(v, 0.78, 'xbold', track=0.02, align='r')
-            G += [affinity.translate(gl, x0 + 0.55, y), affinity.translate(gv, x1 - 0.55, y)]
-            if k < len(rows) - 1: G.append(box(x0 + 0.45, y - 0.32, x1 - 0.45, y - 0.2))   # hairline between rows
-        ko = ko.union(box(x0, y0, x1, y1).buffer(0.4))
         geo = unary_union(lines).difference(hole)
         G.append(geo.difference(unary_union([ko] + [q.buffer(0.35) for q in tags] + [Point(p).buffer(1.75) for p in imus.values()])))
         labels += tags
@@ -284,18 +272,6 @@ def top(bd):
         if P.put(affinity.translate(hz, cx, cy)): break
     else: print('  hazard placard does not fit', P.why(affinity.translate(hz, 0, -5.6)))
     return unary_union(P.G)
-
-POWER_PATH_MOHM = 3.3     # J6 -> J7 -> J1 and back, hardware/scripts/review/rsolve.py (1.09 + 2.02 + 0.17)
-
-def pcb_facts(bd):
-    """Guac Facts rows, read off the board so they stay true"""
-    x0, y0, x1, y1 = bd.outline.bounds
-    oz = [round(t/35) for t in bd.copper_um] or [0]
-    parts = sum(1 for r, *_ in bd.fps if not r.startswith(('H', 'TP', 'JP')))
-    return (('Serving size', f'{x1 - x0:.0f} × {y1 - y0:.0f} mm'),
-            ('Layers', f'{len(bd.copper_um)} · {oz[0]} oz outer' + (f' · {bd.thickness:g} mm' if bd.thickness else '')),
-            ('Parts', f'{parts}'), ('Vias', f'{len(bd.vias)}'),
-            ('Power path', f'{POWER_PATH_MOHM:.1f} mΩ'))
 
 def hazard(w, h):
     """caution placard: hazard-stripe bands top and bottom, HANDS OFF in Chicle, spin speed underneath"""
