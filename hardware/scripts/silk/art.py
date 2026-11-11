@@ -120,7 +120,7 @@ def bottom(bd, style='merged'):
         G.append(box(x0, y0, x1, y1).exterior.buffer(0.1))
         hdr, _ = text('Guac Facts', 1.55, CHICLE, track=0.02, align='l'); G.append(affinity.translate(hdr, x0 + 0.55, y1 - 2.0))
         G.append(box(x0 + 0.45, y1 - 2.75, x1 - 0.45, y1 - 2.35))                       # the heavy rule
-        rows = (('Serving size', '1 lb bot'), ('Spin', '2700–4000 rpm'), ('LSM6 at r12', '±320 g'), ('2× H3LIS at r18', '±400 g'), ('Peak, outer', '322 g'))
+        rows = pcb_facts(bd)
         for k, (l, v) in enumerate(rows):
             y = y1 - 3.75 - k*1.17
             gl, _ = text(l, 0.78, 'black', track=0.02, align='l'); gv, _ = text(v, 0.78, 'xbold', track=0.02, align='r')
@@ -285,13 +285,25 @@ def top(bd):
     else: print('  hazard placard does not fit', P.why(affinity.translate(hz, 0, -5.6)))
     return unary_union(P.G)
 
+POWER_PATH_MOHM = 3.3     # J6 -> J7 -> J1 and back, hardware/scripts/review/rsolve.py (1.09 + 2.02 + 0.17)
+
+def pcb_facts(bd):
+    """Guac Facts rows, read off the board so they stay true"""
+    x0, y0, x1, y1 = bd.outline.bounds
+    oz = [round(t/35) for t in bd.copper_um] or [0]
+    parts = sum(1 for r, *_ in bd.fps if not r.startswith(('H', 'TP', 'JP')))
+    return (('Serving size', f'{x1 - x0:.0f} × {y1 - y0:.0f} mm'),
+            ('Layers', f'{len(bd.copper_um)} · {oz[0]} oz outer' + (f' · {bd.thickness:g} mm' if bd.thickness else '')),
+            ('Parts', f'{parts}'), ('Vias', f'{len(bd.vias)}'),
+            ('Power path', f'{POWER_PATH_MOHM:.1f} mΩ'))
+
 def hazard(w, h):
     """caution placard: hazard-stripe bands top and bottom, HANDS OFF in Chicle, spin speed underneath"""
     band = 0.95; G = [box(-w/2, -h/2, w/2, h/2).exterior.buffer(0.1)]
     stripes = unary_union([Polygon([(x, 0), (x + 0.55, 0), (x + 0.55 - band, band), (x - band, band)]) for x in np.arange(-w/2 - 1, w/2 + 2, 1.1)])
     for yb in (h/2 - band - 0.25, -h/2 + 0.25):
         G.append(affinity.translate(stripes, 0, yb).intersection(box(-w/2 + 0.25, yb, w/2 - 0.25, yb + band)))
-    t, tw = text('HANDS OFF!', 2.0, CHICLE, track=0.03); sc = min(1, (w - 1.6)/tw)
+    t, tw = text('HANDS OFF!', 1.9, 'Bungee-Regular.ttf', track=0.04); sc = min(1, (w - 1.6)/tw)
     G.append(affinity.translate(affinity.scale(t, sc, sc, origin=(0, 0)), 0, -0.15))
     s, _ = text('it spins at 4000 rpm', 0.8, 'xbold', track=0.04); G.append(affinity.translate(s, 0, -h/2 + band + 0.55))
     return dfm(unary_union(G), 0.15)

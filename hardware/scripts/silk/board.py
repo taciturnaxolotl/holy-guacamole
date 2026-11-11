@@ -67,6 +67,9 @@ class Board:
         B = parse(open(path).read()); s.B = B
         s.pads = {'F': [], 'B': []}; s.silk = {'F': [], 'B': []}; s.cu = {'F': [], 'B': []}; s.holes = []; s.court = {'F': [], 'B': []}
         s.texts = {'F': [], 'B': []}; s.fps = []; s.fp = {}
+        st = one(one(B, 'setup'), 'stackup') if one(B, 'setup') else None     # copper weights, outer to outer
+        s.copper_um = [float(one(l, 'thickness')[1])*1000 for l in (find(st, 'layer') if st else []) if one(l, 'type') and one(l, 'type')[1] == 'copper']
+        s.thickness = float(one(one(B, 'general'), 'thickness')[1]) if one(B, 'general') and one(one(B, 'general'), 'thickness') else None
         for f in find(B, 'footprint'):
             at = one(f, 'at'); fx, fy = float(at[1]), float(at[2]); fr = float(at[3]) if len(at) > 3 else 0.
             a = math.radians(-fr)
