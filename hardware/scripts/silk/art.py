@@ -97,20 +97,18 @@ def bottom(bd, style='merged'):
         lines += [LineString([(-20, 0), (20, 0)]).buffer(0.08), LineString([(0, -20), (0, 20)]).buffer(0.08)]
         tags = []
         chips = [Point(p).buffer(2.3) for p in imus.values()]
+        M = lambda g: affinity.scale(g, -1, 1, origin=(0, 0))         # board -> view
         for ref, (x, y) in imus.items():
-            rot = -bd.fp[ref]['rot']                             # mirrored frame
-            chip = affinity.rotate(box(-1.5, -1.25, 1.5, 1.25), rot, origin=(0, 0))
-            G.append(affinity.translate(chip.exterior.buffer(0.09), x, y))
-            G.append(affinity.translate(affinity.rotate(Point(-1.0, 0.75).buffer(0.25), rot, origin=(0, 0)), x, y))
-            lines.append(LineString([(0, 0), (x, y)]).difference(Point(x, y).buffer(2.3)).buffer(0.1))
-            # name only (the rings carry the radii), set along the ring in the band between r 12 and r 18
-            g = _mid(text(ref, 0.85, 'xbold', track=0.04)[0]); a0 = math.atan2(y, x)
-            for da in (0, 5, -5, 10, -10, 15, -15, 20, -20):
-                c = _arc_text(g, 15.0, a0 + math.radians(da))
-                if outline_v.contains(c) and not c.buffer(0.3).intersects(ko) and not any(c.buffer(0.3).intersects(q) for q in tags + chips + [hole]):
-                    tags.append(c); break
-            else: print('  no tag for', ref)
-        for r, ang in ((12, 40), (18, 50)):                      # ring names sit in a gap in their own ring, along it
+            # the chip as drawn on the top: real outline, pin-1 corner filled, its name inside, all the same way
+            fp = bd.fp[ref]; own = unary_union([g for v in fp['pads'].values() for g in v])
+            env = M(unary_union([q for q in (fp['fab'], own) if q and not q.is_empty]).minimum_rotated_rectangle).buffer(0.32, join_style=2)
+            G.append(env.exterior.buffer(0.075))
+            G.append(_corner_tri(env, M(_pad(bd, ref, '1')).centroid))
+            # name turned along the ring like R12 / R18, centred in its box
+            nm = _arc_text(_mid(text(ref, 0.85, 'xbold', track=0.04)[0]), math.hypot(x, y), math.atan2(y, x))
+            tags.append(affinity.translate(nm, env.centroid.x - x, env.centroid.y - y))
+            lines.append(LineString([(0, 0), (x, y)]).difference(env.buffer(0.3)).buffer(0.1))
+        for r, ang in ((12, 45), (18, 45)):                      # ring names sit in a gap in their own ring, along it
             tags.append(_arc_text(_mid(text(f'R{r}', 0.85, 'xbold')[0]), r, math.radians(ang)))
         geo = unary_union(lines).difference(hole)
         G.append(geo.difference(unary_union([ko] + [q.buffer(0.35) for q in tags] + [Point(p).buffer(1.75) for p in imus.values()])))
@@ -200,6 +198,14 @@ class Placer:
                     s.strict = True; return y
         print('  could not place row', [t for _, t in items], s.why(affinity.translate(gs[0][1], gs[0][0], ys[0]))); return None
 
+def _corner_tri(env, p1, leg=1.05):
+    """solid triangle filling the corner of a rectangle outline nearest pin 1, flush with the line's outer edge"""
+    cs = list(env.exterior.coords)[:-1]; i = min(range(len(cs)), key=lambda j: Point(cs[j]).distance(p1)); k = cs[i]
+    o = list(env.buffer(0.075, join_style=2).exterior.coords)[:-1]; kk = min(o, key=lambda q: Point(q).distance(Point(k)))
+    def L(q):
+        dx, dy = q[0] - k[0], q[1] - k[1]; n = math.hypot(dx, dy); return (kk[0] + dx/n*leg, kk[1] + dy/n*leg)
+    return Polygon([kk, L(cs[i - 1]), L(cs[(i + 1) % len(cs)])])
+
 def _arc_text(g, r, a):
     """text centred on radius r at angle a, turned to run along the circle and kept the right way up"""
     rot = math.degrees(a) - 90
@@ -279,11 +285,12 @@ def top(bd):
     y = P.row([(xs[0], '+'), (xs[1], '−')], [29.75, 30.05, 30.35], cap=0.95)
     P.label('LED', [(-17.5, y or 30.05), (-17.7, y or 30.05)], cap=0.9, font='black', track=0.12)
     # UVLO jumper: name each outer pad by the divider it selects
-    for num, t in (('1', '3S'), ('3', '2S')):
-        c = _pad(bd, 'JP1', num).centroid
-        # the jumper is boxed in; stack the names on its axis, beyond the neighbours (3S = pad 1 = S end)
-        sgn = -1 if num == '1' else 1
-        P.label(t, [(c.x + dx, c.y + sgn*d) for d in (1.3, 1.6, 2.0, 2.4, 2.8, 3.2, 3.6, 4.0) for dx in (0, 0.4, -0.4, 0.8)], cap=0.8)
+    if 'JP1' in bd.fp:
+        for num, t in (('1', '3S'), ('3', '2S')):
+            c = _pad(bd, 'JP1', num).centroid
+            # the jumper is boxed in; stack the names on its axis, beyond the neighbours (3S = pad 1 = S end)
+            sgn = -1 if num == '1' else 1
+            P.label(t, [(c.x + dx, c.y + sgn*d) for d in (1.3, 1.6, 2.0, 2.4, 2.8, 3.2, 3.6, 4.0) for dx in (0, 0.4, -0.4, 0.8)], cap=0.8)
     # C21 polymer tantalum: thick band on the anode (pad 1) end of its outline, the usual polarity mark
     fp = bd.fp['C21']; own = unary_union([g for v in fp['pads'].values() for g in v])
     env = unary_union([fp['fab'], own]).minimum_rotated_rectangle.buffer(0.32, join_style=2)
