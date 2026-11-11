@@ -115,6 +115,18 @@ def bottom(bd, style='merged'):
             else: print('  no tag for', ref)
         for r, ang in ((12, 40), (18, 50)):                      # ring names sit in a gap in their ring
             c = (r*math.cos(math.radians(ang)), r*math.sin(math.radians(ang))); tags.append(affinity.translate(_mid(text(f'R{r}', 0.85, 'xbold')[0]), *c))
+        # legend in the free NW (view) corner: what the rings and boxes are
+        x0, y0, x1, y1 = -18.6, 19.9, -1.6, 28.7
+        frame = box(x0, y0, x1, y1).exterior.buffer(0.075)
+        hdr, _ = text('SENSORS', 0.9, 'black', track=0.14, align='l')
+        G += [frame, affinity.translate(hdr, x0 + 0.8, y1 - 1.55), LineString([(x0, y1 - 2.15), (x1, y1 - 2.15)]).buffer(0.075)]
+        rows = (('U4', 'LSM6', 'r12', '±320 g'), ('U5', 'H3LIS', 'r18', '±400 g'), ('U6', 'H3LIS', 'r18', '±400 g'))
+        for k, row in enumerate(rows):
+            y = y1 - 3.6 - k*1.45
+            for cx, t, f in zip((0.8, 3.3, 8.2, 11.3), row, ('black', 'xbold', 'xbold', 'xbold')):
+                g, _ = text(t, 0.8, f, track=0.03, align='l'); G.append(affinity.translate(g, x0 + cx, y))
+        g, _ = text('at 4000 rpm: 215 g / 322 g', 0.8, 'xbold', track=0.03, align='l'); G.append(affinity.translate(g, x0 + 0.8, y0 + 0.75))
+        ko = ko.union(box(x0, y0, x1, y1).buffer(0.4))
         geo = unary_union(lines).difference(hole)
         G.append(geo.difference(unary_union([ko] + [q.buffer(0.35) for q in tags] + [Point(p).buffer(1.75) for p in imus.values()])))
         labels += tags
