@@ -96,15 +96,19 @@ class Board:
                 for side in 'FB':
                     if f'{side}.Cu' in lays or '*.Cu' in lays: s.cu[side].append(g)
                     if f'{side}.Mask' in lays or '*.Mask' in lays: s.pads[side].append(g)
+        ends = set()
         for sg in find(B, 'segment') + find(B, 'arc'):
+            ends.update((round(float(one(sg, k)[1]), 3), round(float(one(sg, k)[2]), 3)) for k in ('start', 'end'))
             L = one(sg, 'layer')[1]
             if L not in ('F.Cu', 'B.Cu'): continue
             a = T(*one(sg, 'start')[1:3]); b = T(*one(sg, 'end')[1:3]); w = float(one(sg, 'width')[1])
             pts = arc_pts(a, T(*one(sg, 'mid')[1:3]), b) if sg[0] == 'arc' else [a, b]
             s.cu[L[0]].append(LineString(pts).buffer(w/2))
-        s.vias = []
+        s.vias = []; s.routed_vias = []      # routed = a track ends on it (stitching vias can move, these cannot)
         for v in find(B, 'via'):
-            c = T(*one(v, 'at')[1:3]); d = float(one(v, 'size')[1]); dr = float(one(v, 'drill')[1]); s.vias.append((c, d, dr))
+            at = one(v, 'at'); c = T(*at[1:3]); d = float(one(v, 'size')[1]); dr = float(one(v, 'drill')[1]); s.vias.append((c, d, dr))
+            nn = one(v, 'net'); net = nn[1] if nn else ''
+            if net != 'GND' or (round(float(at[1]), 3), round(float(at[2]), 3)) in ends: s.routed_vias.append((c, d))
             for side in 'FB': s.cu[side].append(Point(c).buffer(d/2))
         for z in find(B, 'zone'):
             for fp in find(z, 'filled_polygon'):

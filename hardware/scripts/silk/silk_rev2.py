@@ -103,6 +103,9 @@ def main():
     i = txt.rindex('\t(embedded_fonts')
     txt = txt[:i] + ''.join(items) + txt[i:]
     open(pcb, 'w').write(txt)
+    import clear_vias                     # then get the stitching vias out from under it
+    D, moves, drops = clear_vias.plan(pcb); clear_vias.apply(pcb, moves, drops)
+    print(f'stitching vias under silk: {len(moves)} moved, {len(drops)} dropped')
     print(f'wrote {k} silk polygons ({sum(1 for s in items if "B.SilkS" in s)} bottom); previews in {out}')
 
 
