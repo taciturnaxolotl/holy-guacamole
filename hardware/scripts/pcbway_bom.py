@@ -13,12 +13,19 @@ from pathlib import Path
 HW = Path(__file__).resolve().parent.parent
 BOM = HW / "procurement" / "bom_rev2.csv"
 
-NOT_PLACED = {
-    "U1": "Do not place: customer hand-solders the XIAO RP2350 module",
-}
+# Which parts are in the placement file at all is decided in the schematic (exclude from BOM / position files, DNP):
+# J1 (bare lap pads), the probe pads and U1 (the XIAO module, fitted by hand) are left out there.
 
-# Footprints with no component: J1 is bare solder lap pads for 20 AWG wire.
-NO_PART = {"J1"}
+# Per-part instructions for the assembler.
+_IMU = "Rotated on purpose (U4, U5 166 deg; U6 -164 deg): align pin 1 to the footprint's pin-1 mark, see assembly_top.pdf"
+_XT30 = "Through-hole, hand or selective solder; trim the tails flush with the bottom of the board (0.3 mm to the chassis plate)"
+_BIDIR = "Bidirectional, no polarity"
+NOTES = {
+    "U4": _IMU, "U5": _IMU, "U6": _IMU,
+    "D2": _BIDIR, "D3": _BIDIR, "D4": _BIDIR, "D5": _BIDIR, "D6": _BIDIR,
+    "C21": "Polarised: + (pad 1) on the E side, toward J6",
+    "J6": _XT30, "J7": _XT30,
+}
 
 
 def procurement_mpns():
@@ -37,16 +44,15 @@ def main(positions, out):
     with open(positions, newline="") as f:
         for row in csv.DictReader(f):
             ref = row["Ref"]
-            if ref in NO_PART:
-                continue
             if ref in known:
                 maker, mpn, desc = known[ref]
             else:
                 maker, mpn, desc = "TBD", "TBD", row["Val"]
                 missing.append(ref)
-            note = NOT_PLACED.get(ref, "")
-            if mpn == "TBD" and not note:
+            note = NOTES.get(ref, "")
+            if mpn == "TBD":
                 note = "Part number not yet chosen"
+                missing.append(ref)
             key = (maker, mpn, desc, row["Package"], note)
             groups.setdefault(key, []).append(ref)
 
@@ -64,7 +70,7 @@ def main(positions, out):
             writer.writerow([item, ",".join(refs), len(refs), maker, mpn, desc, package, mount, note])
 
     if missing:
-        print("no manufacturer part number for: " + " ".join(missing), file=sys.stderr)
+        sys.exit("no manufacturer part number for: " + " ".join(sorted(set(missing))) + " (fill in procurement/bom_rev2.csv)")
 
 
 if __name__ == "__main__":

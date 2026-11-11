@@ -1,6 +1,7 @@
 """Move GND stitching vias out from under the silkscreen (or drop them when there is nowhere to go).
 
-A stitching via is a GND via with no track ending on it. Each one under silk on either side moves to the
+A stitching via is a GND via with no track ending on it (the 0.62 mm return vias at the signal tunnel
+are not stitching and stay where power_rev2.py put them). Each one under silk on either side moves to the
 nearest spot within MAX_MOVE that is clear of silk on both sides, keeps the board's clearance to every
 other-net track / pad / via on all four layers, stays out of every non-GND zone fill (so it never punches
 a hole in a power pour), keeps hole-to-hole and edge rules, and is not too close to another stitch via.
@@ -21,6 +22,7 @@ from board import Board, T
 
 CLR, HOLE2HOLE, HOLE_CLR, EDGE, SILK_CLR, STITCH_GAP, MAX_MOVE = 0.205, 0.3, 0.25, 0.6, 0.15, 1.0, 3.0   # EDGE > the 0.55 autorouter ring
 LAYERS = ('F.Cu', 'In1.Cu', 'In2.Cu', 'B.Cu')
+RETURN_D = 0.62   # power_rev2.py's GND return vias at the signal tunnel: placed on purpose, never moved
 
 
 def pad_poly(p):
@@ -33,7 +35,7 @@ def plan(pcb):
     D = load(pcb); bd = Board(pcb)
     silk = unary_union([bd.silk['F'], bd.silk['B']])
     ends = Counter((round(e[0], 3), round(e[1], 3)) for s in D['seg'] for e in (s['a'], s['b']))
-    def is_stitch(v): return v['net'] == 'GND' and ends[(round(v['p'][0], 3), round(v['p'][1], 3))] == 0
+    def is_stitch(v): return v['net'] == 'GND' and abs(v['d'] - RETURN_D) > 1e-6 and ends[(round(v['p'][0], 3), round(v['p'][1], 3))] == 0
     # other-net copper on every layer (a through via touches all four)
     foreign = []
     for s in D['seg']:
@@ -48,6 +50,8 @@ def plan(pcb):
             for L, pts in z['fills']:
                 if L in LAYERS and len(pts) > 2: foreign.append(Polygon([T(*q) for q in pts]).buffer(0))
     foreign = unary_union(foreign)
+    # a via in or against a GND SMD pad's mask opening cannot be tented (same rule as stitch_rev2.py)
+    gnd_pads = unary_union([pad_poly(p) for f in D['fp'] for p in f['pads'] if p['net'] == 'GND' and '*.Cu' not in p['layers']])
     drills = [Point(h[0], h[1]).buffer(h[2]/2) for h in bd.holes]
     inside = bd.outline
     vias = [dict(v, c=T(*v['p'])) for v in D['via']]
@@ -64,6 +68,7 @@ def plan(pcb):
             if not inside.buffer(-(EDGE + r)).contains(q): return False
             if q.buffer(r + SILK_CLR).intersects(silk): return False
             if q.buffer(r + CLR).intersects(foreign): return False
+            if q.buffer(r + 0.1).intersects(gnd_pads): return False
             if any(q.distance(d) < max(HOLE2HOLE + v['drill']/2, HOLE_CLR + r) for d in drills): return False
             if any(q.distance(o) < STITCH_GAP for o in placed): return False
             return True

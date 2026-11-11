@@ -6,8 +6,8 @@
 	(paper "User" 134.62 111.76)
 	(title_block
 		(title "Holy Guacamole")
-		(date "2026-06-29")
-		(rev "2.0-draft")
+		(date "2026-11-11")
+		(rev "2.0")
 		(company "Kieran Klukas")
 	)
 	(lib_symbols
@@ -1537,9 +1537,9 @@
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom no)
+		(in_bom yes)
 		(on_board yes)
-		(in_pos_files no)
+		(in_pos_files yes)
 		(dnp no)
 		(uuid "f1877eab-4f3f-4919-8fd6-76484215bb5a")
 		(property "Reference" "J2"

@@ -1,7 +1,8 @@
 #!/bin/sh
 # Freerouting 2.5 needs JDK 25+ and the jar at ~/.cache/freerouting/freerouting-2.5.0.jar; work files go to /tmp/fr
 mkdir -p /tmp/fr
-# usage: run.sh <pcb> ; exports DSN, relaxes class widths for the autorouter, routes, imports SES into <pcb>.routed.kicad_pcb
+# usage: scripts/autoroute_rev2.sh <pcb> ; exports DSN, relaxes class widths for the autorouter, routes, and imports the
+# SES back into <pcb> in place (the board as it was is kept as <pcb minus extension>.prerouted.bak)
 set -e
 PCB=$1; OUT=$PCB; cp $PCB ${PCB%.kicad_pcb}.prerouted.bak
 P=/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/Current/bin/python3
@@ -27,26 +28,8 @@ for net in ('VBUS', '"/Power Subsystem/VBAT_RAW"', '3V3', '5V'):
     t=t[:i]+t[j+7:]
 t=t.replace('(class Power_Main,Default "/Power Subsystem/VBAT_RAW" VBUS', '(class Power_Main,Default')
 t=t.replace('(class Power_Light,Default 3V3', '(class Power_Light,Default').replace('(class Power_Heavy,Default 5V ', '(class Power_Heavy,Default ')
-# inner layers are pours: freerouting must route on F.Cu/B.Cu only
 import re as _re
-def drop_balanced(text, start_pat):
-    out=[]; i=0
-    while True:
-        m=_re.search(start_pat, text[i:])
-        if not m: out.append(text[i:]); break
-        s=i+m.start(); out.append(text[i:s])
-        depth=0; j=s
-        while True:
-            c=text[j]
-            if c=='(': depth+=1
-            elif c==')':
-                depth-=1
-                if depth==0: j+=1; break
-            j+=1
-        while j<len(text) and text[j] in ' \t': j+=1
-        if j<len(text) and text[j]=='\n': j+=1
-        i=j
-    return ''.join(out)
+# inner layers are pours: freerouting must route on F.Cu/B.Cu only, so they are declared as power layers.
 # In2 wires are the hand-placed signal tunnel lanes under the power band (power_rev2.py): they stay, as fixed
 # wiring, so the router knows each tunnel via is joined to its twin across the band
 t=_re.sub(r'(\(layer In[12]\.Cu\n\s*\(type )signal', r'\1power', t)

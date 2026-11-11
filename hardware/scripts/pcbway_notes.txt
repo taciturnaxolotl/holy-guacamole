@@ -1,0 +1,22 @@
+Holy Guacamole carrier, rev 2.0. Notes for fabrication and assembly (export_pcbway.sh copies this into the order package).
+
+PCB
+- 4 layers, 1.6 mm FR4. Layer order top to bottom: F_Cu, In1_Cu (ground plane), In2_Cu (power planes and a few signal tracks), B_Cu.
+- Copper: 2 oz finished on the outer layers, 1 oz on the inner layers.
+- Minimum track 0.18 mm (7 mil), minimum spacing 0.205 mm (8 mil), minimum drill 0.25 mm, minimum via ring 0.185 mm.
+- Finish ENIG. Green solder mask, white silkscreen on both sides.
+- Vias tented on both sides, not plugged. Please do not open or plug any via.
+- Keep the solder mask dams between the pads of U4, U5 and U6 (0.5 mm pitch LGA, 0.22 mm gap).
+- No slots, no castellations, no edge plating. Four non-plated 2.2 mm mounting holes.
+- If the boards are panelised, please put the rails and tabs on the short (north and south) ends only; the long edges sit 0.5 mm from the chassis walls and must be smooth.
+
+Assembly
+- Top side only. The bottom has four bare test pads and no parts.
+- Stencil: top side only, 0.10 to 0.12 mm (the LGA apertures are 0.28 x 0.60 mm).
+- Files: positions_top.csv (placement), bom_pcbway.csv (parts), assembly_top.pdf (reference designators, outlines and pin-1 marks; the silkscreen carries no reference designators).
+- U1 (footprint XIAO-RP2350-SMD, the large module outline at the north end) is NOT in the BOM or the placement file: the customer fits that module. Paste on its pads is fine.
+- J1 (two 2.6 x 4.0 mm pads at the south-east corner) has no part: they are wire solder pads. Paste on them is fine.
+- U4, U5 and U6 are rotated on purpose (166, 166 and -164 degrees). Align pin 1 to the pin-1 mark in assembly_top.pdf.
+- C21 is the only polarised part. Its + pad (pad 1) is on the east side, toward J6.
+- D2 to D6 are bidirectional and have no polarity.
+- J6 and J7 (XT30, through-hole) are soldered by hand or selective solder. Trim their tails flush with the bottom of the board.

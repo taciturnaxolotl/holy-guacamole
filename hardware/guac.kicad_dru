@@ -9,7 +9,7 @@
   (constraint clearance (min 1.0mm)))
 
 # PCBWay normal process, 2 oz outer / 1 oz inner (pcbway.com/capabilities.html, Advanced PCB table).
-# The project-wide minimums (0.18 mm track, 0.21 mm clearance, 0.18 mm via ring) cover the 2 oz
+# The project-wide minimums (0.18 mm track, 0.205 mm clearance, 0.18 mm via ring) cover the 2 oz
 # outer layers; the rules below cover what a single global number cannot.
 
 # Component (plated, non-via) holes on 2 oz need a 12 mil ring.

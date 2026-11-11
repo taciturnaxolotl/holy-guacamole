@@ -5,6 +5,9 @@ usage: <kicad python> scripts/bridge_rev2.py guac.kicad_pcb
 For every signal net still in more than one copper island, a grid router (0.05 mm cells, F.Cu and B.Cu) joins the
 smallest island to the next one with a 0.18 mm track and 0.62/0.25 mm vias, keeping 0.215 mm from other copper,
 power pours and keepouts (PCBWay normal process for 2 oz outer copper; GND pours refill around the result).
+Before that, any signal track freerouting left closer than the 0.205 mm board clearance to another net's pad,
+track or via is ripped up, and so is any via whose hole is within 0.1 mm of an SMD pad of its own net, so the
+grid router lays that stretch again with its own margins.
 Then vias that freerouting left connected on one layer only are removed.
 """
 import heapq
@@ -17,6 +20,7 @@ PCB = sys.argv[1]
 STEP = 0.05
 TW, CLR, VR = 0.18, 0.215, 0.31
 VIA_COST = 40
+PAD_GAP = 0.1   # via hole wall to the edge of an SMD pad of the same net
 POUR_NETS = ("GND", "VBUS", "/Power Subsystem/VBAT_RAW", "3V3", "5V")
 LAYERS = [pcbnew.F_Cu, pcbnew.B_Cu]   # routing layers
 ALL_CU = [pcbnew.F_Cu, pcbnew.In1_Cu, pcbnew.In2_Cu, pcbnew.B_Cu]   # connectivity (the In2 signal tunnel counts)
@@ -60,6 +64,21 @@ def islands(net):
     return sorted(groups.values(), key=len)
 
 
+def mark(grid, shapes, pad):
+    gap = M(pad)
+    for L, sh, box in shapes:
+        ix0 = max(0, int((box.GetLeft() / 1e6 - X0 - pad) / STEP) - 1)
+        ix1 = min(NX - 1, int((box.GetRight() / 1e6 - X0 + pad) / STEP) + 1)
+        iy0 = max(0, int((box.GetTop() / 1e6 - Y0 - pad) / STEP) - 1)
+        iy1 = min(NY - 1, int((box.GetBottom() / 1e6 - Y0 + pad) / STEP) + 1)
+        g = grid[L]
+        for iy in range(iy0, iy1 + 1):
+            for ix in range(ix0, ix1 + 1):
+                k = iy * NX + ix
+                if not g[k] and sh.Collide(pcbnew.VECTOR2I(M(X0 + ix * STEP), M(Y0 + iy * STEP)), gap):
+                    g[k] = 1
+
+
 def obstacles(net, radius, for_via):
     grid = {L: bytearray(NX * NY) for L in LAYERS}
     shapes = []
@@ -79,19 +98,14 @@ def obstacles(net, radius, for_via):
                     shapes.append((L, z.Outline(), z.GetBoundingBox()))
             elif z.GetNetname() != "GND" and z.GetNetCode() != net.GetNetCode():
                 shapes.append((L, z.GetFilledPolysList(L), z.GetBoundingBox()))
-    gap = M(radius + CLR)
-    pad = radius + CLR
-    for L, sh, box in shapes:
-        ix0 = max(0, int((box.GetLeft() / 1e6 - X0 - pad) / STEP) - 1)
-        ix1 = min(NX - 1, int((box.GetRight() / 1e6 - X0 + pad) / STEP) + 1)
-        iy0 = max(0, int((box.GetTop() / 1e6 - Y0 - pad) / STEP) - 1)
-        iy1 = min(NY - 1, int((box.GetBottom() / 1e6 - Y0 + pad) / STEP) + 1)
-        g = grid[L]
-        for iy in range(iy0, iy1 + 1):
-            for ix in range(ix0, ix1 + 1):
-                k = iy * NX + ix
-                if not g[k] and sh.Collide(pcbnew.VECTOR2I(M(X0 + ix * STEP), M(Y0 + iy * STEP)), gap):
-                    g[k] = 1
+    if for_via:
+        # a via hole in or against one of the net's own SMD pads cannot be tented (see check_vias_rev2.py)
+        for f in board.GetFootprints():
+            for p in f.Pads():
+                if p.GetNetCode() == net.GetNetCode() and p.GetAttribute() == pcbnew.PAD_ATTRIB_SMD:
+                    own_pads = [(L, p.GetEffectiveShape(L), p.GetBoundingBox()) for L in LAYERS if p.IsOnLayer(L)]
+                    mark(grid, own_pads, 0.125 + PAD_GAP + 0.03)
+    mark(grid, shapes, radius + CLR)
     m = EDGE + radius
     for L in LAYERS:
         g = grid[L]
@@ -200,6 +214,31 @@ def route(net, src, dst):
             board.Add(t)
     return True
 
+
+MIN_CLR = 0.205   # the board's minimum clearance (guac.kicad_pro)
+copper = [(t, t.GetNetCode(), t.GetBoundingBox()) for t in board.GetTracks()]
+copper += [(p, p.GetNetCode(), p.GetBoundingBox()) for f in board.GetFootprints() for p in f.Pads()]
+tight = []
+for t in board.GetTracks():
+    if t.GetClass() != "PCB_TRACK" or t.GetNetname() in POUR_NETS or t.GetLayer() not in LAYERS:
+        continue
+    L, box = t.GetLayer(), t.GetBoundingBox()
+    box.Inflate(M(MIN_CLR))
+    shape = t.GetEffectiveShape(L)
+    if any(code != t.GetNetCode() and o.IsOnLayer(L) and box.Intersects(obox) and shape.Collide(o.GetEffectiveShape(L), M(MIN_CLR) - 100)
+           for o, code, obox in copper):
+        tight.append(t)
+for t in tight:
+    print("ripping up tight track", t.GetNetname(), flush=True)
+    board.Delete(t)
+# the same for a via whose hole sits in or against one of its own net's SMD pads: the grid router keeps its vias
+# off them, freerouting does not
+smd = [(p, p.GetNetCode(), p.GetBoundingBox()) for f in board.GetFootprints() for p in f.Pads() if p.GetAttribute() == pcbnew.PAD_ATTRIB_SMD]
+for v in [t for t in board.GetTracks() if t.GetClass() == "PCB_VIA" and t.GetNetname() not in POUR_NETS]:
+    hole = pcbnew.SHAPE_SEGMENT(v.GetPosition(), v.GetPosition(), v.GetDrillValue())
+    if any(code == v.GetNetCode() and p.IsOnLayer(L) and p.GetEffectiveShape(L).Collide(hole, M(PAD_GAP)) for p, code, _ in smd for L in LAYERS):
+        print("removing via in pad", v.GetNetname(), flush=True)
+        board.Delete(v)
 
 OPEN = set()
 for code, net in sorted(board.GetNetsByNetcode().items()):

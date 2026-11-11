@@ -6,8 +6,8 @@
 	(paper "User" 189.865 155.067)
 	(title_block
 		(title "Holy Guacamole")
-		(date "2026-06-28")
-		(rev "2.0-draft")
+		(date "2026-11-11")
+		(rev "2.0")
 		(company "Kieran Klukas")
 		(comment 1 "SPDX-License-Identifier: CERN-OHL-S-2.0")
 	)
@@ -2864,7 +2864,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "PESD5V0V1BB"
+		(property "Value" "ESD5B5.0ST1G"
 			(at 43.942 131.826 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -2906,7 +2906,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "C477993"
+		(property "LCSC Part" ""
 			(at 351.15 77.71 0)
 			(hide yes)
 			(show_name no)
@@ -3271,7 +3271,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "PESD5V0V1BB"
+		(property "Value" "ESD5B5.0ST1G"
 			(at 100.33 96.5199 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3313,7 +3313,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "C477993"
+		(property "LCSC Part" ""
 			(at 393.06 52.31 0)
 			(hide yes)
 			(show_name no)
@@ -3451,7 +3451,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "PESD5V0V1BB"
+		(property "Value" "ESD5B5.0ST1G"
 			(at 119.38 96.5199 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3493,7 +3493,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "C477993"
+		(property "LCSC Part" ""
 			(at 412.11 37.31 0)
 			(hide yes)
 			(show_name no)
@@ -4103,9 +4103,9 @@
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom no)
+		(in_bom yes)
 		(on_board yes)
-		(in_pos_files no)
+		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "c23f6c42-ac18-4b1f-8e0e-78e1e2dcc51e")
@@ -4445,7 +4445,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "PESD5V0V1BB"
+		(property "Value" "ESD5B5.0ST1G"
 			(at 48.26 121.9199 90)
 			(hide yes)
 			(show_name no)
@@ -4488,7 +4488,7 @@
 				)
 			)
 		)
-		(property "LCSC Part" "C477993"
+		(property "LCSC Part" ""
 			(at 340.99 77.71 0)
 			(hide yes)
 			(show_name no)
@@ -4672,9 +4672,9 @@
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom no)
+		(in_bom yes)
 		(on_board yes)
-		(in_pos_files no)
+		(in_pos_files yes)
 		(dnp no)
 		(uuid "f5dabc91-9878-455c-a6a3-e73a8f061c41")
 		(property "Reference" "J5"

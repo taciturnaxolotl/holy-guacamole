@@ -2,7 +2,7 @@
 	(version 20241229)
 	(generator "easyeda2kicad-ts")
 	(layer "F.Cu")
-	(attr through_hole)
+	(attr smd)
 	(property "Reference" "REF**"
 		(at 0 -5.01 0)
 		(layer "F.SilkS")

@@ -106,7 +106,7 @@ PLACE = {
     "R9": (-4.6, 26.0, 90, "F"),
     "R10": (-4.6, 28.1, 90, "F"),
     "C12": (-6.0, 28.1, 90, "F"),
-    # IMU array, chip X radial outward (see footprint pin-edge notes in the README)
+    # IMU array, rotated 166 degrees; each chip's radial axis is in docs/spec.md, IMU placement
     "U4": (*U4, IMU_ROT, "F"),
     "U5": (*U5, IMU_ROT, "F"),
     "U6": (*U6, (IMU_ROT + 30) % 360, "F"),
@@ -160,7 +160,12 @@ for c in root.child("components").children("comp"):
     ref = c.child("ref").items[1]
     sp = c.child("sheetpath")
     path = (sp.child("tstamps").items[1] if sp else "/") + c.child("tstamps").items[1]
-    comps[ref] = dict(fp=c.child("footprint").items[1], value=c.child("value").items[1], path=path.replace("//", "/"))
+    flags = {p.child("name").items[1] for p in c.children("property")}
+    comps[ref] = dict(fp=c.child("footprint").items[1], value=c.child("value").items[1], path=path.replace("//", "/"),
+                      no_bom="exclude_from_bom" in flags, no_pos="exclude_from_pos_files" in flags, dnp="dnp" in flags,
+                      fields={x.child("name").items[1]: (x.items[2] if len(x.items) > 2 else "")
+                              for x in (c.child("fields").children("field") if c.child("fields") else [])
+                              if x.child("name").items[1] != "Footprint"})
 nets = {}
 for n in root.child("nets").children("net"):
     nets[n.child("name").items[1]] = [(x.child("ref").items[1], x.child("pin").items[1]) for x in n.children("node")]
@@ -181,6 +186,9 @@ def load_fp(fpid):
         raise SystemExit("footprint load failed: %s from %s (%s)" % (fpid, LIBS.get(lib), e))
     if f is None:
         raise SystemExit("footprint not found: " + fpid)
+    # keep the library nickname in the footprint ID, as "Update PCB from Schematic" would, so the parity check
+    # does not flag every part
+    f.SetFPID(pcbnew.LIB_ID(lib, name))
     return f
 
 
@@ -206,6 +214,14 @@ for ref, c in comps.items():
     f.SetReference(ref)
     f.SetValue(c["value"])
     f.SetPath(pcbnew.KIID_PATH(c["path"]))
+    # carry the symbol's extra fields over, hidden, as "Update PCB from Schematic" would (keeps the parity check quiet)
+    for name, value in c["fields"].items():
+        f.SetField(name, value)
+        f.GetField(name).SetVisible(False)
+    # the symbol's BOM / position-file / DNP flags decide what reaches the assembly files (export_pcbway.sh)
+    attrs = f.GetAttributes() & ~(pcbnew.FP_EXCLUDE_FROM_BOM | pcbnew.FP_EXCLUDE_FROM_POS_FILES | pcbnew.FP_DNP)
+    f.SetAttributes(attrs | (pcbnew.FP_EXCLUDE_FROM_BOM if c["no_bom"] else 0) | (pcbnew.FP_EXCLUDE_FROM_POS_FILES if c["no_pos"] else 0)
+                    | (pcbnew.FP_DNP if c["dnp"] else 0))
     x, y, rot, side = PLACE[ref]
     board.Add(f)
     if side == "B":
@@ -265,6 +281,9 @@ for layer in (pcbnew.User_1,):
         sh.SetStart(K(*a))
         sh.SetEnd(K(*b))
         board.Add(sh)
+tb = board.GetTitleBlock()
+tb.SetRevision("2.0")
+tb.SetDate("2026-11-11")
 ds = board.GetDesignSettings()
 ds.SetAuxOrigin(K(0, 0))
 ds.SetGridOrigin(K(0, 0))

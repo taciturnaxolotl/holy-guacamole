@@ -1,7 +1,7 @@
 """Silkscreen art for the rev-2 carrier: draws it, writes it into the board as filled gr_poly items, renders previews.
 
-usage (from hardware/):  python3 scripts/silk/silk_rev2.py guac.kicad_pcb [--preview-only]
-needs: shapely, fonttools, pillow (fonts are vendored in scripts/silk/fonts, OFL)
+usage (from hardware/):  uv run --with shapely --with fonttools --with pillow python3 scripts/silk/silk_rev2.py guac.kicad_pcb [--preview-only]
+(fonts are vendored in scripts/silk/fonts, OFL; route_best_rev2.sh runs this for you)
 
 Idempotent: every item it writes has a uuid starting 5a17a127-, and a rerun deletes those first. It also replaces
 the old top-side RX / ESC / wordmark / SWD texts (art.DROP_TOP) with its own. Run it after any change that moves

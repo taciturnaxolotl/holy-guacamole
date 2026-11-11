@@ -6,8 +6,8 @@
 	(paper "User" 217.17 107.442)
 	(title_block
 		(title "Holy Guacamole")
-		(date "2026-06-29")
-		(rev "2.0-draft")
+		(date "2026-11-11")
+		(rev "2.0")
 		(company "Kieran Klukas")
 	)
 	(lib_symbols
@@ -2063,7 +2063,7 @@
 		)
 		(uuid "053c4100-9cf1-4725-a56a-91b6eb79d54d")
 	)
-	(text "2S-3S input & 5V buck"
+	(text "3S input & 5V buck"
 		(exclude_from_sim no)
 		(at 201.168 58.42 0)
 		(effects
@@ -3335,7 +3335,7 @@
 				)
 			)
 		)
-		(property "Value" "22uf"
+		(property "Value" "22uF"
 			(at 75.3745 34.8615 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5231,7 +5231,7 @@
 				)
 			)
 		)
-		(property "Value" "22uf"
+		(property "Value" "22uF"
 			(at 66.4845 34.8615 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5320,7 +5320,7 @@
 				)
 			)
 		)
-		(property "Value" "47pf"
+		(property "Value" "47pF"
 			(at 108.712 34.544 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5394,9 +5394,9 @@
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom no)
+		(in_bom yes)
 		(on_board yes)
-		(in_pos_files no)
+		(in_pos_files yes)
 		(dnp no)
 		(uuid "9af968bd-4815-4664-bf9d-26360c0479d5")
 		(property "Reference" "J7"
@@ -5821,9 +5821,9 @@
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom no)
+		(in_bom yes)
 		(on_board yes)
-		(in_pos_files no)
+		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "c4a04c4f-925b-4a65-83a7-13d50289489c")

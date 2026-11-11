@@ -1,5 +1,5 @@
 """DC resistance of a net between two pads: rasterize copper per layer, couple layers at vias / PTH barrels, solve Laplace.
-usage: python3 hardware/scripts/review/rsolve.py NET PAD_A PAD_B [I_amps]   (PCB=path overrides the board file)"""
+usage: uv run --with numpy --with scipy --with shapely python3 hardware/scripts/review/rsolve.py NET PAD_A PAD_B [I_amps]   (PCB=path overrides the board file)"""
 import sys, numpy as np, scipy.sparse as sp, scipy.sparse.linalg as spl
 from shapely.geometry import Polygon, LineString, Point, box
 from shapely.ops import unary_union

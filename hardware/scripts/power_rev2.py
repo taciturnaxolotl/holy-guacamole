@@ -1,6 +1,8 @@
-"""Stage 2 for the rev-2 carrier: power copper (zones), the 5V backbone, and GND pours.
-Run after layout_rev2.py with KiCad's python. Idempotent: it removes any zone/track it previously created
-(identified by the User_2 marker text) before adding them again.
+"""Stage 2 for the rev-2 carrier: power copper (zones), the 5V backbone, GND pours, the In2 signal tunnel, the IMU
+escapes and the other hand routes, the plane fanout vias, and the keepouts the autorouter works inside.
+Run after layout_rev2.py with KiCad's python. Idempotent: it first removes its own zones (named rev2-power...),
+its back-side probe-pad labels, and every track and via, routed ones included, so the board always goes on to the
+autorouter from the same state.
 
 Power scheme (see docs/spec.md): J6 (battery) and J7 (switch loop) mirror each other about x = 0 at the S end
 (chassis v3.4g). VBAT_RAW runs straight across between their N pins on B.Cu (doubled on In2 at both ends); VBUS
@@ -29,12 +31,21 @@ def K(x, y):
 board = pcbnew.LoadBoard(PCB)
 GND, VBUS, VBAT, V5 = (board.FindNet(n) for n in ("GND", "VBUS", "/Power Subsystem/VBAT_RAW", "5V"))
 
+# Remove() hands the item to Python; if the wrapper is then collected, KiCad 10's swig layer breaks and
+# board.Tracks() stops returning a list. Holding the removed items until exit avoids that.
+removed = []
 for z in list(board.Zones()):
     if z.GetZoneName().startswith(MARK):
         board.Remove(z)
+        removed.append(z)
 for t in list(board.GetTracks()):
-    if t.HasFlag(pcbnew.IS_NEW) or t.GetNetname() in ("5V", "VBUS", "GND", "/Power Subsystem/VBAT_RAW"):
-        board.Remove(t)
+    board.Remove(t)
+    removed.append(t)
+SILK_BOTTOM = (("DIO", 4.2, 14.9), ("CLK", 6.4, 13.63), ("GND", 8.6, 12.36), ("VBAT", 10.8, 11.09))
+for d in list(board.GetDrawings()):
+    if d.GetClass() == "PCB_TEXT" and d.GetLayer() == pcbnew.B_SilkS and d.GetText() in [s[0] for s in SILK_BOTTOM]:
+        board.Remove(d)
+        removed.append(d)
 
 
 def zone(net, layer, polys, name, priority, clearance=0.3, min_w=0.25, thermal=False):
@@ -143,6 +154,7 @@ for i, name in enumerate(TUNNEL_NETS):
     via(x, ys, n, d=0.62, drill=0.25)
     track([(x, yn), (x, ys)], n, pcbnew.In2_Cu, 0.18)
 track([(0.2, -3.6), (0.2, -16.2)], board.FindNet("3V3"), pcbnew.In2_Cu, 0.4)
+# (GND return vias for the tunnel go in after routing, where the fan-outs leave room: stitch_rev2.py)
 ta = pcbnew.ZONE(board)
 ta.SetIsRuleArea(True)
 ta.SetDoNotAllowZoneFills(True)
@@ -194,15 +206,17 @@ track([(12.6, 25.4), (14.8, 25.96)], V5, F, 0.4)
 # Thin VBUS feed (about 0.5 A: buck input, UVLO and VBAT dividers, TinySLEDs), B.Cu from the band's NW tongue up
 # the W board edge (under the LED leads, clear of U4's fanout) to the buck input caps, then on to J2 pin 1. The autorouter never sees VBUS.
 via(-14.8, -5.9, VBUS, d=0.75, drill=0.35)
-track([(-14.8, -5.9), (-18.6, -5.9), (-18.6, 21.6), (-7.65, 21.6)], VBUS, B, 0.8)
+track([(-14.8, -5.9), (-18.6, -5.9), (-18.6, 21.6), (-7.5, 21.6), (-6.6, 21.7)], VBUS, B, 0.8)
 track([(-9.3, 15.45), (-9.3, 16.4), (-10.02, 17.0)], VBUS, F, 0.5)
 track([(-9.3, 16.4), (-8.7, 17.2), (-7.65, 17.2), (-7.65, 22.75)], VBUS, F, 0.6)
-via(-7.65, 21.6, VBUS, d=0.8, drill=0.4)
+# the feed's via sits just E of C19/C20 (between their pads its hole would be 0.03 mm from C19's opening)
+track([(-7.65, 21.7), (-6.6, 21.7)], VBUS, F, 0.6)
+via(-6.6, 21.7, VBUS, d=0.8, drill=0.4)
 track([(-11.7, 15.45), (-11.45, 16.4), (-10.98, 17.0)], GND, F, 0.4)
 track([(-10.98, 17.0), (-10.98, 17.95), (-9.55, 17.95), (-9.55, 22.75)], GND, F, 0.5)
 via(-3.52, 14.5, VBUS, d=0.7, drill=0.3)
 track([(-3.52, 14.5), (-3.52, 15.8)], VBUS, F, 0.4)
-track([(-3.52, 14.5), (-3.52, 21.6), (-7.65, 21.6)], VBUS, B, 0.6)
+track([(-3.52, 14.5), (-3.52, 21.7), (-6.6, 21.7)], VBUS, B, 0.6)
 track([(-4.6, 25.52), (-4.6, 22.0)], VBUS, F, 0.4)
 via(-4.6, 22.0, VBUS, d=0.7, drill=0.3)
 j2_1 = next(p for p in board.FindFootprintByReference("J2").Pads() if p.GetNumber() == "1")
@@ -228,10 +242,15 @@ FANOUT_SKIP = {("J1", "2"), ("C13", "2"), ("U1", "14"), ("U1", "12"), ("U1", "28
 VIA_R = 0.35
 CLR = 0.22
 STUB_W = 0.25
+PAD_GAP = 0.1   # via copper to the edge of any SMD pad, its own included: a via in or against a pad's mask opening
+                # cannot be tented and wicks the joint's solder down the hole
 all_pads = []
+smd_pads = []
 for fp in board.GetFootprints():
     for pad in fp.Pads():
         all_pads.append(((pad.GetParentAsString(), pad.GetNumber()), pad.GetNetname(), pad.GetEffectiveShape(pcbnew.F_Cu)))
+        if pad.GetAttribute() == pcbnew.PAD_ATTRIB_SMD and pad.IsOnLayer(pcbnew.F_Cu):
+            smd_pads.append(pad.GetEffectiveShape(pcbnew.F_Cu))
 placed_vias = [(v.GetPosition().x / 1e6 - OX, OY - v.GetPosition().y / 1e6, v.GetWidth() / 2e6) for v in board.GetTracks() if v.GetClass() == "PCB_VIA"]
 
 
@@ -246,6 +265,8 @@ def clear(vx, vy, net, own, stubs):
     if not (abs(vx) < 19.45 - VIA_R and abs(vy) < 37.45 - VIA_R) or in_strip(vx, vy):
         return False
     vshape = pcbnew.SHAPE_CIRCLE(K(vx, vy), mm(VIA_R))
+    if any(shape.Collide(vshape, mm(PAD_GAP)) for shape in smd_pads):
+        return False
     sshapes = [pcbnew.SHAPE_SEGMENT(K(sx, sy), K(vx, vy), mm(STUB_W)) for sx, sy in stubs]
     for key, pnet, shape in all_pads:
         if key in own or pnet == net.GetNetname():
@@ -299,7 +320,7 @@ def padxy(ref, num):
 
 
 c10_1 = padxy("C10", "1")
-# U6 (rotated so its SPI pins face the board centre) sits over the E power strips: no vias under it.
+# U6 (rotated so its SPI pins face the board centre) is fanned out by hand, with one GND via under its centre.
 u6 = {n: padxy("U6", n) for n in ("1", "4", "6", "7", "8", "14", "15")}
 XE = 19.15
 track([u6["14"], (XE, u6["14"][1]), (XE, 7.3), (u6["1"][0], 7.3), u6["1"]], V3, F, 0.2)
@@ -350,8 +371,8 @@ def fan3(ref, mid, outer, diag=1.0):
         placed_vias.append((ex, ey, 0.35))
 
 
-# U6's W side faces the B.Cu VBUS strip (x 14.4..16.45), so its vias have to land west of it. GND pad 5 (boxed
-# in by the SCK escape, and the chip interior is too tight for a 0.18 mm track) and SPI pads 6-8 run out as four
+# U6's W side: GND pad 5 (boxed in by the SCK escape, and the chip interior is too tight for a 0.18 mm track)
+# and SPI pads 6-8 run out as four
 # parallel lanes, each jogging 45 degrees to a 0.95 mm lane spacing so the 0.7 mm vias sit side by side.
 def lanes(ref, mid, reach, plan):
     fp = board.FindFootprintByReference(ref)
@@ -388,10 +409,44 @@ fan3("U4", "13", ("12", "14"))
 escape("U4", "6", length=1.1)
 # U5 SCK: its escape via is boxed in by U5's own fanout and C13, so it gets a hand-routed B.Cu run to its tunnel
 # via, along the S edge of the power band
-_v = next(v for v in board.GetTracks() if v.GetClass() == "PCB_VIA" and v.GetNetname() == "/SPI_SCK"
-          and abs(v.GetPosition().x / 1e6 - OX + 4.3) < 0.6 and abs(OY - v.GetPosition().y / 1e6 + 15.2) < 0.6)
-_vx, _vy = _v.GetPosition().x / 1e6 - OX, OY - _v.GetPosition().y / 1e6
+def via_near(netname, x, y):
+    v = next(v for v in board.GetTracks() if v.GetClass() == "PCB_VIA" and v.GetNetname() == netname
+             and abs(v.GetPosition().x / 1e6 - OX - x) < 0.6 and abs(OY - v.GetPosition().y / 1e6 - y) < 0.6)
+    return v.GetPosition().x / 1e6 - OX, OY - v.GetPosition().y / 1e6
+
+
+_vx, _vy = via_near("/SPI_SCK", -4.3, -15.2)
 track([(_vx, _vy), (_vx + (_vy + 13.95), -13.95), (1.0, -13.95)], SCK, B, 0.18)
+# The S end of the tunnel is as tight as the lanes themselves, and left to itself the autorouter strands one
+# or two of the signals there (they then went 60 mm round the W end of the band, past the switch pins). So the
+# rest of U5's SPI lines are drawn too, on B.Cu. MOSI comes in from the W under SCK. MISO_B drops S past the
+# CS_B via to a via of its own and doubles back on F.Cu to R7; CS_B and MISO (from a via W of R7) go S round
+# that, then E and up between the deeper row's vias. DSHOT 1 drops straight out of its lane on F.Cu, under C21,
+# to R12.
+track([via_near("/SPI_MOSI", -6.46, -15.81), (-5.9, -15.86), (-3.45, -15.86), (-2.44, -14.85), (1.66, -14.85)], board.FindNet("/SPI_MOSI"), B, 0.18)
+MISO_B, MISO = board.FindNet("/IMU Array/MISO_B"), board.FindNet("/SPI_MISO")
+_r7_1, _r7_2 = padxy("R7", "1"), padxy("R7", "2")
+track([via_near("/IMU Array/MISO_B", -7.21, -16.75), (-6.18, -17.78), (-6.18, -20.3)], MISO_B, B, 0.18)
+via(-6.18, -20.3, MISO_B, d=0.62, drill=0.25)
+track([(-6.18, -20.3), (-6.18 - (_r7_1[1] + 20.3), _r7_1[1]), _r7_1], MISO_B, F, 0.18)
+_cx, _cy = via_near("/IMU Array/CS_B", -6.99, -17.94)
+track([(_cx, _cy), (_cx, -21.2), (_cx + 0.4, -21.6), (0.3, -21.6), (2.32, -19.58), (2.32, -13.95)], board.FindNet("/IMU Array/CS_B"), B, 0.18)
+_mx = _r7_2[0] - 1.0
+via(_mx, _r7_2[1], MISO, d=0.62, drill=0.25)
+track([_r7_2, (_mx, _r7_2[1])], MISO, F, 0.18)
+track([(_mx, _r7_2[1]), (_mx, -21.6), (_mx + 0.5, -22.1), (1.2, -22.1), (2.98, -20.32), (2.98, -14.85)], MISO, B, 0.18)
+for _p in ((-6.18, -20.3, 0.31), (_mx, _r7_2[1], 0.31)):
+    placed_vias.append(_p)
+# N end: CS_B's lane via sits in the middle of the row with U11 pin 1 straight above it, and the autorouter boxes
+# it in with its neighbours' fan-outs about one run in three, so it goes straight up on F.Cu between the two
+# upper-row vias
+track([(2.32, -5.85), (2.32, padxy("U11", "1")[1])], board.FindNet("/IMU Array/CS_B"), F, 0.18)
+# and the other three vias of the lower row get a short F.Cu stub out past the upper row, so a neighbour's
+# fan-out cannot close the 0.7 mm gap they leave through; the autorouter picks each one up at its N end
+for _n, _x in (("/SPI_SCK", 1.0), ("/CRSF_TX", 3.64), ("/DS1_IO", 4.96)):
+    track([(_x, -5.85), (_x, -3.9)], board.FindNet(_n), F, 0.18)
+_r12 = padxy("R12", "1")
+track([(4.96, -13.95), (4.96, -18.6), (4.96 + (-18.6 - _r12[1]), _r12[1]), _r12], board.FindNet("/DS1_IO"), F, 0.18)
 escape("R22", "1", length=1.1)
 escape("D5", "2", length=1.5)
 
@@ -407,7 +462,8 @@ for fp in board.GetFootprints():
         side = ("E" if dx > 0 else "W") if abs(dx) >= abs(dy) else ("N" if dy > 0 else "S")
         groups.setdefault((fp.GetReference(), pad.GetNetname(), side), []).append((px, py, pad))
 SIDE_ANG = {"E": 0, "N": 90, "W": 180, "S": 270}
-for (ref, netname, side), items in groups.items():
+# IC pads first: they have the fewest places to put a via, and a capacitor next door can take another spot
+for (ref, netname, side), items in sorted(groups.items(), key=lambda g: not g[0][0].startswith("U")):
     items.sort()
     clusters = [[items[0]]]
     for it in items[1:]:
@@ -448,12 +504,9 @@ via(9.6, 23.1, V3, d=0.7, drill=0.3)
 track([(7.99, 21.91), (9.6, 21.91), (9.6, 23.1)], V3, F, 0.3)
 track([(14.8, 20.88), (9.6, 20.88), (9.6, 21.91)], V3, F, 0.25)
 
-# buck feedback 5V sense from the output caps, and the SPI_SCK trunk from the XIAO to the latch area
-
-
 # power copper: no autorouted tracks on it (keepouts are net-blind, so they allow vias; the pours themselves
-# keep foreign vias out). VBUS is on F and B; VBAT_RAW only on F, so signals cross
-# its strip on B.Cu.
+# keep foreign vias out). VBAT_RAW is on B.Cu (and In2 at the band ends) with VBUS on F.Cu over it, so signals
+# cross the band only through the In2 tunnel.
 G = 0.5
 
 
@@ -464,7 +517,10 @@ def grow(r, w=G, s=G, e=G, n=G):
 for name, layers, (x0, x1, y0, y1) in (("VBAT_RAW B", (B,), grow(VBAT_BAND)), ("VBUS band F", (F,), grow(VBUS_BAND, e=0)),
                                        ("VBUS J7", (F, B), grow(VBUS_J7)), ("VBUS E", (F, B), grow(VBUS_E, e=0, s=0)), ("VBUS NE", (F, B), grow(VBUS_NE, e=0)),
                                        ("VBUS tongue", (F,), grow(VBUS_TONGUE)), ("VBUS C21", (F,), grow(VBUS_C21)),
-                                       ("USB notch edge", (F, B), (-0.25, 13.65, 28.55, 38.1))):
+                                       ("USB notch edge", (F, B), (-0.25, 13.65, 28.55, 38.1)),
+                                       # the only way round the band is the strip W of J7: closed, so every signal that
+                                       # crosses takes its tunnel lane instead of a 60 mm detour past the switch pins
+                                       ("W bypass", (F, B), (-19.6, -15.8, -17.6, -6.8))):
     ka = pcbnew.ZONE(board)
     ka.SetIsRuleArea(True)
     ka.SetDoNotAllowTracks(True)
@@ -520,28 +576,18 @@ hole.SetClosed(True)
 o.AddHole(hole)
 board.Add(ring)
 
-# GND pours, both layers, lowest priority, thermals on SMD pads except the big power pads
+# GND pours, both layers, lowest priority, solid pad connections
 zone(GND, F, [rect(-20, 20, -38, 38)], "GND F", 0, clearance=0.21, min_w=0.2, thermal=False)
 zone(GND, B, [rect(-20, 20, -38, 38)], "GND B", 0, clearance=0.21, min_w=0.2, thermal=False)
 
-# stitching vias: a sparse grid for the pours (bridge_rev2.py adds the dense stitching after routing)
+# stitching vias: a sparse grid for the pours (stitch_rev2.py adds the dense stitching after routing)
 for x, y in [(12.0, -24.5), (12.5, -19.5), (-18.5, 30.5), (18.5, 30.5),
-             (0.0, -6.0), (-7.0, -4.0), (7.0, -3.4), (-12.0, -6.5), (9.0, 8.0), (17.5, 12.0), (17.5, 20.0)]:
+             (0.0, -6.0), (-7.0, -4.0), (-12.0, -6.5), (9.0, 8.0), (17.5, 12.0), (17.5, 20.0)]:
     if not in_strip(x, y):
         via(x, y, GND, d=0.7, drill=0.3)
 
-# silkscreen labels at the connectors and the board name under the S ledge
-for txt, x, y, size, rot in (("BAT", 10.1, -12.8, 1.0, 90), ("SW", -10.1, -12.8, 1.0, 90), ("ESC", 8.5, -31.0, 0.8, 0), ("RX", -1.1, -31.0, 0.8, 0),
-                             ("LED", -14.0, 22.3, 0.8, 0), ("HOLY GUACAMOLE rev2", 0.0, -33.2, 1.0, 0), ("SWD/VBAT pads on bottom", 0.0, -35.0, 0.8, 0)):
-    tx = pcbnew.PCB_TEXT(board)
-    tx.SetText(txt)
-    tx.SetLayer(pcbnew.F_SilkS)
-    tx.SetTextAngleDegrees(rot)
-    tx.SetPosition(K(x, y))
-    tx.SetTextSize(pcbnew.VECTOR2I(mm(size), mm(size)))
-    tx.SetTextThickness(mm(0.15))
-    board.Add(tx)
-for txt, x, y in (("DIO", 4.2, 14.9), ("CLK", 6.4, 13.63), ("GND", 8.6, 12.36), ("VBAT", 10.8, 11.09)):
+# probe-pad labels on the back (the top-side legend is all drawn by silk/silk_rev2.py)
+for txt, x, y in SILK_BOTTOM:
     tx = pcbnew.PCB_TEXT(board)
     tx.SetText(txt)
     tx.SetLayer(pcbnew.B_SilkS)

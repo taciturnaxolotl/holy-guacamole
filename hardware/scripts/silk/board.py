@@ -108,7 +108,7 @@ class Board:
         for v in find(B, 'via'):
             at = one(v, 'at'); c = T(*at[1:3]); d = float(one(v, 'size')[1]); dr = float(one(v, 'drill')[1]); s.vias.append((c, d, dr))
             nn = one(v, 'net'); net = nn[1] if nn else ''
-            if net != 'GND' or (round(float(at[1]), 3), round(float(at[2]), 3)) in ends: s.routed_vias.append((c, d))
+            if net != 'GND' or abs(d - 0.62) < 1e-6 or (round(float(at[1]), 3), round(float(at[2]), 3)) in ends: s.routed_vias.append((c, d))
             for side in 'FB': s.cu[side].append(Point(c).buffer(d/2))
         for z in find(B, 'zone'):
             for fp in find(z, 'filled_polygon'):

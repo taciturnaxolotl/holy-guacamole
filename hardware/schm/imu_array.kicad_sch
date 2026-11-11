@@ -6,8 +6,8 @@
 	(paper "User" 246.38 166.37)
 	(title_block
 		(title "Holy Guacamole")
-		(date "2026-06-29")
-		(rev "2.0-draft")
+		(date "2026-11-11")
+		(rev "2.0")
 		(company "Kieran Klukas")
 	)
 	(lib_symbols
