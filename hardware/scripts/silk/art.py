@@ -274,14 +274,17 @@ def top(bd):
     return unary_union(P.G)
 
 def hazard(w, h):
-    """caution placard: hazard-stripe bands top and bottom, HANDS OFF in Chicle, spin speed underneath"""
+    """hazard-stripe placard: stripe bands top and bottom, DANGEROUSLY AWESOME PCB in Bungee"""
     band = 0.95; G = [box(-w/2, -h/2, w/2, h/2).exterior.buffer(0.1)]
     stripes = unary_union([Polygon([(x, 0), (x + 0.55, 0), (x + 0.55 - band, band), (x - band, band)]) for x in np.arange(-w/2 - 1, w/2 + 2, 1.1)])
     for yb in (h/2 - band - 0.25, -h/2 + 0.25):
         G.append(affinity.translate(stripes, 0, yb).intersection(box(-w/2 + 0.25, yb, w/2 - 0.25, yb + band)))
-    t, tw = text('HANDS OFF!', 1.9, 'Bungee-Regular.ttf', track=0.04); sc = min(1, (w - 1.6)/tw)
-    G.append(affinity.translate(affinity.scale(t, sc, sc, origin=(0, 0)), 0, -0.15))
-    s, _ = text('it spins at 4000 rpm', 0.8, 'xbold', track=0.04); G.append(affinity.translate(s, 0, -h/2 + band + 0.55))
+    lines = ('DANGEROUSLY', 'AWESOME PCB'); cap = 1.35; gap = 0.65
+    gs = [text(t, cap, 'Bungee-Regular.ttf', track=0.04) for t in lines]
+    sc = min(1, (w - 1.6)/max(tw for _, tw in gs))
+    for k, (t, tw) in enumerate(gs):
+        yb = (cap*sc + gap)/2 - k*(cap*sc + gap) - cap*sc/2
+        G.append(affinity.translate(affinity.scale(t, sc, sc, origin=(0, 0)), 0, yb))
     return dfm(unary_union(G), 0.15)
 
 def dfm(g, wmin=0.16):
