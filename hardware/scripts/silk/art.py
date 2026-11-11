@@ -45,13 +45,13 @@ def _common(bd, V):
             labels.append(affinity.translate(_mid(g), vx - 2.35 if vx > 0 else vx + 2.35, y))
     h, wh = text('HOLY', 4.8, CHICLE, track=0.02); G.append(affinity.translate(h, 0, -27.0))
     gm, wg = text('GUACAMOLE', 3.4, CHICLE, track=0.02); gm = affinity.scale(gm, min(1, 32/wg), min(1, 32/wg), origin=(0, 0)); G.append(affinity.translate(gm, 0, -31.4))
-    l1, _ = text('1 LB MELTYBRAIN  ·  REV 2  ·  2026', 0.8, 'xbold', track=0.08); G.append(affinity.translate(l1, 0, -33.4))
-    l2, _ = text('KIERAN KLUKAS  ·  dunkirk.sh/h/guac', 0.8, 'xbold', track=0.08); G.append(affinity.translate(l2, 0, -35.3))
+    l1, _ = text('my favorite lil meltybrain  /  rev 2  /  nov 2026', 0.95, 'xbold', track=0.03); G.append(affinity.translate(l1, 0, -33.4))
+    l2, _ = text('Kieran Klukas  /  dunkirk.sh/h/guac', 0.95, 'xbold', track=0.03); G.append(affinity.translate(l2, 0, -35.3))
     from oshw_logo import logo
     G.append(logo(7.2, (5.2, 32.6)))
     for k, t in enumerate(('OPEN', 'SOURCE', 'HARDWARE')):
         g, w = text(t, 0.85, 'xbold', track=0.06, align='l'); G.append(affinity.translate(g, 9.7, 34.1 - k*1.45))
-    g, w = text('CERN-OHL-S-2.0', 0.8, 'xbold', track=0.04, align='l'); G.append(affinity.translate(g, 9.7, 29.15))
+    g, w = text('CERN-OHL-S-2.0', 0.8, 'xbold', track=0.02, align='l'); G.append(affinity.translate(g, 8.8, 29.15))   # tucked under the gear's curve
     return G, labels
 
 def _avoid(bd, labels, extra=()):
