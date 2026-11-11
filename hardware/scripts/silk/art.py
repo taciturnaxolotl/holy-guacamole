@@ -265,7 +265,6 @@ def top(bd):
     h, wh = text('HOLY', 2.2, CHICLE, track=0.02); g2, wg = text('GUACAMOLE', 1.75, CHICLE, track=0.02)
     sc = min(1, 9.4/wg); h = affinity.scale(h, sc, sc, origin=(0, 0)); g2 = affinity.scale(g2, sc, sc, origin=(0, 0))
     P.put(affinity.translate(h, -4.9, 34.45), force=True); P.put(affinity.translate(g2, -4.9, 31.9), force=True)
-    P.label('REV 2', [(-4.9, 30.5), (-4.9, 30.3), (-6.5, 30.5), (-3.3, 30.5)], cap=0.8, font='xbold', track=0.1)
     # middle of the front: a hazard placard in the free band between the ICs and the XT30s
     hz = hazard(16.0, 6.6)
     for cx, cy in ((0, -5.6), (-0.5, -5.6), (0.5, -5.6), (0, -5.3), (0, -5.9)):
