@@ -23,13 +23,18 @@
 #define CH_MID   992
 #define CH_MAX   1811
 
-/* Channels the flight firmware currently reads (for reference in the view).
+/* Channels the flight firmware currently reads (for reference in the view),
+ * by 0-based index. Mirrors include/rc_map.h; keep the two in step.
  * Everything else is free to assign. */
 static const char *role_of(int ch) {
     switch (ch) {
-        case 0: return "stick X (roll)";
-        case 1: return "stick Y (pitch)";
-        case 2: return "throttle / base";
+        case 0: return "heading trim";      /* ch1:  left stick X  */
+        case 1: return "translate Y";       /* ch2:  right stick Y */
+        case 2: return "(unused)";          /* ch3:  left stick Y  */
+        case 3: return "translate X";       /* ch4:  right stick X */
+        case 4: return "arm";               /* ch5  */
+        case 7: return "mode";              /* ch8:  STOP/SPIN/DRIFT */
+        case 9: return "attack";            /* ch10 */
         default: return "";
     }
 }

@@ -1,39 +1,44 @@
 #include "rc_health.h"
 
-#include "pico/stdlib.h"
-
-static uint32_t last_checksum = 0;
-static uint32_t last_change_ms = 0;
-static bool initialized = false;
-
-/* Weighted checksum of channel values. Different weights per channel
- * so that a change in any single channel is detectable even if others
- * are static. Taken from PotatoMelt. */
-static uint32_t compute_checksum(const uint16_t channels[16]) {
-    return (uint32_t)channels[0] * 64
-         + (uint32_t)channels[1] * 16
-         + (uint32_t)channels[2] * 4
-         + (uint32_t)channels[3];
-}
+static bool     link_ok;
+static bool     lost;            /* timed out; waiting for a newer frame */
+static uint32_t lost_frame_ms;   /* the frame timestamp that timed out */
 
 void rc_health_init(void) {
-    last_checksum = 0;
-    last_change_ms = to_ms_since_boot(get_absolute_time());
-    initialized = true;
+    link_ok = false;
+    lost = false;
+    lost_frame_ms = 0;
 }
 
-void rc_health_update(const uint16_t channels[16]) {
-    if (!initialized) return;
-
-    uint32_t cs = compute_checksum(channels);
-    if (cs != last_checksum) {
-        last_checksum = cs;
-        last_change_ms = to_ms_since_boot(get_absolute_time());
+void rc_health_update(bool frame_seen, uint32_t last_frame_ms, uint32_t now_ms) {
+    if (!frame_seen) {
+        link_ok = false;
+        return;
     }
+
+    /* Once a frame has timed out, only a newer frame brings the link back.
+     * Without this the 32-bit age would wrap after 49.7 days of silence and
+     * make the dead link look alive for one timeout period. */
+    if (lost) {
+        if (last_frame_ms == lost_frame_ms) {
+            link_ok = false;
+            return;
+        }
+        lost = false;
+    }
+
+    /* Signed so a frame stamped a moment after now_ms was sampled reads as
+     * fresh rather than as a huge unsigned age. */
+    int32_t age_ms = (int32_t)(now_ms - last_frame_ms);
+    if (age_ms >= RC_LINK_TIMEOUT_MS) {
+        lost = true;
+        lost_frame_ms = last_frame_ms;
+        link_ok = false;
+        return;
+    }
+    link_ok = true;
 }
 
 bool rc_health_ok(void) {
-    if (!initialized) return false;
-    uint32_t now = to_ms_since_boot(get_absolute_time());
-    return (now - last_change_ms) < RC_STALE_TIMEOUT_MS;
+    return link_ok;
 }

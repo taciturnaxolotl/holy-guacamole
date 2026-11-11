@@ -8,7 +8,7 @@
  *   picotool load -x -f build/holy_guacamole.uf2
  *
  * ┌───────────────────────── SAFETY ─────────────────────────┐
- * │ REMOVE THE WEAPON BLADE. Get the wheels off the bench     │
+ * │ REMOVE THE WEAPON RING. Get the wheels off the bench      │
  * │ (prop the robot up) so it can't drive itself off the      │
  * │ edge. Throttle is capped low but motors still move.       │
  * └───────────────────────────────────────────────────────────┘
@@ -75,7 +75,7 @@ int main(void) {
     sleep_ms(2000);   /* let USB CDC enumerate before the banner */
 
     printf("\n=== Motor + channel bench test ===\n");
-    printf("SAFETY: remove the weapon blade, wheels off the bench.\n");
+    printf("SAFETY: remove the weapon ring, wheels off the bench.\n");
     printf("keys: a=motorA b=motorB c=both s/space=stop 1-5=cap +/-=nudge\n\n");
 
     dshot_esc_t esc1, esc2;

@@ -4,10 +4,13 @@
  * IMU array geometry and shared physical constants.
  *
  * Positions are from the spec: one inner LSM6DSV320X (with gyro) and
- * two outer H3LIS331DL. Each chip is mounted with its X axis pointing
- * radially outward from the rotation centre and its Y axis tangential
- * (CCW-positive). These constants are shared config used by both the
- * physics simulator (forward model) and the EKF measurement model.
+ * two outer H3LIS331DL. Every chip has one in-plane axis on the radial
+ * line and the other tangential, but which axis and which way round
+ * differs per chip; the mapping lives in imu_convert.c, which hands the
+ * estimator radial (+omega^2 r) and tangential (+alpha r, CCW-positive)
+ * values so nothing downstream sees chip axes. These constants are
+ * shared config used by both the physics simulator (forward model) and
+ * the EKF measurement model.
  *
  * All units are SI: metres, rad/s, rad/s^2, m/s^2.
  */
@@ -53,7 +56,8 @@ static inline float wrap_0_2pi(float a) {
 
 typedef struct {
     float radius_m;    /* distance from rotation centre */
-    float angle_rad;   /* mounting angle around the disc (for CoR/linear terms) */
+    float angle_rad;   /* bearing of the chip from the rotation centre, CCW from
+                        * board +x (for CoR/linear terms) */
     bool  has_gyro;    /* true only for the inner LSM6DSV320X */
 } imu_geom_t;
 

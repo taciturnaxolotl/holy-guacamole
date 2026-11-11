@@ -35,7 +35,7 @@ void imu_synth_init(imu_synth_t *s, uint64_t seed) {
     s->gyro_sigma        = 0.0015f; /* rad/s (LSM6 ~3.8 mdps/rtHz) */
 
     /* Quantization LSB at the operating full-scale ranges. */
-    s->accel_inner_lsb = 0.0958f;   /* 9.77 mg at +/-320g */
+    s->accel_inner_lsb = 0.1022f;   /* 10.417 mg at +/-320g */
     s->accel_outer_lsb = 1.912f;    /* 195 mg at +/-400g */
     s->gyro_lsb        = 0.00244f;  /* 140 mdps at +/-4000 dps */
 

@@ -13,7 +13,7 @@
  */
 
 /* Initialize and start the hardware watchdog with the given timeout in ms.
- * Call once from core 1 (main) before launching core 0. */
+ * Call once from core 0 (main) before launching core 1. */
 void watchdog_start(uint32_t timeout_ms);
 
 /* Feed the watchdog from core 0. Must be called at least once per

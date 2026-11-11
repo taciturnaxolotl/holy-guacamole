@@ -45,6 +45,12 @@ add_hg_test(test_sim_convergence ${EKF_SRCS} ${SIM_DIR}/robot_sim.c ${SIM_DIR}/i
 add_hg_test(test_drift ${SRC_DIR}/control/drift.c)
 add_hg_test(test_accel_cal ${EKF_SRCS} ${SRC_DIR}/estimation/accel_cal.c)
 
+# Safety logic: arming interlock, battery halt/warn decisions, RC link health.
+# arming.h and battery_monitor.h are header-only.
+add_hg_test(test_arming)
+add_hg_test(test_battery_monitor)
+add_hg_test(test_rc_health ${SRC_DIR}/safety/rc_health.c)
+
 # Closed-loop digital-twin scenarios: plant + the real app_ estimator and
 # controller, run headless with assertions on emergent behaviour.
 # These tests exercise the IMU+EKF path, so define SENSOR_SOURCE_IMU_EKF.
@@ -59,3 +65,24 @@ add_hg_test(test_scenarios
     ${SRC_DIR}/app/control_loop.c
 )
 target_compile_definitions(test_scenarios PRIVATE SENSOR_SOURCE_IMU_EKF)
+
+# IMU driver: the real latch and SPI driver built against fake_pico/, a
+# host stand-in for the pico-sdk calls they use that feeds a model of the
+# chip-select latch and the three sensors.
+add_hg_test(test_imu_spi
+    ${SRC_DIR}/imu/latch.c
+    ${SRC_DIR}/imu/imu_spi.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/fake_pico/fake_pico.c
+)
+target_include_directories(test_imu_spi PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/fake_pico
+    ${CMAKE_CURRENT_SOURCE_DIR}/../include
+)
+
+# Raw counts -> SI measurement vector: scale factors and per-chip axis map.
+add_hg_test(test_imu_convert
+    ${SRC_DIR}/math/linalg.c
+    ${SRC_DIR}/estimation/imu_geom.c
+    ${SRC_DIR}/estimation/meas_model.c
+    ${SRC_DIR}/estimation/imu_convert.c
+)

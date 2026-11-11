@@ -3,36 +3,43 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "safety/battery_monitor.h"   /* thresholds and the decision logic */
+
 /*
  * Battery voltage monitor with low-voltage alert and safety halt.
  *
- * Reads the VBAT ADC divider on core 0's sensor tick, filters with an
- * exponential moving average, and exposes the current cell voltage.
- * Core 1 checks battery_ok() before commanding motors; if voltage is
- * critically low, motors are cut regardless of stick input.
+ * Core 0 reads the VBAT ADC divider on its sensor tick and filters it with
+ * an exponential moving average. Core 1 turns the filtered cell voltage
+ * into the warning and halt flags once per control tick (battery_update),
+ * so all the decision state lives on one core.
  *
- * Thresholds are per-cell for the 3S HV pack (GNB 380, 4.35 V/cell full). The alert level
- * triggers a warning flag the LED/status system can display; the halt
- * level cuts motors immediately.
+ * Thresholds are per-cell for the 3S HV pack (GNB 380, 4.35 V/cell full)
+ * and live in battery_monitor.h with the logic that uses them. The warning
+ * flag is for the LED/status system. The halt cuts the motors after the
+ * low reading has persisted, then stays latched until the operator disarms
+ * with the pack recovered.
  */
 
-/* Per-cell voltage thresholds (volts). */
-#define BATTERY_WARN_V   3.75f
-#define BATTERY_HALT_V   3.60f
 #define BATTERY_CELLS    3       /* 3S HV pack; the board is 3S-only (no UVLO jumper) */
 
-/* Initialize ADC and start background sampling. Call from core 0 init. */
+/* Initialize ADC and prime the filter. Call from core 0 init. */
 void battery_init(void);
 
 /* Sample the ADC and update the filtered voltage. Call once per sensor
  * tick (~1kHz) from core 0. */
 void battery_sample(void);
 
-/* Returns true if battery voltage is above the halt threshold.
- * Core 1 should check this before commanding motors. */
+/* Re-evaluate the warning and halt flags from the filtered voltage. Call
+ * once per control tick from core 1. disarm_cmd is true while the operator
+ * holds the arm switch low on a healthy link; see battery_monitor.h. */
+void battery_update(uint32_t now_ms, bool disarm_cmd);
+
+/* False once the low-voltage halt has latched. Core 1 only; reflects the
+ * last battery_update(). */
 bool battery_ok(void);
 
-/* Returns true if battery voltage is below the warning threshold. */
+/* True while the low-voltage warning is active. Core 1 only; reflects the
+ * last battery_update(). */
 bool battery_low(void);
 
 /* Current filtered pack voltage in volts. */

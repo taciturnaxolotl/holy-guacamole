@@ -4,8 +4,8 @@
 #include "hardware/adc.h"
 
 /* VBAT divider: R9=120k high, R10=33.2k low.
- * Pack voltage = adc_v * (120 + 33.2) / 33.2 = adc_v * 4.614 */
-#define DIVIDER_RATIO 4.614f
+ * Pack voltage = adc_v * (120 + 33.2) / 33.2 = adc_v * 4.6145 */
+#define DIVIDER_RATIO 4.6145f
 
 /* ADC reference voltage on RP2350. */
 #define ADC_VREF 3.3f
@@ -14,8 +14,13 @@
  * At 1kHz sampling, alpha=0.01 gives ~100ms time constant. */
 #define FILTER_ALPHA 0.01f
 
-static float filtered_pack_v = 0.0f;
+/* Written by core 0, read by core 1. A single aligned float, so the read
+ * is atomic on the RP2350 and needs no lock. */
+static volatile float filtered_pack_v = 0.0f;
 static bool initialized = false;
+
+/* Core 1 only. */
+static battery_monitor_t monitor;
 
 void battery_init(void) {
     adc_init();
@@ -24,6 +29,7 @@ void battery_init(void) {
     /* Prime the filter with an initial reading. */
     uint16_t raw = adc_read();
     filtered_pack_v = (float)raw / 4095.0f * ADC_VREF * DIVIDER_RATIO;
+    battery_monitor_init(&monitor);
     initialized = true;
 }
 
@@ -32,15 +38,20 @@ void battery_sample(void) {
     adc_select_input(ADC_VBAT_CHAN);
     uint16_t raw = adc_read();
     float pack_v = (float)raw / 4095.0f * ADC_VREF * DIVIDER_RATIO;
-    filtered_pack_v += FILTER_ALPHA * (pack_v - filtered_pack_v);
+    float filtered = filtered_pack_v;
+    filtered_pack_v = filtered + FILTER_ALPHA * (pack_v - filtered);
+}
+
+void battery_update(uint32_t now_ms, bool disarm_cmd) {
+    battery_monitor_update(&monitor, battery_cell_voltage(), now_ms, disarm_cmd);
 }
 
 bool battery_ok(void) {
-    return battery_cell_voltage() >= BATTERY_HALT_V;
+    return battery_monitor_ok(&monitor);
 }
 
 bool battery_low(void) {
-    return battery_cell_voltage() < BATTERY_WARN_V;
+    return battery_monitor_low(&monitor);
 }
 
 float battery_voltage(void) {
