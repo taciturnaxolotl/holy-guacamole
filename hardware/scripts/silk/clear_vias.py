@@ -19,7 +19,7 @@ HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE); sys
 from kpcb import load
 from board import Board, T
 
-CLR, HOLE2HOLE, EDGE, SILK_CLR, STITCH_GAP, MAX_MOVE = 0.205, 0.3, 0.5, 0.15, 1.0, 3.0
+CLR, HOLE2HOLE, HOLE_CLR, EDGE, SILK_CLR, STITCH_GAP, MAX_MOVE = 0.205, 0.3, 0.25, 0.6, 0.15, 1.0, 3.0   # EDGE > the 0.55 autorouter ring
 LAYERS = ('F.Cu', 'In1.Cu', 'In2.Cu', 'B.Cu')
 
 
@@ -64,7 +64,7 @@ def plan(pcb):
             if not inside.buffer(-(EDGE + r)).contains(q): return False
             if q.buffer(r + SILK_CLR).intersects(silk): return False
             if q.buffer(r + CLR).intersects(foreign): return False
-            if any(q.distance(d) < HOLE2HOLE + v['drill']/2 for d in drills): return False
+            if any(q.distance(d) < max(HOLE2HOLE + v['drill']/2, HOLE_CLR + r) for d in drills): return False
             if any(q.distance(o) < STITCH_GAP for o in placed): return False
             return True
         best = None

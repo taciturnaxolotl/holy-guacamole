@@ -1,7 +1,7 @@
 #!/bin/sh
 # Freerouting 2.5 needs JDK 25+ and the jar at ~/.cache/freerouting/freerouting-2.5.0.jar; work files go to /tmp/fr
 mkdir -p /tmp/fr
-# usage: route_best.sh <pcb> [attempts]  ; reruns $(dirname "$0")/autoroute_rev2.sh until KiCad DRC (errors) is clean, keeps best, then runs bridge_rev2.py and stitch_rev2.py
+# usage: route_best.sh <pcb> [attempts]  ; reruns $(dirname "$0")/autoroute_rev2.sh until KiCad DRC (errors) is clean, keeps best, then runs bridge_rev2.py, stitch_rev2.py and silk/silk_rev2.py
 PCB=$1; N=${2:-5}
 cp $PCB /tmp/fr/prerouted.kicad_pcb
 best=999
@@ -21,5 +21,8 @@ P=/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/Cu
 $P $(dirname "$0")/bridge_rev2.py $PCB 2>/dev/null
 # GND stitching grid
 $P $(dirname "$0")/stitch_rev2.py $PCB 2>/dev/null
+# silkscreen art (moves or drops stitching vias that end up under silk), then refill
+uv run -q --with shapely --with fonttools --with pillow python3 $(dirname "$0")/silk/silk_rev2.py $PCB 2>&1 | tail -2
+$P -c "import pcbnew; b=pcbnew.LoadBoard('$PCB'); pcbnew.ZONE_FILLER(b).Fill(b.Zones()); b.Save('$PCB')" 2>/dev/null
 kicad-cli pcb drc --severity-error -o /tmp/fr/drc_final.rpt $PCB >/dev/null 2>&1
 echo "after bridge: $(grep -c "^\[" /tmp/fr/drc_final.rpt) error-level violations"

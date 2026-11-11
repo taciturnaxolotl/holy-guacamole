@@ -153,7 +153,7 @@ Gender convention: the battery lead carries the female XT30, so the board gets t
 | Via stitching | VBUS is stitched F to B every 1.6–1.8 mm along the E edge and the band's E strip (0.75/0.35 vias), plus six at `J7` pin 1 |
 | Clearances | Nearest IMU to ESC-path copper: `U5`, 2.05 mm (`U6` sat 0.6 mm from it before; now 5.5 mm). Autorouted signals keep at least 0.45 mm from power copper (keepouts grown 0.5 mm around the strips) |
 
-The buck, its input caps (`C1`, `C19`, `C20`, `C2`), the UVLO dividers, the `VBAT_SNS` divider and `J2` take VBUS from a 0.8 mm B.Cu feed that leaves the band's NW corner and runs up the W board edge, not from the ESC path. `C21` sits on a short F.Cu stub straight off the band, and `D2` on the top of the E-edge strip.
+The buck, its input caps (`C1`, `C19`, `C20`, `C2`), the UVLO divider, the `VBAT_SNS` divider and `J2` take VBUS from a 0.8 mm B.Cu feed that leaves the band's NW corner and runs up the W board edge, not from the ESC path. `C21` sits on a short F.Cu stub straight off the band, and `D2` on the top of the E-edge strip.
 
 ### ESC BEC policy
 

@@ -233,7 +233,7 @@ this table; change here and in the struct together.
 | Normal RPM | 2600–2750 rpm (272–288 rad/s) | tracking mode, ~0.44 throttle |
 | Strike/burst RPM | 3750–4000 rpm (393–419 rad/s) | pre-attack punch, ~0.65 throttle |
 | Full-throttle terminal ω | ~644 rad/s (~6150 rpm) | headroom above combat RPM so drift modulation doesn't clip |
-| Battery | 2S 350 mAh (sim, `battery.h`) / **3S HV 380 mAh** (GNB, 13.05 V full, 11.4 V nominal) | 3S no-load chassis ≈ 1100 × 11.4 × 0.375 ≈ 4,700 rpm; the real loaded figure needs the bench |
+| Battery | **3S HV 380 mAh** (GNB, 13.05 V full, 11.4 V nominal); `battery.h` is 3S | 3S no-load chassis ≈ 1100 × 11.4 × 0.375 ≈ 4,700 rpm; the real loaded figure needs the bench |
 | Arena | ~1.8 m square (5.9 ft), ¼" polycarbonate walls | half-extent 0.9 m; matches braindump ~6 ft antweight arena |
 
 ### IMU array

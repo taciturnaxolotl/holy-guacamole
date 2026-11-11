@@ -12,14 +12,13 @@ J6,1,AMASS,XT30UPB-M,"XT30 male vertical PCB connector, through-hole",,
 J7,1,AMASS,XT30UPB-F,"XT30 female vertical PCB connector, through-hole",,
 L1,1,Bourns,SRP6060FA-5R6M,5.6uH shielded power inductor 6.4x6.6mm,DigiKey,SRP6060FA-5R6MCT-ND
 Q1,1,Alpha & Omega Semiconductor,AO3402,30V N-channel MOSFET SOT-23,DigiKey,785-1002-1-ND
-R1 R4 R5 R11 R24 R26,6,Vishay Dale,CRCW040210K0FKEDHP,10k ohm 1% 0402 resistor,DigiKey,541-10.0KYCT-ND
+R1 R4 R5 R11 R26,5,Vishay Dale,CRCW040210K0FKEDHP,10k ohm 1% 0402 resistor,DigiKey,541-10.0KYCT-ND
 R6 R7 R8 R12 R13,5,Vishay Dale,CRCW040233R0JNEDC,33 ohm 5% 0402 resistor,DigiKey,541-4009-1-ND
 R9,1,Panasonic Industry,ERJ-2RKF1203X,120k ohm 1% 0402 resistor,DigiKey,P120KLCT-ND
 R10,1,Vishay Dale,CRCW040233K2FKEDC,33.2k ohm 1% 0402 resistor,DigiKey,541-4092-1-ND
 R16,1,Vishay,MCS04020C1000FE000,100 ohm 1% 0402 resistor,DigiKey,MCS0402-100-CFCT-ND
 R17 R18 R22,3,Bourns,CR0402-FX-1003GLF,100k ohm 1% 0402 resistor,DigiKey,CR0402-FX-1003GLFCT-ND
-R23,1,Vishay Dale,CRCW040247K0FKED,47k ohm 1% 0402 resistor,DigiKey,541-47.0KLCT-ND
-R25,1,Stackpole Electronics,RMCF0402FT75K0,75k ohm 1% 0402 resistor,DigiKey,RMCF0402FT75K0CT-ND
+R25,1,Vishay Dale,CRCW040266K5FKED,66.5k ohm 1% 0402 resistor (UVLO set; look up the DigiKey number when ordering),DigiKey,
 R27,1,Vishay Dale,CRCW0402158KFKTD,158k ohm 1% 0402 AP63301 feedback resistor,DigiKey,541-CRCW0402158KFKTDCT-ND
 R28,1,Vishay Dale,CRCW040230K1FKED,30.1k ohm 1% 0402 AP63301 feedback resistor,DigiKey,541-4109-1-ND
 U1,1,Seeed Technology,102010550,XIAO RP2350 module; headers supplied loose and not installed,DigiKey,1597-102010550-ND
