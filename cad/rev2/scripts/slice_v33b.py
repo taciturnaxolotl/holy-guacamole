@@ -1,5 +1,7 @@
 """Planar sections of v33 rev B lower/upper/bot/top (from the mjf STLs that concept_v33 exports with the STEPs).
-Writes sections/v33b_z*.dxf (layer per part), .png, and solid_<part>_z*.wkt (shapely) used by build_rev2.py."""
+Writes sections/v33b_z*.dxf (layer per part), .png, and solid_<part>_z*.wkt (shapely), for reference only.
+Also tessellates the STEPs to /tmp/hg33b_work/v33b_<part>.stl; build_rev2.py reads those meshes, not the sections.
+The STEPs come from /tmp/hg33b/ (not in this repo). Run from cad/rev2."""
 import trimesh, ezdxf, sys, os, numpy as np
 from shapely.geometry import box
 from shapely.ops import unary_union

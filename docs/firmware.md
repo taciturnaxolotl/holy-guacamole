@@ -6,7 +6,7 @@ SITL digital twin. Updated as code lands.
 and the simulator fidelity model. For hardware see `spec.md` (carrier PCB) and
 `braindump.md` (design research / rationale).
 
-> `spec.md` is the Rev B 2.1 system and carrier-PCB spec (chassis v3.4f, rev 2
+> `spec.md` is the Rev B 2.2 system and carrier-PCB spec (chassis v3.4g, rev 2
 > carrier). Section 9 below lists what the code still assumes from the old
 > hardware and has to change for rev 2.
 > `braindump.md` is the design/research record and describes *intended* designs
@@ -150,6 +150,10 @@ firmware/sim/
   imu_synth.{c,h}        truth-state -> noisy/saturated measurement vector
   robot_sim.{c,h}        headless pure-angular kinematic sim
   drive.c                interactive raylib test-drive harness
+  zorro_input.{c,h}      RadioMaster Zorro stick input for drive (raw HID on macOS)
+  pad_test.c             gamepad test harness (raw axes and buttons)
+  zorro_mapper.c         visual Zorro axis/button mapper (macOS only)
+  zorro_detect.c         terminal Zorro HID detector (macOS only)
 
 firmware/tests/
   test_scenarios.c       closed-loop assert-based scenarios (wired to CTest;
@@ -183,7 +187,7 @@ FIFO drains and the LED stays dark; `R17` keeps the gate low before init.
 
 | Status | Condition | Pattern |
 |---|---|---|
-| IMU fault | `sensor_primary.init()` failed (arming is locked out) | 400 ms on every 2 s (spec asks 1 s on / 1 s off, which breaks the 25% duty cap) |
+| IMU fault | `sensor_primary.init()` failed (arming is locked out) | 400 ms on every 2 s (matches the spec; the old 1 s on / 1 s off broke the 25% duty cap) |
 | RC failsafe | link timed out or `rc_health` stale after a good frame | 3 x 50 ms, 200 ms apart, every 1.5 s |
 | No link | no valid CRSF frame since boot | 50 ms every 2 s |
 | Low battery | `battery_low()` | 40 ms at 5 Hz |
@@ -356,17 +360,20 @@ Defaults: `e_wall=0.35`, `μ_wall=0.5`, 2 tabs 180° apart.
   translation is strong and roughly flat across 1000–4000 rpm.
 - First-order **ESC lag** on commanded → applied throttle; spin-up time
   constant ~0.7 s (~1 s to 3000 rpm).
-- Floor friction is **Coulomb** (`μ·m·g`), not linear viscous; this is why the
-  arrow-key response feels less springy than the old Box2D build, and is the
-  more realistic behaviour.
+- Floor friction is mostly **Coulomb** (`μ·m·g`, μ = 0.35), with a small
+  linear viscous term (0.4) on top; this is why the arrow-key response feels
+  less springy than the old Box2D build, and is the more realistic behaviour.
 
 **Validated (§7.2–7.4, host smoke test):**
 
+This table was measured when the full-throttle terminal was still 4000 rpm.
+The terminal is now ~6150 rpm (`omega_free = 644` in `sim/plant.c`), so the
+old terminal and spin-up rows (4001 rpm at full throttle, 2681 rpm at 0.67,
+0.99 s to 3000 rpm) are gone. They have not been re-measured. The current
+check is scenario 1 in §7.6. The two rows left are from the same old run.
+
 | Metric | Result | Target |
 |---|---|---|
-| Full-throttle terminal | 4001 rpm | ~4000 |
-| Time to 3000 rpm | 0.99 s | < 2 s |
-| 0.67-throttle terminal | 2681 rpm | ~2700 |
 | Back-EMF spindown to 5% | 2.12 s | (free, no brake) |
 | Heading-synced drift, A=0.30, 2 s | 1.08 m | > 0 |
 
@@ -408,7 +415,7 @@ amplitude-dependent bias no longer trims out).
 controller, runs headless, and asserts on emergent behaviour. Wired into CTest
 (`test_scenarios`), deterministic (seeded). Current scenarios, all passing:
 
-1. **Spin-up**: full throttle reaches 3700–4100 rpm, EKF omega tracks within
+1. **Spin-up**: 0.65 throttle reaches 3600–4200 rpm, EKF omega tracks within
    5%, and the gyro is confirmed pinned at its rail.
 2. **Cruise drift**: commanding a stick direction at ~2700 rpm translates the
    robot (>0.1 m) while omega stays locked within 3% (calibrated sensor).
@@ -429,7 +436,7 @@ FIFO) and `accel_cal` correction inside the SI estimation path.
   though it may stress/break the current EKF. That is the sim doing its job;
   any EKF changes are tracked as follow-up, not bundled into the sim work.
 - **Starting tuning guesses:** `k=0.55`, `e_wall=0.35`, `μ_wall=0.5`, floor
-  `μ≈0.4`. All one-line tunable in `plant_params_t`.
+  `μ = 0.35` plus a small viscous term (0.4). All one-line tunable in `plant_params_t`.
 - **Build sequence:** plant → walls → motor → sensors → harness, testing each.
 
 ---
@@ -493,7 +500,7 @@ build) latent warnings. Decide per item: **wire it or delete it.**
 
 Checked against `spec.md` Rev B 2.1 and the routed board.
 
-| Item | Code today | Rev 2 / v3.4f | Change |
+| Item | Code today | Rev 2 / v3.4g | Change |
 |---|---|---|---|
 | Pack (`battery.h`) | `BATTERY_CELLS 3`, warn 3.75 / halt 3.60 V/cell | 3S HV 380, 13.05 V full | Done. The hardware UVLO is 3S-only and cuts at about 7.96 V (2.65 V/cell), well under the 10.8 V firmware halt |
 | IMU angles (`imu_geom.c`) | 0 / 90 / 210° | 166 / 256 / 16° | Add 166°, then replace with measured positions |

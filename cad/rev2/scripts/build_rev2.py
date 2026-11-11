@@ -1,6 +1,8 @@
-"""Rev-2 carrier: outline, keepouts and proposed placements for holy guacamole v33 rev B (+ the agreed v34 changes).
+"""Rev-2 carrier: outline, keepouts and placements for holy guacamole, chassis v3.4g.
 
-Source of truth: /tmp/hg33b/holy_guacamole_v33b/ (README Z table, scripts/concept_v33.py, step/*.step), read-only.
+The base constants come from v33 rev B: /tmp/hg33b/holy_guacamole_v33b/ (README Z table, scripts/concept_v33.py,
+step/*.step), read-only and not in this repo. The chassis changes from v3.4c to v3.4g are entered below as boxes,
+each tagged with its version. The IMU rotation scan uses only the placement and keepout rectangles, no mesh.
 Frame = the generator's: origin on the spin axis, +Y = N (switch/USB), -Y = S (ESC/rx), +Z up, viewed from +Z.
 Board coordinates == chassis XY.  Board bottom z 0.9, thickness T (1.6 nominal, 1.2 also tabulated).
 
@@ -91,7 +93,7 @@ THT = [(13.8, -15.8), (13.8, -10.8), (-13.8, -15.8), (-13.8, -10.8)]   # J6, J7 
 IMU_NOM = [("U4", 12.0, 0.0), ("U5", 18.0, 90.0), ("U6", 18.0, 210.0)]   # (ref, r, angle) = firmware imu_geom.c
 IMU_HALF = 2.0                                                          # 3x3 LGA + 0.5 courtyard
 
-# ---------------- geometry checks against rev B ----------------
+# ---------------- geometry checks against the chassis meshes in WORK (rev B unless MPFX says otherwise) ----------------
 mesh = {n: trimesh.load(WORK + f"{MPFX}{n}.stl") for n in ("lower", "upper", "bot")}
 def sec(n, z):
     s = mesh[n].section(plane_origin=[0, 0, z], plane_normal=[0, 0, 1])
@@ -169,7 +171,7 @@ def imu_boxes(theta):
         out.append((ref, x, y, box(x - IMU_HALF, y - IMU_HALF, x + IMU_HALF, y + IMU_HALF)))
     return out
 OBST = unary_union([box(p[1], p[3], p[2], p[4]) for p in PL] + [K["LEDGE_CLAMP_NO_PARTS"], K["S_GROOVE_WIRES_" + tag(L16['groove'])]] +
-                   [v for k, v in K.items() if k.startswith("LED_") and k != "LED_CORNER"] +
+                   [v for k, v in K.items() if k.startswith("LED_")] +
                    [Point(h).buffer(KEEP_D / 2) for h in HOLES])
 NOISY = unary_union([box(p[1], p[3], p[2], p[4]) for p in PL if p[0] in ("L1", "U2_BUCK")])
 scan = []

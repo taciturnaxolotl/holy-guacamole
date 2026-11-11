@@ -1,5 +1,7 @@
 # Handoff: rev-2 carrier power layout (from the chassis/review session, 2026-11-10)
 
+> **Status: done.** Option B is implemented on `main` (`cb06b2c`, chassis v3.4g); see `spec.md`, Copper and current, for the measured result. As built, `Q1`/`R16`/`R17` sit further N than proposed below (y 23.9…29.85), `D2` moved 2.3 mm N, and the IMU scan window is 152…168°. Kept as the review record; the numbers below describe the old layout.
+
 Board checked: `guac.kicad_pcb` at `c8054af` (copper unchanged since `96137c3`, the PCBWay reroute).
 Coordinates are chassis/board mm: origin on the spin axis, +x E, +y N (KiCad x = 80 + x, KiCad y = 65.5 − y).
 Prompted by Discord review (IrregularJoe, Camden Wallraff, Robert K). All numbers below are measured from the board file, not estimated.
@@ -31,7 +33,7 @@ DC solve of the board copper (2 oz outer, 1 oz inner, vias and PTH barrels inclu
 
 ## Option B (chosen 2026-11-10): J7 to the SW corner, J2 to the old J7 spot
 
-Kieran OK'd the chassis change. The chassis side (v3.4g) and the board constraints (`cad/rev2/scripts/build_rev2.py` → `keepout.dxf`, branch `chassis-v34g-j7-sw`) are done by the chassis session; this section is the board session's work list. Re-import `keepout.dxf` from that branch before placing.
+Kieran OK'd the chassis change. The chassis side (v3.4g) and the board constraints (`cad/rev2/scripts/build_rev2.py` → `keepout.dxf`, on `main`) are done by the chassis session; this section is the board session's work list. Re-import `keepout.dxf` from `main` before placing.
 
 **Placement (courtyards are the `PLACEMENT_*` layers in the new `keepout.dxf`):**
 
@@ -63,7 +65,7 @@ Band contents to clear (y −9…−13, x −12…12): Q1, R16, R17 (moving). U5
 Expected: power copper ~70 mm instead of ~190 mm, **~1.5–2 mΩ instead of 10.6 mΩ** (~0.15–0.2 W at 10 A), nothing carrying ESC current N of y −8.
 
 **After moving:**
-- Re-run DRC against `guac.kicad_dru`, the connectivity check, and the resistance solve (`hardware/scripts/review/rsolve.py`: `python3 hardware/scripts/review/rsolve.py "/Power Subsystem/VBAT_RAW" J6.2 J7.2 10`, `... VBUS J7.1 J1.1 10`).
+- Re-run DRC against `guac.kicad_dru`, the connectivity check, and the resistance solve (`hardware/scripts/review/rsolve.py`: `uv run --with numpy --with scipy --with shapely python3 hardware/scripts/review/rsolve.py "/Power Subsystem/VBAT_RAW" J6.2 J7.2 10`, `... VBUS J7.1 J1.1 10`).
 - In2: with the power gone from the E edge, the 3V3 pour no longer sits over power strips. Check nothing on In2 3V3 overlaps the new band (make In2 under the band GND or power).
 
 ## Option A (not taken): keep J7 where it is and harden the board

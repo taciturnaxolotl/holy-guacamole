@@ -1,3 +1,5 @@
+"""Print the bounding box of each named v33 rev B part: python scripts/bboxes.py lower upper bot ...
+Reads v33m_<part>.step from /tmp/hg33b/ (not in this repo)."""
 import cadquery as cq, sys
 M="/tmp/hg33b/holy_guacamole_v33b/step/"   # v33 rev B
 for n in sys.argv[1:]:

@@ -1,6 +1,6 @@
 # Holy Guacamole: System and Carrier PCB Specification
 
-**Document status:** Rev B 2.1 (2026-11-10). Covers the robot at chassis v3.4f and the rev 2 carrier as routed for PCBWay. The KiCad schematic `hardware/guac.kicad_sch` and board `hardware/guac.kicad_pcb` are the source of truth for the electronics. The chassis comes from the v3.4f CAD, which lives outside this repo; `cad/rev2/README.md` records what the board takes from it.
+**Document status:** Rev B 2.2 (2026-11-11). Covers the robot at chassis v3.4g and the rev 2 carrier as routed for PCBWay. The KiCad schematic `hardware/guac.kicad_sch` and board `hardware/guac.kicad_pcb` are the source of truth for the electronics. The chassis comes from the v3.4g CAD, which lives outside this repo; `cad/rev2/README.md` records what the board takes from it.
 **Robot:** Holy Guacamole, 1 lb meltybrain antweight, MRCA full combat.
 **Previous revisions:** Rev A (v1.3c: 40 × 50 mm board, fly-lead pads, solder-down receiver) and Rev B 2.0-draft (pre-route). See git history for that text.
 
@@ -71,7 +71,7 @@ The carrier hosts a Seeed XIAO RP2350 module. The XIAO provides the RP2350, flas
 - A low-side MOSFET driver for the two paralleled TinySLED heading LEDs.
 - Flush debug pads on the underside: SWD, VBAT_SNS, and GND.
 
-Runtime IO stays on the XIAO edge pads. The XIAO's underside pads are NC.
+Runtime IO stays on the XIAO edge pads. Most of the XIAO's underside pads are unconnected, but five are not: pads 23 and 24 (SWDIO, SWDCK) go to the probe pads `TP13` and `TP14`, pads 26 and 30 are GND, and pad 28 is 3V3. The SWD probe pads only work if the module's underside pads are soldered. That takes reflow or hot air; an iron on the edge castellations does not reach them.
 
 ---
 
@@ -98,7 +98,7 @@ Runtime IO stays on the XIAO edge pads. The XIAO's underside pads are NC.
 | `D5`, `D6` | ESD clamps (ESD5B5.0ST1G) on CRSF_RX/CRSF_TX at `J5` | SOD-523 |
 | `TP10`, `TP13`–`TP15` | VBAT_SNS, SWDIO, SWDCK, GND test pads | 1 mm pad |
 
-Free refs from deletions: `R14`, `R15`, `R19`, `R20`, `R21`, `C14`–`C17`, `U7`–`U10`, `U12`, `J3`. Do not reuse them in this revision, so old BOMs and photos stay unambiguous.
+Free refs from deletions: `R14`, `R15`, `R19`, `R20`, `R21`, `R23`, `R24`, `C14`–`C17`, `U7`–`U10`, `U12`, `J3`, `JP1`. Do not reuse them in this revision, so old BOMs and photos stay unambiguous.
 
 ### Buck part choice
 
@@ -143,13 +143,13 @@ Gender convention: the battery lead carries the female XT30, so the board gets t
 | Item | Rule |
 |---|---|
 | Copper weight | 2 oz outer, 1 oz inner |
-| Current | Up to about 16 A on VBUS/GND at 4–8 A per ESC channel, sustained for the whole match (a meltybrain spins continuously). The AM32 limit is set to 4–5 A per channel |
+| Current | The copper is sized for about 16 A on VBUS/GND (8 A per ESC channel), sustained for the whole match (a meltybrain spins continuously). That is the design ceiling. The AM32 limit is set to 4–5 A per channel, so the configured maximum is about 10 A |
 | Layout | `J6` and `J7` mirror each other about x = 0, with both VBAT_RAW pins on y −10.8. **VBAT_RAW** runs straight across between them on B.Cu (5.8 mm, y −13.3…−7.5), doubled on In2 at both ends. **VBUS** comes back right on top of it on F.Cu (6.8 mm, y −13.3…−6.5), with an F+B strip over the band's E half (y −6.5…−4.6) to get round `J6`'s VBAT pin, then runs down the E edge to `J1` on F, B and In2 (3.9 mm). Going out and back on top of each other, the two currents' fields cancel. No ESC current runs N of y −4.6. The fills keep the 1 mm outer-layer VBUS↔VBAT_RAW gap at each other's through-hole pins |
-| Resistance | DC solve of the board copper at 20 °C: VBAT_RAW 1.09 mΩ, VBUS 2.07 mΩ, GND return 0.20 mΩ, **3.4 mΩ** end to end (0.34 W at 10 A, 0.86 W at 16 A). The NW layout it replaced was 10.2 mΩ by the same solve. VBUS is the larger half because it has only F.Cu across the band (B.Cu is VBAT_RAW there). Add about 20% hot |
+| Resistance | DC solve of the board copper at 20 °C: VBAT_RAW 1.09 mΩ, VBUS 2.02 mΩ, GND return 0.17 mΩ, **3.3 mΩ** end to end (0.33 W at 10 A, 0.84 W at 16 A). The NW layout it replaced was 10.2 mΩ by the same solve. VBUS is the larger half because it has only F.Cu across the band (B.Cu is VBAT_RAW there). Add about 20% hot |
 | VBUS to VBAT_RAW | 1.0 mm minimum on the outer layers (`guac.kicad_dru`). Both strips face the bottom plate, and a metal chip bridging them shorts the switch |
 | Inner layers | In1 is solid GND, so the F.Cu VBUS band references GND. In2 carries 3V3 (centre), 5V (W edge, N end, and a finger to `J5`), the VBAT_RAW band ends, and the E-edge VBUS strip; the In2 3V3 pour keeps 1 mm from all power copper. 47 mm² of F.Cu and 41 mm² of B.Cu power copper still sit over In2 3V3, all of it on the band's edges and the E-edge strip, far from the IMUs |
-| Signal tunnel | F and B are both power copper across the band, so the eight signals that cross it (SPI SCK/MOSI/MISO, `CS_B`, CRSF TX/RX, DSHOT 1/2) go through short In2 lanes at x 1.0…5.6 between two staggered via rows just outside the band (0.66 mm lane pitch). 3V3 crosses as a 0.4 mm In2 lane at x 0.2. The router may also take a signal up the W edge past `J7` (DS1 and CRSF_TX do on the current board, about 1 mm from `J7`'s pins) |
-| GND | Poured on all layers. `scripts/stitch_rev2.py` adds a 3.5 mm stitching grid plus an edge ring wherever F, In1 and B GND overlap (257 GND vias on the current board). The return from `J1` to `J6` stays in the S end |
+| Signal tunnel | F and B are both power copper across the band, so the eight signals that cross it (SPI SCK/MOSI/MISO, `CS_B`, CRSF TX/RX, DSHOT 1/2) go through short In2 lanes at x 1.0…5.6 between two staggered via rows just outside the band (0.66 mm lane pitch). 3V3 crosses as a 0.4 mm In2 lane at x 0.2. A no-track rule area closes the strip W of `J7`, the only other way round the band, so all eight use their lanes. The S-end fan-out at `U5` (SCK, MOSI, MISO, `MISO_B`, `CS_B`) and DSHOT 1's drop to `R12` are drawn by `power_rev2.py`; the autorouter does the rest. `stitch_rev2.py` then puts up to three GND return vias (0.62/0.25) at each end of the tunnel, within about 3 mm of every lane via |
+| GND | Poured on all layers. `scripts/stitch_rev2.py` adds a 3.5 mm stitching grid plus an edge ring wherever F, In1 and B GND overlap (228 GND vias on the current board). The return from `J1` to `J6` stays in the S end |
 | Via stitching | VBUS is stitched F to B every 1.6–1.8 mm along the E edge and the band's E strip (0.75/0.35 vias), plus six at `J7` pin 1 |
 | Clearances | Nearest IMU to ESC-path copper: `U5`, 2.05 mm (`U6` sat 0.6 mm from it before; now 5.5 mm). Autorouted signals keep at least 0.45 mm from power copper (keepouts grown 0.5 mm around the strips) |
 
@@ -173,13 +173,13 @@ The Repeat AM32 BEC stays **isolated**; do not tie it to the carrier 5 V rail. T
 | UVLO | 3S only: `R25` 66.5 kΩ / `R26` 10 kΩ on EN, about 7.96 V off / 8.93 V on (2.65 V/cell). It is a dead-pack backstop set below spin-up sag; the firmware's per-cell warn / halt does the real low-voltage handling |
 | Input-cap margin | At 13.05 V each Samsung `CL21A226MAYNNNE` keeps a little under 4.4 µF, so the three-cap worst case is about 10 µF, right at the reference design value. For more margin, use a 35 V 22 µF 0805 such as Murata GRM21BR6YA226ME43 |
 
-On the routed board, `C2` (100 nF) then `C1` sit directly off U2 VIN/GND, with a loop under 3 mm. `C19`/`C20` sit beside `C1` on a 0.6 mm VBUS spine that drops into the N VBUS strip. FB is taken from the `C4`/`C5` node. `L1` and the SW node are kept away from the IMUs and `VBAT_SNS`. `L1` is the tallest part after the XT30s; stake it (see [Impact hardening](#impact-hardening)).
+On the routed board, `C2` (100 nF) then `C1` sit directly off U2 VIN/GND, with a loop under 3 mm. `C19`/`C20` sit beside `C1` on a 0.6 mm F.Cu VBUS spine, fed through a via from the 0.8 mm B.Cu VBUS feed that comes up the W edge. FB is taken from the `C4`/`C5` node. `L1` and the SW node are kept away from the IMUs and `VBAT_SNS`. `L1` is the tallest part after the XT30s; stake it (see [Impact hardening](#impact-hardening)).
 
 ---
 
 ## Board outline and mechanical
 
-The outline and keepouts come from the chassis and live in `cad/rev2/` (`board_outline.dxf`, `keepout.dxf`, `README.md`). If this section and `cad/rev2/README.md` disagree, the README wins. Placement has not moved since `244dd04`, so chassis v3.4f fits the routed board (`hardware/guac.kicad_pcb`) unchanged.
+The outline and keepouts come from the chassis and live in `cad/rev2/` (`board_outline.dxf`, `keepout.dxf`, `README.md`). If this section and `cad/rev2/README.md` disagree, the README wins. Placement follows chassis v3.4g (`J7` mirrors `J6` at the S end, `J2` in the NW). A v3.4f chassis does not fit this board.
 
 | Parameter | Value |
 |---|---|
@@ -192,7 +192,7 @@ The outline and keepouts come from the chassis and live in `cad/rev2/` (`board_o
 | Layers | 4 |
 | Finish | ENIG (the LGA pads need flat pads) |
 
-### Chassis features for the board (in v3.4f)
+### Chassis features for the board (in v3.4g)
 
 1. A recess in the underside of each end ledge: x ±20.5, |y| 29.9…38.5. The board drops in from below.
 2. Four M2 heat-set bores (≤ 3.7 mm deep with a 1.6 mm board).
@@ -214,13 +214,13 @@ The board bottom is at z 0.9. The bottom plate (0.8 mm) tops out at z 0.58, in a
 
 | Region | Height limit above the board |
 |---|---|
-| Battery strip, \|x\| ≤ 6.5 | 4.7 mm |
-| Side corridors, \|x\| 6.5…20.5 | about 23 mm (open to the rib shelves at z 25.5) |
+| Battery strip, \|x\| ≤ 9.0 | 4.7 mm |
+| Side corridors, \|x\| 9.0…20.5 | about 23 mm (open to the rib shelves at z 25.5) |
 | Motor-screw key band, \|y\| ≤ 8, in the corridors | about 4 mm |
 | Motor-lead entries, y −25…−15, z 9.8…19.2 | about 7 mm |
 | Ledge-clamped ends, \|y\| ≥ 29.9 | none (no top-side parts) |
 
-`L1` (6 mm) sits in the NW corridor, 3 mm S of the buck so the LED leads have a lead-in to `J2`. `C21` (≤ 4.3 mm) fits in the battery strip in the S, right off the power band. A 25 V polymer part at 13.05 V runs at 52% of its rating, inside the usual 80% derating. A mated XT30 stands about 21 mm, topping out near z 23.5 under the 26.5 side shelves; route its 16 AWG off sideways.
+`L1` (6 mm) sits in the NW corridor, W of the buck. It moved 3 mm S in v3.4g so the LED leads have a lead-in to `J2`. `C21` (≤ 4.3 mm) fits in the battery strip in the S, right off the power band. A 25 V polymer part at 13.05 V runs at 52% of its rating, inside the usual 80% derating. A mated XT30 stands about 21 mm, topping out near z 23.5 under the 25.5 side shelves; route its leads off sideways.
 
 USB runs through a ribbon extension with a slim male end, from the XIAO to a USB-C female on the shelves (z 19.4…21.4) under the top-plate slot.
 
@@ -245,18 +245,20 @@ Exact coordinates are in `cad/rev2/README.md`.
 
 With the bottom plate off, only the underside and the four screws can be reached. The E and W edges sit 0.5 mm from the walls and the ends are under the ledges. So the debug pads are **flush, unpopulated pads on the bottom copper**, the one exception to "nothing on the underside":
 
-| Pad | Signal |
-|---|---|
-| `TP10` | VBAT_SNS |
-| `TP13` | SWDIO |
-| `TP14` | SWDCK |
-| `TP15` | GND |
+| Pad | Signal | Silk label |
+|---|---|---|
+| `TP13` | SWDIO | DIO |
+| `TP14` | SWDCK | CLK |
+| `TP15` | GND | GND |
+| `TP10` | VBAT_SNS | VBAT |
+
+The four Ø1.0 pads sit in a tilted row under the XIAO, about 15 mm from the spin axis, from (4.2, 14.9) to (10.8, 11.09), in the order of the table. The pad labelled "VBAT" is `VBAT_SNS`, the pack voltage divided by 4.61 (about 2.8 V at full charge), not the pack itself. `TP13` and `TP14` reach the RP2350 through the XIAO's underside pads 23 and 24, so they are dead unless those pads are soldered (see [Overview](#overview)).
 
 That is all of them. There are no pads on the CRSF lines or on VBUS. For a bench UART, unplug the receiver and use the `J5` harness. USB through the chimney works with the top plate off and the battery in.
 
 ### IMU placement
 
-The nominal array is U4 at 0°/r12, U5 at 90°/r18, U6 at 210°/r18 (the asymmetry breaks heading singularities). Nominally that puts U5 under the XIAO. Rotating the **whole array 166° CCW** clears everything; only 164–168° works.
+The nominal array is U4 at 0°/r12, U5 at 90°/r18, U6 at 210°/r18 (the asymmetry breaks heading singularities). Nominally that puts U5 under the XIAO. Rotating the **whole array 166° CCW** clears everything. Anything from 152° to 168° works (the first layout allowed only 164–168°).
 
 | Sensor | Nominal | As placed (+166°) | Board position (x, y) | Accel at 4000 rpm |
 |---|---|---|---|---:|
@@ -266,7 +268,7 @@ The nominal array is U4 at 0°/r12, U5 at 90°/r18, U6 at 210°/r18 (the asymmet
 
 Sensor axis map from the footprint rotations: the radial-outward direction is **+X on U4, +Y on U5, and −X on U6**. Firmware must take this per-chip mapping instead of assuming X radial on every chip. Store **measured** post-assembly IMU coordinates in firmware.
 
-The 166° window depends on `J2`, `J6`, `J7` and `C21`. Against the v3.4g meshes the scan gives 151…168°, so 166° stays, with 0.90 mm minimum clearance. Re-run `cad/rev2/scripts/build_rev2.py` after any placement change.
+The 166° window depends on `J2`, `J6`, `J7` and `C21`. Against the v3.4g placements and keepouts the scan gives 152…168°, so 166° stays, with 0.90 mm minimum clearance. Re-run `cad/rev2/scripts/build_rev2.py` after any placement change.
 
 ---
 
@@ -276,7 +278,7 @@ The 166° window depends on `J2`, `J6`, `J7` and `C21`. Against the v3.4g meshes
 2. No MLCC within 2 mm of a mounting hole or 1 mm of an edge. Orient 0805 caps parallel to the nearest edge. Use soft-termination parts for `C1`, `C19`, `C20`, `C4`, `C5` where available (for example Murata GCJ or KEMET FT-CAP).
 3. Stake `L1`, `C21`, and the XIAO corners with epoxy after the electrical test.
 4. Conformal-coat the whole board, masking the GH sockets, XT30 pins, USB-C, and test pads.
-5. A zip-tie strain-relief slot (about 1.2 × 3 mm) beside every connector: `J1`, `J2`, `J4`, `J5`, `J6`, `J7`.
+5. No tie slots on the board; there is no room for them. Strain relief is on the chassis: snap channels on the S ledge hold the `J1` leads, and each lap joint gets an epoxy fillet. The GH plugs latch.
 6. Silkscreen polarity at every connector.
 
 ---
@@ -401,7 +403,7 @@ Keep duty below about 25% so on-times stay under the module's thermal limit. The
 | D8 / SCK | GPIO2 | `SPI_SCK` |  |
 | D9 / MISO | GPIO4 | `SPI_MISO` | IMU data in |
 | D10 / MOSI | GPIO3 | `SPI_MOSI` | IMUs and latch |
-| SWDIO / SWDCLK | | SWD | Test pads |
+| SWDIO / SWDCLK (underside pads 23 / 24) | | SWD | To `TP13` / `TP14` |
 | 5V | | 5V | From buck |
 | 3V3 | | 3V3 | To IMUs and latch |
 
@@ -419,7 +421,7 @@ Keep duty below about 25% so on-times stay under the module's thermal limit. The
 | `J5` to receiver | JST-GH 4-pin | 28 AWG, twisted |
 | `J2` to both TinySLEDs | JST-GH 2-pin, Y-splice just S of the plug | 26–28 AWG, up the W board edge |
 
-Zip-tie every lead through its strain-relief slot.
+Secure every lead in its chassis channel or groove, and fillet the `J1` joints with epoxy.
 
 ---
 
@@ -435,13 +437,13 @@ Zip-tie every lead through its strain-relief slot.
 | Vias | Tented |
 | Quantity | 5 |
 | Min trace / space | 0.18 / 0.205 mm (7 / 8 mil, the 2 oz outer-layer limit). Smallest routed track is 0.18 mm |
-| Vias used | 0.62/0.25 (autorouted signal), 0.64/0.25 (GND stitching), 0.7/0.3, 0.75/0.35, and 0.8/0.4 mm. Smallest ring 0.185 mm (≥ the 7 mil, 0.178 mm, limit) |
+| Vias used | 0.62/0.25 (autorouted signal, tunnel GND return), 0.64/0.25 (GND stitching), 0.7/0.3, 0.75/0.35, and 0.8/0.4 mm. Smallest ring 0.185 mm (≥ the 7 mil, 0.178 mm, limit) |
 | Plated component holes | 0.31 mm ring (12 mil on 2 oz) and 0.41 mm hole to hole |
 | Inner layers | 0.18 mm hole-to-copper isolation (7 mil on 4 layers) |
 | Rules | `guac.kicad_pro` and `guac.kicad_dru` hold these limits. KiCad DRC is clean against them |
-| Order files | `hardware/scripts/export_pcbway.sh` writes gerbers, drills, placement and BOM to `hardware/production/pcbway/` (not tracked) |
+| Order files | `hardware/scripts/export_pcbway.sh` writes gerbers, drills, placement, BOM, an assembly drawing and the fab notes (`scripts/pcbway_notes.txt`) to `hardware/production/pcbway/` (not tracked). It stops if DRC fails, a via hole sits in a pad, or a part has no part number |
 | BOM | `hardware/procurement/bom_rev2.csv` (manufacturer and supplier part numbers) |
-| Assembly | Top side only. `U1` (XIAO) is not placed; it is hand-soldered. `J1` has no part (bare lap pads). The assembly BOM comes from `hardware/scripts/pcbway_bom.py` |
+| Assembly | Top side only. `U1` (XIAO) is not placed; it is soldered by hand (hot air or reflow if the SWD pads are wanted, see [Overview](#overview)). `J1` has no part (bare lap pads). The assembly BOM comes from `hardware/scripts/pcbway_bom.py` |
 | Stencil | Stainless, ordered with the board |
 
 After the v3.4g power move: KiCad DRC is clean against these rules with all nets connected, and the outer VBUS↔VBAT_RAW gap is at least 1.0 mm. Repeat after any layout change.
@@ -453,7 +455,7 @@ After the v3.4g power move: KiCad DRC is clean against these rules with all nets
 1. **`C21` part number.** The PCBWay BOM still lists it as TBD. Pick a real 100 µF / 25 V polymer tantalum in 7343-43 (≤ 4.3 mm). Two 47 µF in parallel are fine if 100 µF isn't stocked.
 2. **3S UVLO cutoff.** Decided: `R25` is 66.5 kΩ, so the hardware cuts at about 8.0 V and spin-up sag on the 380 mAh pack cannot brown the brain out. (75 kΩ cut at 8.85 V.)
 3. **Pack capacity.** A 3-minute match at about 10 A average draws about 500 mAh, against 380 mAh. Either confirm the real average current with a bench soak, lower the ESC current limit, or move to a larger pack.
-4. **Bench soak.** Run 3 minutes at the ESC current limit and check copper and connector temperature. The solve says 3.4 mΩ on the board; measure it.
+4. **Bench soak.** Run 3 minutes at the ESC current limit and check copper and connector temperature. The solve says 3.3 mΩ on the board; measure it.
 5. **TinySLED at 13.05 V.** The module is sold as 2–3S, which likely means 12.6 V max. Tiny's LEDs reportedly use a series resistor with no regulation, so 13.05 V pushes the current up by more than 3.5%. Either confirm with Tiny's or use the 3–6S version (tinysleds.com/products/3-6s-led). `Q1` (30 V) is fine either way.
 6. **Buck light-load check.** Scope the 5 V ripple at the real ~120 mA load to confirm the AP63301 choice.
 7. **Power integrity.** Scope VBUS, 5V, and 3V3 during spin-up, regen braking, and TinySLED strobes.
@@ -463,7 +465,7 @@ After the v3.4g power move: KiCad DRC is clean against these rules with all nets
 11. **LED maximum on-time.** This spec asks for a hard cap but gives no number. Firmware caps a single pulse at about 655 ms (and duty at 25%). Set the real limit from the TinySLED's thermal behaviour.
 12. **Through-hole tails.** Only `J6` and `J7` are through-hole (4 pins). Trim their tails flush over the Ø4 bottom-plate reliefs (v3.4g moves `J7`'s to the SW).
 13. **Rev A bodge.** On existing Rev A boards, lift or cut R6/R7/R8 pin 2 from MOSI and jumper them to D9 before IMU bring-up.
-14. **Firmware plant parameters.** Update them for 3S, the Ø42 wheel, and the v3.4f geometry.
+14. **Firmware plant parameters.** Update them for 3S, the Ø42 wheel, and the v3.4g geometry.
 
 ### Later
 

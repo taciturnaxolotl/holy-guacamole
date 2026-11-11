@@ -1,11 +1,11 @@
 # Holy Guacamole — Full Project Braindump
 
-> **Superseded for hardware by [`spec.md`](spec.md) (rev 2).** This braindump describes the Rev A carrier (JLCPCB, 2 layers, SK9822 status LEDs, on-board receiver). Treat its PCB sections as history; the rev 2 board, pin map and fab rules live in `spec.md`.
+> **Superseded for hardware by [`spec.md`](spec.md) (rev 2).** Do not build from this file. Sections 4, 9 and 10 are a summary frozen at chassis v3.4f on 2026-11-10, and they may lag the spec (the board-resistance figure in section 10 is from before the v3.4g power move). Older passages describe the Rev A carrier (JLCPCB, 4 layers, SK9822 status LEDs, on-board receiver); treat them as history. The rev 2 board, pin map and fab rules live in `spec.md`.
  
 **Robot:** Holy Guacamole — 1lb meltybrain antweight, MRCA full-combat ruleset  
 **Document type:** Running knowledge dump — research, design decisions, hardware, firmware architecture  
 **Target event:** none set (Buckeye Bot Bash 2, Aug 29 2026, has passed)  
-**Status:** Chassis v3.4f and the rev 2 carrier (routed for PCBWay) are designed. Next: the MJF frame, the PCB order, and bench bring-up. Hardware numbers here are refreshed to v3.4f; `spec.md` (Rev B 2.1) is the authority where they differ.
+**Status:** Chassis v3.4f and the rev 2 carrier (routed for PCBWay) are designed. Next: the MJF frame, the PCB order, and bench bring-up. Hardware numbers here are refreshed to v3.4f. The chassis has since moved to v3.4g (the switch XT30 went to the S end of the board); `spec.md` (Rev B 2.2) is the authority where they differ.
  
 ---
  
@@ -445,7 +445,7 @@ Telemetry back channel: RPM, heading error, battery voltage, current draw — lo
  
 **Capacity check (open):** a 2-minute match was budgeted at ~420 mAh on 2S (spin-up ~15 A for 10 s, ~7 A steady, ~12 A impact recovery, +20% margin, +20% sag). A rough 3S estimate at ~10 A average over 3 minutes is ~500 mAh, against 380. Measure real average current on the bench soak; lower the ESC current limit or move to a larger pack if it's short.
  
-UVLO: `JP1` 2-3 cuts at ~8.85 V (2.95 V/cell); `R25` 66.5k would move it to ~8.0 V. Firmware low-battery halt must sit above the hardware cutoff.
+UVLO: 3S only, set by `R25` 66.5 kΩ / `R26` 10 kΩ (`JP1` is gone). It cuts at about 8.0 V (2.65 V/cell). Firmware low-battery halt must sit above the hardware cutoff.
  
 ### 9.7 Power switch: Fingertech Mini Power Switch
  
@@ -461,11 +461,11 @@ UVLO: `JP1` 2-3 cuts at ~8.85 V (2.95 V/cell); `R25` 66.5k would move it to ~8.0
  
 ## 10. Carrier PCB specification
  
-The current board is rev 2. Full detail is in `spec.md` (Rev B 2.1, which tracks `hardware/guac.kicad_sch` and `hardware/guac.kicad_pcb`). Summary:
+The current board is rev 2. Full detail is in `spec.md` (Rev B 2.2, which tracks `hardware/guac.kicad_sch` and `hardware/guac.kicad_pcb`). Summary:
  
 - 40 × 76 × 1.6 mm, 4 layers, 2 oz outer / 1 oz inner, ENIG, centred on the spin axis, clamped under the chassis end ledges with 4 × M2. Fabbed at PCBWay (normal process: 0.18 / 0.205 mm trace/space).
 - The carrier is also the power distribution board: battery on `J6` (XT30-M), switch loop on `J7` (XT30-F), ESC feed on `J1` lap pads; ~9 mΩ of board copper; outer VBUS↔VBAT_RAW kept 1 mm apart.
-- AP63301 5 V buck (forced PWM), JP1 UVLO select, SMAJ15CA TVS and 100 µF polymer bulk on VBUS.
+- AP63301 5 V buck (forced PWM), 3S-only UVLO (`R25` 66.5 kΩ, about 8 V), SMAJ15CA TVS and 100 µF polymer bulk on VBUS.
 - SN74HC595 latch for the three IMU chip-selects (QD–QH NC). SK9822 chain and MCP23S17 are gone.
 - JST-GH for ESC signal (`J4`), receiver (`J5`), and both TinySLEDs on one Y-splice (`J2`, Q1 AO3402 low-side).
 - Flush bottom-copper debug pads only: `TP13` SWDIO, `TP14` SWDCK, `TP15` GND, `TP10` VBAT_SNS. Nothing else on the underside (0.32 mm to the bottom plate).

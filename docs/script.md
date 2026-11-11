@@ -1,3 +1,5 @@
+> July 2026 video script. It describes the Rev A board (selectable battery cutoff on JP1, SK9822 RGB status LEDs, double-sided assembly). Rev 2 is in [`spec.md`](spec.md).
+
 ### talking head intro
 
 [outdoors] hi! I decided it would be a wonderful idea to design, manufacture, and assemble a combat robot to take to open sauce.

@@ -1,3 +1,5 @@
+"""List the larger and taller solids of the Rev A board component model (v33m_pcbcomp.step) with their extents.
+This is where the Rev A part heights in the README (XIAO shield, USB-C) come from. Reads /tmp/hg33b/ (not in this repo)."""
 import cadquery as cq
 M="/tmp/hg33b/holy_guacamole_v33b/step/"
 s=cq.importers.importStep(M+"v33m_pcbcomp.step"); vs=s.solids().vals()

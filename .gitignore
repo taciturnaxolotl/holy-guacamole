@@ -12,3 +12,7 @@ result
 result-*
 
 crush.json
+
+# Python
+__pycache__/
+*.pyc
