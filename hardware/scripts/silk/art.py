@@ -103,18 +103,15 @@ def bottom(bd, style='merged'):
             G.append(affinity.translate(chip.exterior.buffer(0.09), x, y))
             G.append(affinity.translate(affinity.rotate(Point(-1.0, 0.75).buffer(0.25), rot, origin=(0, 0)), x, y))
             lines.append(LineString([(0, 0), (x, y)]).difference(Point(x, y).buffer(2.3)).buffer(0.1))
-            r = math.hypot(x, y); g = _mid(text(f'{ref} · r{r:.0f}', 0.85, 'xbold', track=0.04)[0])
-            for d in (3.3, 3.9, 4.6, 5.4):
-                hit = None
-                for k in range(16):
-                    t = math.atan2(y, x) + math.radians(k*22.5*(1 if k % 2 else -1)*0.5)
-                    c = affinity.translate(g, x + d*math.cos(t), y + d*math.sin(t))
-                    if outline_v.contains(c) and not c.buffer(0.3).intersects(ko) and not any(c.buffer(0.3).intersects(q) for q in tags + chips + [hole]):
-                        hit = c; break
-                if hit: tags.append(hit); break
+            # name only (the rings carry the radii), set along the ring in the band between r 12 and r 18
+            g = _mid(text(ref, 0.85, 'xbold', track=0.04)[0]); a0 = math.atan2(y, x)
+            for da in (0, 5, -5, 10, -10, 15, -15, 20, -20):
+                c = _arc_text(g, 15.0, a0 + math.radians(da))
+                if outline_v.contains(c) and not c.buffer(0.3).intersects(ko) and not any(c.buffer(0.3).intersects(q) for q in tags + chips + [hole]):
+                    tags.append(c); break
             else: print('  no tag for', ref)
-        for r, ang in ((12, 40), (18, 50)):                      # ring names sit in a gap in their ring
-            c = (r*math.cos(math.radians(ang)), r*math.sin(math.radians(ang))); tags.append(affinity.translate(_mid(text(f'R{r}', 0.85, 'xbold')[0]), *c))
+        for r, ang in ((12, 40), (18, 50)):                      # ring names sit in a gap in their own ring, along it
+            tags.append(_arc_text(_mid(text(f'R{r}', 0.85, 'xbold')[0]), r, math.radians(ang)))
         geo = unary_union(lines).difference(hole)
         G.append(geo.difference(unary_union([ko] + [q.buffer(0.35) for q in tags] + [Point(p).buffer(1.75) for p in imus.values()])))
         labels += tags
@@ -202,6 +199,12 @@ class Placer:
                     if not s.strict: s.over_vias += [g for g in cand if g.intersects(s.rvias)]
                     s.strict = True; return y
         print('  could not place row', [t for _, t in items], s.why(affinity.translate(gs[0][1], gs[0][0], ys[0]))); return None
+
+def _arc_text(g, r, a):
+    """text centred on radius r at angle a, turned to run along the circle and kept the right way up"""
+    rot = math.degrees(a) - 90
+    if math.cos(math.radians(rot)) < 0: rot += 180
+    return affinity.translate(affinity.rotate(g, rot, origin=(0, 0)), r*math.cos(a), r*math.sin(a))
 
 def _mid(g):
     """centre a glyph run on its own ink box, so + - and capitals share one midline"""
