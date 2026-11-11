@@ -47,7 +47,7 @@
 | 7 | Duplicate CS pull-ups `R19`/`R20` deleted. | `R4`/`R5` already do the job. |
 | 8 | **Bug fix:** `R6`/`R7`/`R8` (IMU SDO series resistors) now land on `SPI_MISO`. In Rev A they were wired to `SPI_MOSI` in both schematic and PCB. | Rev A boards cannot read the IMUs without a bodge (see Open items). |
 | 9 | New 40 × 76 mm outline centred on the spin axis, ends clamped under the chassis end ledges. 4 layers, 1.6 mm, 2 oz outer copper, 4 × M2 screws. | See [Board outline](#board-outline-and-mechanical). |
-| 10 | 3S HV is now the design pack; 2S stays selectable on `JP1`. | More spin-up torque without a board respin. |
+| 10 | 3S HV is the only pack. `JP1` and the 2S divider (`R23`/`R24`) are gone; the 3S divider is wired straight to the buck's EN. | One less hand-soldered part; tuning only ever happens at one voltage. |
 | 11 | The ESC BEC stays isolated, as in Rev A. | Unchanged policy. |
 
 Review suggestions that were **not** taken as written:
@@ -63,7 +63,7 @@ Review suggestions that were **not** taken as written:
 The carrier hosts a Seeed XIAO RP2350 module. The XIAO provides the RP2350, flash, USB, crystal, and the 3.3 V regulator. The carrier provides:
 
 - Battery, switch-loop, and ESC power distribution on board copper.
-- A 5 V buck rail from the switched LiPo bus (3S HV design pack; 2S supported through the UVLO jumper).
+- A 5 V buck rail from the switched LiPo bus (3S HV pack only).
 - SPI to one inner LSM6DSV320X 6-axis IMU and two outer H3LIS331DL high-G accelerometers. Their chip-selects come from an SN74HC595 latch loaded over the same SPI bus.
 - Two direct bidirectional DSHOT/EDT lines to the Repeat AM32 dual ESC.
 - A CRSF UART and 5 V feed to the off-board ELRS receiver.
@@ -91,7 +91,6 @@ Runtime IO stays on the XIAO edge pads. The XIAO's underside pads are NC.
 | `J5` | ELRS receiver harness, JST-GH 4-pin | `JST_GH_SM04B-GHS-TB` |
 | `J6` | Battery, XT30 male, vertical | `AMASS_XT30UPB-M` |
 | `J7` | Switch loop, XT30 female, vertical | `AMASS_XT30UPB-F` |
-| `JP1` | UVLO select solder jumper (open / 2S / 3S) | 3-pad jumper |
 | `L1` | 5.6 µH Bourns SRP6060FA | SRP6060FA |
 | `C21` | 100 µF 25 V polymer tantalum, ≤ 4.3 mm tall | `CP_EIA-7343-43_Kemet-X` |
 | `D2` | SMAJ15CA bidirectional TVS on VBUS | SMA |
@@ -165,13 +164,13 @@ The Repeat AM32 BEC stays **isolated**; do not tie it to the carrier 5 V rail. T
 | Parameter | Value |
 |---|---|
 | Part | AP63301WU-7, TSOT-23-6 |
-| Input | 3.8–32 V part rating. Design range is VBUS 9.0–13.05 V (3S HV); 2S (6.0–8.4 V) also works |
+| Input | 3.8–32 V part rating. Design range is VBUS 9.0–13.05 V (3S HV) |
 | Output | 5.0 V, set by `R27` 158 kΩ / `R28` 30.1 kΩ, with `C18` 47 pF feed-forward |
 | Inductor | `L1` 5.6 µH Bourns SRP6060FA |
 | Input caps | `C1`, `C19`, `C20` 22 µF 25 V 0805 + `C2` 100 nF |
 | Output caps | `C4`, `C5` 22 µF |
 | Bootstrap | `C3` 100 nF |
-| UVLO | `JP1` selects the divider. **Bridge 2-3 for this pack** = 3S: `R25` 75 kΩ / `R26` 10 kΩ, about 8.85 V off / 9.92 V on (2.95 V/cell). Bridge 1-2 = 2S: `R23` 47 kΩ / `R24` 10 kΩ, 5.96 / 6.66 V. Leave open to bypass |
+| UVLO | 3S only: `R25` 66.5 kΩ / `R26` 10 kΩ on EN, about 7.96 V off / 8.93 V on (2.65 V/cell). It is a dead-pack backstop set below spin-up sag; the firmware's per-cell warn / halt does the real low-voltage handling |
 | Input-cap margin | At 13.05 V each Samsung `CL21A226MAYNNNE` keeps a little under 4.4 µF, so the three-cap worst case is about 10 µF, right at the reference design value. For more margin, use a 35 V 22 µF 0805 such as Murata GRM21BR6YA226ME43 |
 
 On the routed board, `C2` (100 nF) then `C1` sit directly off U2 VIN/GND, with a loop under 3 mm. `C19`/`C20` sit beside `C1` on a 0.6 mm VBUS spine that drops into the N VBUS strip. FB is taken from the `C4`/`C5` node. `L1` and the SW node are kept away from the IMUs and `VBAT_SNS`. `L1` is the tallest part after the XT30s; stake it (see [Impact hardening](#impact-hardening)).
@@ -452,7 +451,7 @@ After the v3.4g power move: KiCad DRC is clean against these rules with all nets
 ## Open items
 
 1. **`C21` part number.** The PCBWay BOM still lists it as TBD. Pick a real 100 µF / 25 V polymer tantalum in 7343-43 (≤ 4.3 mm). Two 47 µF in parallel are fine if 100 µF isn't stocked.
-2. **3S UVLO cutoff.** `R25` 75 kΩ cuts at about 8.85 V (2.95 V/cell), which can trip under spin-up sag on a 380 mAh pack. Changing `R25` to 66.5 kΩ moves the cutoff to about 8.0 V. Decide before ordering.
+2. **3S UVLO cutoff.** Decided: `R25` is 66.5 kΩ, so the hardware cuts at about 8.0 V and spin-up sag on the 380 mAh pack cannot brown the brain out. (75 kΩ cut at 8.85 V.)
 3. **Pack capacity.** A 3-minute match at about 10 A average draws about 500 mAh, against 380 mAh. Either confirm the real average current with a bench soak, lower the ESC current limit, or move to a larger pack.
 4. **Bench soak.** Run 3 minutes at the ESC current limit and check copper and connector temperature. The solve says 3.4 mΩ on the board; measure it.
 5. **TinySLED at 13.05 V.** The module is sold as 2–3S, which likely means 12.6 V max. Tiny's LEDs reportedly use a series resistor with no regulation, so 13.05 V pushes the current up by more than 3.5%. Either confirm with Tiny's or use the 3–6S version (tinysleds.com/products/3-6s-led). `Q1` (30 V) is fine either way.

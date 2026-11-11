@@ -67,7 +67,7 @@ the ExpressLRS Configurator over USB.
 | SITL sim | **hand-rolled plant (Box2D dropped), realistic IMU, scenario harness**, see §7 |
 | Drivers (`imu_spi`, `dshot`, `crsf`, `latch`) | in progress |
 | Heading/status LED (`head_led`) | implemented; PIO one-shot pulses, strobe + status codes (see section 3.1). Not yet bench-verified |
-| Rev 2 hardware match | **not yet**: 2S cell count, nominal IMU angles, one axis convention for all IMUs, old chassis plant numbers (section 9) |
+| Rev 2 hardware match | **not yet**: nominal IMU angles, one axis convention for all IMUs, old chassis plant numbers (section 9) |
 
 ---
 
@@ -495,7 +495,7 @@ Checked against `spec.md` Rev B 2.1 and the routed board.
 
 | Item | Code today | Rev 2 / v3.4f | Change |
 |---|---|---|---|
-| Pack (`battery.h`) | `BATTERY_CELLS 2`, warn 3.75 / halt 3.60 V/cell | 3S HV 380, 13.05 V full | `BATTERY_CELLS 3`. The hardware UVLO (`JP1` 2-3) cuts at about 8.85 V, or 2.95 V/cell, so the firmware halt must stay above that |
+| Pack (`battery.h`) | `BATTERY_CELLS 3`, warn 3.75 / halt 3.60 V/cell | 3S HV 380, 13.05 V full | Done. The hardware UVLO is 3S-only and cuts at about 7.96 V (2.65 V/cell), well under the 10.8 V firmware halt |
 | IMU angles (`imu_geom.c`) | 0 / 90 / 210° | 166 / 256 / 16° | Add 166°, then replace with measured positions |
 | IMU axes (`imu_convert.c`) | X radial, Y tangential on all three | Radial is **+X on U4, +Y on U5, −X on U6** | Per-chip axis and sign map, radial and tangential, including the sign of tangential against the spin direction. Confirm on the bench spin (braindump §11.6 step 1) |
 | Plant (`sim/plant.c`) | 170 / 230 mm disc, 0.454 kg, I ≈ 1.8e-3 | Section 5 v3.4f numbers | Update `plant_params_t` defaults |
