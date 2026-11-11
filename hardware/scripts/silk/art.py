@@ -115,17 +115,17 @@ def bottom(bd, style='merged'):
             else: print('  no tag for', ref)
         for r, ang in ((12, 40), (18, 50)):                      # ring names sit in a gap in their ring
             c = (r*math.cos(math.radians(ang)), r*math.sin(math.radians(ang))); tags.append(affinity.translate(_mid(text(f'R{r}', 0.85, 'xbold')[0]), *c))
-        # legend in the free NW (view) corner: what the rings and boxes are
-        x0, y0, x1, y1 = -18.6, 19.9, -1.6, 28.7
-        frame = box(x0, y0, x1, y1).exterior.buffer(0.075)
-        hdr, _ = text('SENSORS', 0.9, 'black', track=0.14, align='l')
-        G += [frame, affinity.translate(hdr, x0 + 0.8, y1 - 1.55), LineString([(x0, y1 - 2.15), (x1, y1 - 2.15)]).buffer(0.075)]
-        rows = (('U4', 'LSM6', 'r12', '±320 g'), ('U5', 'H3LIS', 'r18', '±400 g'), ('U6', 'H3LIS', 'r18', '±400 g'))
-        for k, row in enumerate(rows):
-            y = y1 - 3.6 - k*1.45
-            for cx, t, f in zip((0.8, 3.3, 8.2, 11.3), row, ('black', 'xbold', 'xbold', 'xbold')):
-                g, _ = text(t, 0.8, f, track=0.03, align='l'); G.append(affinity.translate(g, x0 + cx, y))
-        g, _ = text('at 4000 rpm: 215 g / 322 g', 0.8, 'xbold', track=0.03, align='l'); G.append(affinity.translate(g, x0 + 0.8, y0 + 0.75))
+        # "Guac Facts": a nutrition label in the free NW (view) corner, saying what the rings and boxes are
+        x0, y0, x1, y1 = -18.6, 19.7, -1.6, 28.8
+        G.append(box(x0, y0, x1, y1).exterior.buffer(0.1))
+        hdr, _ = text('Guac Facts', 1.55, CHICLE, track=0.02, align='l'); G.append(affinity.translate(hdr, x0 + 0.55, y1 - 2.0))
+        G.append(box(x0 + 0.45, y1 - 2.75, x1 - 0.45, y1 - 2.35))                       # the heavy rule
+        rows = (('Serving size', '1 lb bot'), ('Spin', '2700–4000 rpm'), ('LSM6 at r12', '±320 g'), ('2× H3LIS at r18', '±400 g'), ('Peak, outer', '322 g'))
+        for k, (l, v) in enumerate(rows):
+            y = y1 - 3.75 - k*1.17
+            gl, _ = text(l, 0.78, 'black', track=0.02, align='l'); gv, _ = text(v, 0.78, 'xbold', track=0.02, align='r')
+            G += [affinity.translate(gl, x0 + 0.55, y), affinity.translate(gv, x1 - 0.55, y)]
+            if k < len(rows) - 1: G.append(box(x0 + 0.45, y - 0.32, x1 - 0.45, y - 0.2))   # hairline between rows
         ko = ko.union(box(x0, y0, x1, y1).buffer(0.4))
         geo = unary_union(lines).difference(hole)
         G.append(geo.difference(unary_union([ko] + [q.buffer(0.35) for q in tags] + [Point(p).buffer(1.75) for p in imus.values()])))
@@ -278,8 +278,23 @@ def top(bd):
     sc = min(1, 9.4/wg); h = affinity.scale(h, sc, sc, origin=(0, 0)); g2 = affinity.scale(g2, sc, sc, origin=(0, 0))
     P.put(affinity.translate(h, -4.9, 34.45), force=True); P.put(affinity.translate(g2, -4.9, 31.9), force=True)
     P.label('REV 2', [(-4.9, 30.5), (-4.9, 30.3), (-6.5, 30.5), (-3.3, 30.5)], cap=0.8, font='xbold', track=0.1)
-    s2, _ = text('SWD + VBAT TEST PADS ON THE BOTTOM', 0.8, 'xbold', track=0.06); P.put(affinity.translate(s2, 0, -35.7), force=True)
+    # middle of the front: a hazard placard in the free band between the ICs and the XT30s
+    hz = hazard(16.0, 6.6)
+    for cx, cy in ((0, -5.6), (-0.5, -5.6), (0.5, -5.6), (0, -5.3), (0, -5.9)):
+        if P.put(affinity.translate(hz, cx, cy)): break
+    else: print('  hazard placard does not fit', P.why(affinity.translate(hz, 0, -5.6)))
     return unary_union(P.G)
+
+def hazard(w, h):
+    """caution placard: hazard-stripe bands top and bottom, HANDS OFF in Chicle, spin speed underneath"""
+    band = 0.95; G = [box(-w/2, -h/2, w/2, h/2).exterior.buffer(0.1)]
+    stripes = unary_union([Polygon([(x, 0), (x + 0.55, 0), (x + 0.55 - band, band), (x - band, band)]) for x in np.arange(-w/2 - 1, w/2 + 2, 1.1)])
+    for yb in (h/2 - band - 0.25, -h/2 + 0.25):
+        G.append(affinity.translate(stripes, 0, yb).intersection(box(-w/2 + 0.25, yb, w/2 - 0.25, yb + band)))
+    t, tw = text('HANDS OFF!', 2.0, CHICLE, track=0.03); sc = min(1, (w - 1.6)/tw)
+    G.append(affinity.translate(affinity.scale(t, sc, sc, origin=(0, 0)), 0, -0.15))
+    s, _ = text('it spins at 4000 rpm', 0.8, 'xbold', track=0.04); G.append(affinity.translate(s, 0, -h/2 + band + 0.55))
+    return dfm(unary_union(G), 0.15)
 
 def dfm(g, wmin=0.16):
     """morphological opening: drop anything thinner than wmin (PCBWay silk min line 0.15)"""
