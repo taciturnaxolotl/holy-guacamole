@@ -5,7 +5,7 @@ its back-side probe-pad labels, and every track and via, routed ones included, s
 autorouter from the same state.
 
 Power scheme (see docs/spec.md): J6 (battery) and J7 (switch loop) mirror each other about x = 0 at the S end
-(chassis v3.4g). VBAT_RAW runs straight across between their N pins on B.Cu (doubled on In2 at both ends); VBUS
+(chassis v3.4g). VBAT_RAW runs straight across between their N pins on B.Cu; VBUS
 comes back on top of it on F.Cu, then down the E edge to J1 on F, B and In2. The signals that cross the band go
 through an In2 tunnel. A thin VBUS feed runs up the W edge to the buck, the dividers and J2 (now in the NW).
 """
@@ -106,7 +106,7 @@ B, F = pcbnew.B_Cu, pcbnew.F_Cu
 
 # The drive motors run for the whole match, so the loop is sized for sustained current, not bursts. J6 (battery)
 # and J7 (switch loop) mirror each other about x = 0 at the S end (chassis v3.4g), with both VBAT_RAW pins on
-# y -10.8. VBAT_RAW runs straight across between them in a band on B.Cu (doubled on In2 at both ends); VBUS
+# y -10.8. VBAT_RAW runs straight across between them in a band on B.Cu; VBUS
 # comes back right over it on F.Cu, then down the E edge to J1 on F, B and In2. Going out and coming back on
 # top of each other, the two currents' fields cancel, and nothing carrying ESC current runs N of y -4.6 (D2's
 # VBUS pad, a TVS, sits at y -2.4).
@@ -124,8 +124,9 @@ zone(VBUS, F, [rect(*VBUS_BAND), rect(*VBUS_J7), rect(*VBUS_E), rect(*VBUS_NE), 
 # B.Cu VBUS: below the band at J7, and the E edge plus the strip over the band's E half; the fill keeps the
 # 1 mm outer-layer gap to the VBAT_RAW band and J6 pin 2 by itself
 zone(VBUS, B, [rect(-15.3, -8.0, -17.0, -14.3), rect(*VBUS_E), rect(*VBUS_NE)], "VBUS B", 3)
-# In2: VBAT_RAW at both ends of the band, picked up by the J6/J7 pin barrels; the middle is left for the
-# signal tunnel below. VBUS doubles the E edge. 1 mm local clearance keeps the In2 3V3 plane well back.
+# In2: a VBAT_RAW piece at each end of the band, tied to its own J6/J7 pin barrel; the middle is left for the
+# signal tunnel below. Each piece hangs on one pin, so it carries no current: it is there to keep the In2 3V3
+# plane out from under the battery band (1 mm local clearance holds it well back). VBUS doubles the E edge.
 zone(VBAT, pcbnew.In2_Cu, [rect(-15.3, -0.5, -13.3, -7.5), rect(6.6, 15.3, -13.3, -7.5)], "VBAT_RAW In2", 12, clearance=1.0)
 zone(VBUS, pcbnew.In2_Cu, [rect(15.5, 19.45, -29.3, -13.8)], "VBUS In2", 10, clearance=1.0)
 for y in (-6.8, -8.6, -10.4, -12.2, -15.0, -16.6, -19.6, -21.2, -22.8, -24.4):
@@ -225,10 +226,13 @@ track([(-13.5, 21.6), (-13.5, 25.3), (_jx, 26.4)], VBUS, B, 0.6)
 via(_jx, 26.4, VBUS, d=0.7, drill=0.3)
 track([(_jx, 26.4), (_jx, _jy)], VBUS, F, 0.4)
 
-# inner layers: In1 solid GND, In2 split between 3V3 (centre) and 5V (W strip, N band, S band to J5)
+# inner layers: In1 solid GND, In2 split between 3V3 (centre) and 5V (W strip, N band, S band to J5). GND takes
+# whatever In2 the rails leave, which is the N and S ends of the board: it evens up the copper between the two
+# inner layers. Lowest priority, so it never displaces a rail, and the gaps between rails are too narrow for it.
 V3 = board.FindNet("3V3")
 I1, I2 = pcbnew.In1_Cu, pcbnew.In2_Cu
 zone(GND, I1, [rect(-20, 20, -38, 38)], "GND In1", 0, clearance=0.2, min_w=0.2)
+zone(GND, I2, [rect(-20, 20, -38, 38)], "GND In2", 0, clearance=0.2, min_w=0.25)
 zone(V3, I2, [rect(-16.0, 19.45, -27.5, 23.4), rect(13.6, 19.45, 23.0, 29.9)], "3V3 In2", 1, clearance=0.2, min_w=0.25)
 zone(V5, I2, [rect(-19.45, -16.5, -30.0, 29.9), rect(-19.45, 13.3, 23.8, 29.9), rect(-19.45, 0.5, -30.0, -28.0), rect(-19.45, -6.6, 9.4, 11.3)], "5V In2", 2, clearance=0.2, min_w=0.25)
 via(-1.725, -29.0, V5, d=0.7, drill=0.3)
