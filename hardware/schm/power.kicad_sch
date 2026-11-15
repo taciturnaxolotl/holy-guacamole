@@ -4534,7 +4534,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "100uF 25V polymer tantalum"
+		(property "Value" "47uF 35V polymer tantalum"
 			(at 76.2 52.07 0)
 			(show_name no)
 			(do_not_autoplace no)

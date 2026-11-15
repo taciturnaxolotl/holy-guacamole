@@ -41,7 +41,7 @@
 | 1 | The carrier is now the power distribution board. The battery and switch loop land on vertical XT30s, and the ESC battery feed leaves from 20 AWG SMD lap pads at the S edge. | Removes the J1 pigtail, the 16 AWG splices, and the separate PDB. This deliberately reverses the Rev A rule that high current never touches the carrier. |
 | 2 | Latching JST-GH connectors for the ESC signal, the receiver, and both TinySLEDs. | Solder pads and fly-leads were the weakest joints in impacts. |
 | 3 | The ELRS receiver moves off-board to the S pocket on a JST-GH harness. `U7` is gone; `J5` replaces it, with ESD clamps `D5`/`D6`. | Gets the antenna out of the battery's shadow and off the board's copper. |
-| 4 | 100 µF / 25 V polymer tantalum bulk capacitor `C21` on VBUS near the ESC feed. | Absorbs ESC regen and hot-plug ringing on the board-mounted bus. |
+| 4 | 47 µF / 35 V polymer tantalum bulk capacitor `C21` (KEMET T521X476M035ATE030, 30 mΩ ESR) on VBUS near the ESC feed. | Absorbs ESC regen and hot-plug ringing on the board-mounted bus. |
 | 5 | SK9822 status-LED chain deleted (`U8`, `U9`, `U10`, `U12`, `C14`–`C17`, `R14`, `R15`, `R21`). `U11` QD is NC. | Neither LED has a window in the chassis; the TinySLED blinks status codes instead. |
 | 6 | The MCP23S17 expander is replaced by an SN74HC595 chip-select latch (`U11`). | Simpler; three CS lines are all that is needed. |
 | 7 | Duplicate CS pull-ups `R19`/`R20` deleted. | `R4`/`R5` already do the job. |
@@ -92,7 +92,7 @@ Runtime IO stays on the XIAO edge pads. Most of the XIAO's underside pads are un
 | `J6` | Battery, XT30 male, vertical | `AMASS_XT30UPB-M` |
 | `J7` | Switch loop, XT30 female, vertical | `AMASS_XT30UPB-F` |
 | `L1` | 5.6 µH Bourns SRP6060FA | SRP6060FA |
-| `C21` | 100 µF 25 V polymer tantalum, ≤ 4.3 mm tall | `CP_EIA-7343-43_Kemet-X` |
+| `C21` | 47 µF 35 V polymer tantalum (KEMET T521X476M035ATE030), ≤ 4.3 mm tall | `CP_EIA-7343-43_Kemet-X` |
 | `D2` | SMAJ15CA bidirectional TVS on VBUS | SMA |
 | `D3`, `D4` | ESD clamps on DSHOT1/DSHOT2 at `J4` | SOD-523 |
 | `D5`, `D6` | ESD clamps (ESD5B5.0ST1G) on CRSF_RX/CRSF_TX at `J5` | SOD-523 |
@@ -122,7 +122,7 @@ The 5 V load is about 100–150 mA (XIAO plus receiver), which would keep an AP6
       -> J7 XT30-F (switch loop, SW corridor, mirror of J6) pin 2 VBAT_RAW out
           -> Fingertech switch on a twisted 20 AWG XT30 pigtail (~85 mm, W corridor at z ≈ 24), in its frame socket
       <- J7 pin 1                              net VBUS (switched)
-          -> C21 100 µF bulk + D2 SMAJ15CA     at the S edge
+          -> C21 47 µF bulk  + D2 SMAJ15CA     at the S edge
           -> J1 pads -> AM32 dual ESC battery pads (20 AWG)
           -> U2 buck -> 5V
                 -> XIAO 5V pad -> XIAO 3V3 -> IMUs, latch, pull-ups
@@ -220,7 +220,7 @@ The board bottom is at z 0.9. The bottom plate (0.8 mm) tops out at z 0.58, in a
 | Motor-lead entries, y −25…−15, z 9.8…19.2 | about 7 mm |
 | Ledge-clamped ends, \|y\| ≥ 29.9 | none (no top-side parts) |
 
-`L1` (6 mm) sits in the NW corridor, W of the buck. It moved 3 mm S in v3.4g so the LED leads have a lead-in to `J2`. `C21` (≤ 4.3 mm) fits in the battery strip in the S, right off the power band. A 25 V polymer part at 13.05 V runs at 52% of its rating, inside the usual 80% derating. A mated XT30 stands about 21 mm, topping out near z 23.5 under the 25.5 side shelves; route its leads off sideways.
+`L1` (6 mm) sits in the NW corridor, W of the buck. It moved 3 mm S in v3.4g so the LED leads have a lead-in to `J2`. `C21` (≤ 4.3 mm) fits in the battery strip in the S, right off the power band. A 35 V polymer part at 13.05 V runs at 37% of its rating, and a 24 V TVS clamp peak reaches 69%, inside KEMET's 90% guidance for this series. 47 µF was chosen over 100 µF / 25 V for that headroom, half the ESR (30 mΩ) and more ripple current (3.65 A RMS); the ESCs carry their own bulk capacitance. A mated XT30 stands about 21 mm, topping out near z 23.5 under the 25.5 side shelves; route its leads off sideways.
 
 USB runs through a ribbon extension with a slim male end, from the XIAO to a USB-C female on the shelves (z 19.4…21.4) under the top-plate slot.
 
@@ -452,7 +452,7 @@ After the v3.4g power move: KiCad DRC is clean against these rules with all nets
 
 ## Open items
 
-1. **`C21` part number.** The PCBWay BOM still lists it as TBD. Pick a real 100 µF / 25 V polymer tantalum in 7343-43 (≤ 4.3 mm). Two 47 µF in parallel are fine if 100 µF isn't stocked.
+1. **`C21` part number.** Done: KEMET T521X476M035ATE030 (47 µF / 35 V, 7343-43). Check stock when ordering; T521X107M025ATE030 (100 µF / 25 V, same footprint) is the fallback.
 2. **3S UVLO cutoff.** Decided: `R25` is 66.5 kΩ, so the hardware cuts at about 8.0 V and spin-up sag on the 380 mAh pack cannot brown the brain out. (75 kΩ cut at 8.85 V.)
 3. **Pack capacity.** A 3-minute match at about 10 A average draws about 500 mAh, against 380 mAh. Either confirm the real average current with a bench soak, lower the ESC current limit, or move to a larger pack.
 4. **Bench soak.** Run 3 minutes at the ESC current limit and check copper and connector temperature. The solve says 3.3 mΩ on the board; measure it.

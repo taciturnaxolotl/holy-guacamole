@@ -7805,7 +7805,7 @@
 				)
 			)
 		)
-		(property "Value" "100uF 25V polymer tantalum"
+		(property "Value" "47uF 35V polymer tantalum"
 			(at 0 3.1 180)
 			(layer "F.Fab")
 			(uuid "2784e7a5-c8fc-4d91-91ae-3c146cdd7af6")
