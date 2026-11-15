@@ -130,7 +130,7 @@ def bottom(bd, style='merged'):
 CHICLE = 'Chicle-Regular.ttf'
 # parts that get an assembly outline on the top (0402/0603 passives and the jumper are left bare)
 PIN1 = ('U2', 'U4', 'U5', 'U6', 'U11')
-OUTLINE = ('U1', 'U2', 'U4', 'U5', 'U6', 'U11', 'L1', 'C21', 'D2', 'Q1', 'J2', 'J4', 'J5')
+OUTLINE = ('U1', 'U2', 'U4', 'U5', 'U6', 'U11', 'L1', 'C21', 'D2', 'D7', 'Q1', 'J2', 'J4', 'J5')
 
 class Placer:
     """greedy label placement on the top: every mark keeps 0.2 mm off exposed copper, stays off part bodies
@@ -284,13 +284,14 @@ def top(bd):
     xs = [_pad(bd, 'J2', n).centroid.x for n in ('1', '2')]
     y = P.row([(xs[0], '+'), (xs[1], '−')], [29.75, 30.05, 30.35], cap=0.95)
     P.label('LED', [(-17.5, y or 30.05), (-17.7, y or 30.05)], cap=0.9, font='black', track=0.12)
-    # C21 polymer tantalum: thick band on the anode (pad 1) end of its outline, the usual polarity mark
-    fp = bd.fp['C21']; own = unary_union([g for v in fp['pads'].values() for g in v])
-    env = unary_union([fp['fab'], own]).minimum_rotated_rectangle.buffer(0.32, join_style=2)
-    cs = list(env.exterior.coords); p1 = _pad(bd, 'C21', '1').centroid
-    segs = sorted((LineString([cs[i], cs[i+1]]) for i in range(len(cs)-1)), key=lambda l: l.centroid.distance(p1))
-    band = segs[0].buffer(0.2, cap_style=2).intersection(env.buffer(0.2)).difference(bd.pads['F'].buffer(0.2))
-    P.put(band, force=True)
+    # polarity bands: C21 polymer tantalum on its anode (pad 1) end, D7 Schottky on its cathode (pad 1) end
+    for ref in ('C21', 'D7'):
+        fp = bd.fp[ref]; own = unary_union([g for v in fp['pads'].values() for g in v])
+        env = unary_union([fp['fab'], own]).minimum_rotated_rectangle.buffer(0.32, join_style=2)
+        cs = list(env.exterior.coords); p1 = _pad(bd, ref, '1').centroid
+        segs = sorted((LineString([cs[i], cs[i+1]]) for i in range(len(cs)-1)), key=lambda l: l.centroid.distance(p1))
+        band = segs[0].buffer(0.2, cap_style=2).intersection(env.buffer(0.2)).difference(bd.pads['F'].buffer(0.2))
+        P.put(band, force=True)
     # wordmark in the free N strip (W of the USB notch), test-pad note in the S strip
     av, body = avocado(tilt=-10); b = affinity.scale(body, 0.235, 0.235, origin=(0, 0))
     mini = unary_union([b.difference(b.buffer(-0.34)), Point(0, 0).buffer(0.95)])

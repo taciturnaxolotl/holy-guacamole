@@ -102,6 +102,8 @@ PLACE = {
     "J1": (16.6, -27.3, 180, "F"),
     "C21": (4.75, -16.8, 180, "F"),
     "D2": (16.1, -3.4, 180, "F"),
+    # USB isolation Schottky, E of the XIAO 5V pad: cathode (pad 1) S, beside U1 pad 14; anode N
+    "D7": (17.9, 26.9, 90, "F"),
     # battery sense near XIAO A0 (pin 1, west column, north end)
     "R9": (-4.6, 26.0, 90, "F"),
     "R10": (-4.6, 28.1, 90, "F"),

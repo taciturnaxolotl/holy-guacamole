@@ -96,6 +96,7 @@ Runtime IO stays on the XIAO edge pads. Most of the XIAO's underside pads are un
 | `D2` | SMAJ15CA bidirectional TVS on VBUS | SMA |
 | `D3`, `D4` | ESD clamps on DSHOT1/DSHOT2 at `J4` | SOD-523 |
 | `D5`, `D6` | ESD clamps (ESD5B5.0ST1G) on CRSF_RX/CRSF_TX at `J5` | SOD-523 |
+| `D7` | Schottky (Nexperia PMEG4010CEH, 40 V 1 A) from the buck 5V to the XIAO 5V pad, which is the module's USB VBUS | SOD-123F |
 | `TP10`, `TP13`–`TP15` | VBAT_SNS, SWDIO, SWDCK, GND test pads | 1 mm pad |
 
 Free refs from deletions: `R14`, `R15`, `R19`, `R20`, `R21`, `R23`, `R24`, `C14`–`C17`, `U7`–`U10`, `U12`, `J3`, `JP1`. Do not reuse them in this revision, so old BOMs and photos stay unambiguous.
@@ -125,7 +126,7 @@ The 5 V load is about 100–150 mA (XIAO plus receiver), which would keep an AP6
           -> C21 47 µF bulk  + D2 SMAJ15CA     at the S edge
           -> J1 pads -> AM32 dual ESC battery pads (20 AWG)
           -> U2 buck -> 5V
-                -> XIAO 5V pad -> XIAO 3V3 -> IMUs, latch, pull-ups
+                -> D7 Schottky -> XIAO 5V pad (= USB VBUS) -> XIAO 3V3 -> IMUs, latch, pull-ups
                 -> J5 pin 2 -> ELRS receiver
           -> R9/R10 divider -> VBAT_SNS (XIAO A0)
           -> J2 pin 1 -> both TinySLEDs -> Q1 -> GND
@@ -254,7 +255,7 @@ With the bottom plate off, only the underside and the four screws can be reached
 
 The four Ø1.0 pads sit in a tilted row under the XIAO, about 15 mm from the spin axis, from (4.2, 14.9) to (10.8, 11.09), in the order of the table. The pad labelled "VBAT" is `VBAT_SNS`, the pack voltage divided by 4.61 (about 2.8 V at full charge), not the pack itself. `TP13` and `TP14` reach the RP2350 through the XIAO's underside pads 23 and 24, so they are dead unless those pads are soldered (see [Overview](#overview)).
 
-That is all of them. There are no pads on the CRSF lines or on VBUS. For a bench UART, unplug the receiver and use the `J5` harness. USB through the chimney works with the top plate off and the battery in.
+That is all of them. There are no pads on the CRSF lines or on VBUS. For a bench UART, unplug the receiver and use the `J5` harness. USB through the chimney works with the top plate off and the battery in. The XIAO's 5V pad is wired straight to its USB-C VBUS (Seeed schematic v1.0, no diode on the module), so `D7` sits between the buck and that pad: a PC on USB cannot drive the carrier's 5V rail, and the buck and the PC never fight. On USB alone the XIAO, the IMUs and the 3V3 parts run, but the receiver on `J5` does not (it is on the buck side); plug in the battery to bind or configure it. With the battery in and the PC's port unpowered, the buck can still feed that port's VBUS through `D7` at about 4.7 V, which ports tolerate.
 
 ### IMU placement
 

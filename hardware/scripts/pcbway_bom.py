@@ -24,6 +24,7 @@ NOTES = {
     "U4": _IMU, "U5": _IMU, "U6": _IMU,
     "D2": _BIDIR, "D3": _BIDIR, "D4": _BIDIR, "D5": _BIDIR, "D6": _BIDIR,
     "C21": "Polarised: + (pad 1) on the E side, toward J6",
+    "D7": "Polarised: cathode bar (pad 1) toward U1 pad 14, to the S",
     "J6": _XT30, "J7": _XT30,
 }
 

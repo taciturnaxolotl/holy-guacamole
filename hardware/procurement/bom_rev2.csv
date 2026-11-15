@@ -6,6 +6,7 @@ C18,1,TDK,C1005C0G1H470G050BA,47pF C0G 50V 2% 0402 AP63301 feed-forward capacito
 C21,1,KEMET,T521X476M035ATE030,"47uF 35V polymer tantalum, 30 mOhm ESR, EIA 7343-43 (X case), max 4.3 mm tall",,
 D2,1,Bourns,SMAJ15CA,15V bidirectional 400W TVS DO-214AC SMA,DigiKey,SMAJ15CABCT-ND
 D3 D4 D5 D6,4,onsemi,ESD5B5.0ST1G,Bidirectional 5V ESD diode SOD-523,DigiKey,ESD5B5.0ST1GOSCT-ND
+D7,1,Nexperia,PMEG4010CEH,"40V 1A Schottky, SOD-123F (USB VBUS isolation for the XIAO 5V pad)",,
 J2,1,JST,SM02B-GHS-TB(LF)(SN),JST-GH 2-pin SMD right-angle header,,
 J4 J5,2,JST,SM04B-GHS-TB(LF)(SN),JST-GH 4-pin SMD right-angle header,,
 J6,1,AMASS,XT30UPB-M,"XT30 male vertical PCB connector, through-hole",,

@@ -202,7 +202,6 @@ track([_xy(_r16), _xy(_r17), _xy(_q1)], QG, F, 0.25)
 # 5V: L1 pad 2 straight N to C4; C5 and the rest of the rail through the In2 5V pour
 track([(-18.33, 11.55), (-18.33, 15.95)], V5, F, 0.6)
 via(12.6, 25.4, V5, d=0.7, drill=0.3)
-track([(12.6, 25.4), (14.8, 25.96)], V5, F, 0.4)
 
 # Thin VBUS feed (about 0.5 A: buck input, UVLO and VBAT dividers, TinySLEDs), B.Cu from the band's NW tongue up
 # the W board edge (under the LED leads, clear of U4's fanout) to the buck input caps, then on to J2 pin 1. The autorouter never sees VBUS.
@@ -241,7 +240,7 @@ track([(-1.725, -29.0), (-1.725, -24.55)], V5, F, 0.3)
 # plane fanout: every 3V3 / 5V SMD pad gets a via to the In2 pour. Pads are grouped per footprint edge and
 # only adjacent pads share a via; candidate spots and the stub path are checked against every other pad and via.
 import math
-FANOUT_SKIP = {("J1", "2"), ("C13", "2"), ("U1", "14"), ("U1", "12"), ("U1", "28"), ("J5", "2"), ("U6", "1"), ("U6", "14"), ("U6", "15"), ("C10", "1"),
+FANOUT_SKIP = {("J1", "2"), ("D7", "2"), ("C13", "2"), ("U1", "14"), ("U1", "12"), ("U1", "28"), ("J5", "2"), ("U6", "1"), ("U6", "14"), ("U6", "15"), ("C10", "1"),
                ("U6", "5"), ("C10", "2"), ("U4", "6"), ("D5", "2"), ("U6", "10"), ("U6", "12"), ("U6", "13"), ("U6", "16")}
 VIA_R = 0.35
 CLR = 0.22
@@ -322,6 +321,12 @@ def padxy(ref, num):
     pad = next(p for p in board.FindFootprintByReference(ref).Pads() if p.GetNumber() == num)
     return pad.GetPosition().x / 1e6 - OX, OY - pad.GetPosition().y / 1e6
 
+
+# the XIAO's 5V pad is its USB VBUS, so the buck reaches it through D7 (anode 5V, cathode XIAO_5V) and a PC on
+# USB cannot drive the carrier 5V rail. The 5V run goes N of pad 14 (and S of the USB-notch keepout) to the anode.
+_d7a, _d7k, _u14 = padxy("D7", "2"), padxy("D7", "1"), padxy("U1", "14")
+track([(12.6, 25.4), (12.6, 28.25), (_d7a[0], 28.25), _d7a], V5, F, 0.4)
+track([_u14, (_d7k[0], _u14[1]), _d7k], board.FindNet("/XIAO_5V"), F, 0.4)
 
 c10_1 = padxy("C10", "1")
 # U6 (rotated so its SPI pins face the board centre) is fanned out by hand, with one GND via under its centre.

@@ -17,6 +17,6 @@ Assembly
 - U1 (footprint XIAO-RP2350-SMD, the large module outline at the north end) is NOT in the BOM or the placement file: the customer fits that module. Paste on its pads is fine.
 - J1 (two 2.6 x 4.0 mm pads at the south-east corner) has no part: they are wire solder pads. Paste on them is fine.
 - U4, U5 and U6 are rotated on purpose (166, 166 and -164 degrees). Align pin 1 to the pin-1 mark in assembly_top.pdf.
-- C21 is the only polarised part. Its + pad (pad 1) is on the east side, toward J6.
+- Two parts are polarised. C21: + pad (pad 1) on the east side, toward J6. D7 (Schottky, east of U1 pad 14): cathode (pad 1) to the south, next to U1 pad 14.
 - D2 to D6 are bidirectional and have no polarity.
 - J6 and J7 (XT30, through-hole) are soldered by hand or selective solder. Trim their tails flush with the bottom of the board.
