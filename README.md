@@ -8,23 +8,6 @@ This is a meltybrain style combat robot whose main weapon is simply its own spin
 
 The canonical repo for this is hosted on tangled over at [`dunkirk.sh/holy-guacamole`](https://tangled.org/dunkirk.sh/holy-guacamole)
 
-## Repo map
-
-- [`docs/spec.md`](docs/spec.md): the robot and the rev 2 carrier board (4 layers, 2 oz outer copper, 3S only, made by PCBWay)
-- [`docs/firmware.md`](docs/firmware.md): what the firmware and the simulator do today
-- [`hardware/procurement/bom_rev2.csv`](hardware/procurement/bom_rev2.csv): the rev 2 parts list
-- [`cad/rev2/README.md`](cad/rev2/README.md): what the board takes from the chassis (outline, keepouts, placement)
-- [`hardware/`](hardware): the KiCad project. Scripts place and route the board, so it can be rebuilt from the schematic:
-
-```sh
-cd hardware && kicad-cli sch export netlist -o /tmp/rev2.net guac.kicad_sch
-# the next two need KiCad's own python (it ships pcbnew); this is the macOS path
-KIPY=/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/Current/bin/python3
-$KIPY scripts/layout_rev2.py && $KIPY scripts/power_rev2.py
-sh scripts/route_best_rev2.sh guac.kicad_pcb   # autoroute (Freerouting 2.5, JDK 25+), then stitching and silk
-sh scripts/export_pcbway.sh                    # order files into production/pcbway/
-```
-
 | | | | |
 |---|---|---|---|
 | ![front copper](https://l4.dunkirk.sh/i/B3zZRVosO1XD.webp) | ![back copper](https://l4.dunkirk.sh/i/vYjFfVZuXrg_.webp) | ![inner 1 copper](https://l4.dunkirk.sh/i/HOcu8oD0EThD.webp) | ![inner 2 copper](https://l4.dunkirk.sh/i/nMP7O4GS9EUh.webp) |
