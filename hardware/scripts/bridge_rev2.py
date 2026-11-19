@@ -3,7 +3,7 @@
 usage: <kicad python> scripts/bridge_rev2.py guac.kicad_pcb
 
 For every signal net still in more than one copper island, a grid router (0.05 mm cells, F.Cu and B.Cu) joins the
-smallest island to the next one with a 0.18 mm track and 0.62/0.25 mm vias, keeping 0.215 mm from other copper,
+smallest island to the next one with a 0.205 mm track and 0.62/0.25 mm vias, keeping 0.215 mm from other copper,
 power pours and keepouts (PCBWay normal process for 2 oz outer copper; GND pours refill around the result).
 Before that, any signal track freerouting left closer than the 0.205 mm board clearance to another net's pad,
 track or via is ripped up, and so is any via whose hole is within 0.1 mm of an SMD pad of its own net, so the
@@ -18,7 +18,7 @@ import pcbnew
 
 PCB = sys.argv[1]
 STEP = 0.05
-TW, CLR, VR = 0.18, 0.215, 0.31
+TW, CLR, VR = 0.205, 0.215, 0.31
 VIA_COST = 40
 PAD_GAP = 0.1   # via hole wall to the edge of an SMD pad of the same net
 POUR_NETS = ("GND", "VBUS", "/Power Subsystem/VBAT_RAW", "3V3", "5V")

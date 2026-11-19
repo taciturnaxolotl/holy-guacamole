@@ -437,7 +437,7 @@ Secure every lead in its chassis channel or groove, and fillet the `J1` joints w
 | Mask / silk | Green / white |
 | Vias | Tented |
 | Quantity | 5 |
-| Min trace / space | 0.18 / 0.205 mm (7 / 8 mil, the 2 oz outer-layer limit). Smallest routed track is 0.18 mm |
+| Min trace / space | 0.205 / 0.205 mm, inside PCBWay's 8/8 mil class (0.203 mm) for 2 oz outer copper. Every signal track is 0.205 mm. (6/6 mil would allow thinner tracks but roughly doubles the price) |
 | Vias used | 0.62/0.25 (autorouted signal, tunnel GND return), 0.64/0.25 (GND stitching), 0.7/0.3, 0.75/0.35, and 0.8/0.4 mm. Smallest ring 0.185 mm (≥ the 7 mil, 0.178 mm, limit) |
 | Plated component holes | 0.31 mm ring (12 mil on 2 oz) and 0.41 mm hole to hole |
 | Inner layers | 0.18 mm hole-to-copper isolation (7 mil on 4 layers) |

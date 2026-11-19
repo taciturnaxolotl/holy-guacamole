@@ -13,7 +13,7 @@ p='/tmp/fr/guac.dsn'; t=open(p).read()
 def fix(cls, w, c):
     global t
     t=re.sub(r'(\(class %s[^\n]*\n(?:[^\n]*\n)*?\s*\(rule\n\s*\(width )\d+(\)\n\s*\(clearance )\d+' % re.escape(cls), lambda m: m.group(1)+str(w)+m.group(2)+str(c), t, count=1)
-fix('kicad_default', 180, 207); fix('Power_Heavy,Default', 400, 207); fix('Power_Light,Default', 250, 207); fix('Power_Main,Default', 600, 207); fix('GND,Default', 400, 207); fix('Analog,Default', 250, 207)
+fix('kicad_default', 205, 210); fix('Power_Heavy,Default', 400, 210); fix('Power_Light,Default', 250, 210); fix('Power_Main,Default', 600, 210); fix('GND,Default', 400, 210); fix('Analog,Default', 250, 210)
 # freerouting sees the 0.5 mm pitch pads of the 166-degree IMUs as violating 0.207 mm between each other (actual
 # gap 0.22 mm) and then gives up on every net touching them. Their signal pads are all escaped by power_rev2.py,
 # so the router never connects to them directly: narrow them (full length, so vias still keep off the pad
@@ -68,8 +68,8 @@ for t in own:
         t.SetNet(b.FindNet(t.GetNetname()))
         b.Add(t)
 for t in b.GetTracks():
-    if t.GetClass() == 'PCB_TRACK' and t.GetWidth() < 180000:
-        t.SetWidth(180000)
+    if t.GetClass() == 'PCB_TRACK' and t.GetWidth() < 205000:
+        t.SetWidth(205000)
 pcbnew.ZONE_FILLER(b).Fill(b.Zones())
 b.Save(pcb)
 IMP

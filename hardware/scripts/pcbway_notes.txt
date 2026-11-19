@@ -1,9 +1,9 @@
 Holy Guacamole carrier, rev 2.0. Notes for fabrication and assembly (export_pcbway.sh copies this into the order package).
 
 PCB
-- 4 layers, 1.6 mm FR4. Layer order top to bottom: F_Cu, In1_Cu (ground plane), In2_Cu (power planes and a few signal tracks), B_Cu.
+- 4 layers, 1.6 mm FR4. Layer order top to bottom: guac-F_Cu.gtl, guac-In1_Cu.g1 (ground plane), guac-In2_Cu.g2 (power planes and a few signal tracks), guac-B_Cu.gbl.
 - Copper: 2 oz finished on the outer layers, 1 oz on the inner layers.
-- Minimum track 0.18 mm (7 mil), minimum spacing 0.205 mm (8 mil), minimum drill 0.25 mm, minimum via ring 0.185 mm.
+- Minimum track 0.205 mm and minimum spacing 0.205 mm (8/8 mil class), minimum drill 0.25 mm, minimum via ring 0.185 mm.
 - Finish ENIG. Green solder mask, white silkscreen on both sides.
 - Vias tented on both sides, not plugged. Please do not open or plug any via.
 - Keep the solder mask dams between the pads of U4, U5 and U6 (0.5 mm pitch LGA, 0.22 mm gap).
@@ -20,4 +20,9 @@ Assembly
 - U4, U5 and U6 are rotated on purpose (166, 166 and -164 degrees). Align pin 1 to the pin-1 mark in assembly_top.pdf.
 - Two parts are polarised. C21: + pad (pad 1) on the east side, toward J6. D7 (Schottky, east of U1 pad 14): cathode (pad 1) to the south, next to U1 pad 14.
 - D2 to D6 are bidirectional and have no polarity.
+- Substitutes: equivalent parts are fine for the plain resistors and ceramic capacitors (R*, C1-C13, C18-C20) if value, tolerance,
+  voltage rating, dielectric (X5R/X7R/C0G) and package all match. Please do NOT substitute anything else (U2, U4, U5, U6, U11,
+  Q1, L1, C21, D2-D7, J2, J4-J7) without asking first.
+- Sensitive parts: U4, U5, U6 (LGA accelerometers) and U2, U11 are ESD sensitive; C21 (polymer tantalum) and the LGA parts are
+  moisture sensitive (MSL 3), so please bake them if the bags have been open past their floor life.
 - J6 and J7 (XT30, through-hole) are soldered by hand or selective solder. Trim their tails flush with the bottom of the board.

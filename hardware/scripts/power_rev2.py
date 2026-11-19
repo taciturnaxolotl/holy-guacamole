@@ -18,6 +18,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 PCB = os.path.join(os.path.dirname(HERE), "guac.kicad_pcb")
 OX, OY = 80.0, 65.5
 MARK = "rev2-power"
+SIG_W = 0.205   # signal track width: PCBWay's 8/8 mil class for 2 oz outer copper (8 mil = 0.2032 mm)
 
 
 def mm(v):
@@ -153,7 +154,7 @@ for i, name in enumerate(TUNNEL_NETS):
     yn, ys = (-5.85, -13.95) if i % 2 == 0 else (-4.95, -14.85)
     via(x, yn, n, d=0.62, drill=0.25)
     via(x, ys, n, d=0.62, drill=0.25)
-    track([(x, yn), (x, ys)], n, pcbnew.In2_Cu, 0.18)
+    track([(x, yn), (x, ys)], n, pcbnew.In2_Cu, SIG_W)
 track([(0.2, -3.6), (0.2, -16.2)], board.FindNet("3V3"), pcbnew.In2_Cu, 0.4)
 # (GND return vias for the tunnel go in after routing, where the fan-outs leave room: stitch_rev2.py)
 ta = pcbnew.ZONE(board)
@@ -296,7 +297,7 @@ def clear(vx, vy, net, own, stubs):
     return True
 
 
-def escape(ref, num, length=0.9, via_net=True, width=0.2):
+def escape(ref, num, length=0.9, via_net=True, width=SIG_W):
     """Stub straight out of an IC pad along the pad's own normal, ending in a via."""
     fp = board.FindFootprintByReference(ref)
     pad = next(p for p in fp.Pads() if p.GetNumber() == num)
@@ -332,8 +333,8 @@ c10_1 = padxy("C10", "1")
 # U6 (rotated so its SPI pins face the board centre) is fanned out by hand, with one GND via under its centre.
 u6 = {n: padxy("U6", n) for n in ("1", "4", "6", "7", "8", "14", "15")}
 XE = 19.15
-track([u6["14"], (XE, u6["14"][1]), (XE, 7.3), (u6["1"][0], 7.3), u6["1"]], V3, F, 0.2)
-track([u6["15"], (XE, u6["15"][1])], V3, F, 0.2)
+track([u6["14"], (XE, u6["14"][1]), (XE, 7.3), (u6["1"][0], 7.3), u6["1"]], V3, F, SIG_W)
+track([u6["15"], (XE, u6["15"][1])], V3, F, SIG_W)
 track([(u6["1"][0], 7.3), (16.75, 7.3), (16.75, 8.45)], V3, F, 0.3)
 via(16.75, 8.45, V3, d=0.7, drill=0.3)
 placed_vias.append((16.75, 8.45, 0.35))
@@ -349,7 +350,7 @@ _sx, _sy = -math.sin(_s), math.cos(_s)
 if _sy < 0:
     _sx, _sy = -_sx, -_sy
 _l = (6.9 - u6["4"][1]) / _sy
-track([u6["4"], (u6["4"][0] + _l * _sx, 6.9), (14.3, 6.9), (14.0, 6.6)], SCK, F, 0.2)
+track([u6["4"], (u6["4"][0] + _l * _sx, 6.9), (14.3, 6.9), (14.0, 6.6)], SCK, F, SIG_W)
 via(14.0, 6.6, SCK, d=0.7, drill=0.3)
 placed_vias.append((14.0, 6.6, 0.35))
 # Three SPI pads in a row at 0.5 mm pitch are too close for three vias in a row: the middle pad escapes
@@ -375,7 +376,7 @@ def fan3(ref, mid, outer, diag=1.0):
             kx, ky = px + 0.5 * nx, py + 0.5 * ny
             ex, ey = kx + diag * 0.707 * (nx - side * ny), ky + diag * 0.707 * (ny + side * nx)
             pts = [(px, py), (kx, ky), (ex, ey)]
-        track(pts, pad.GetNet(), F, 0.18)
+        track(pts, pad.GetNet(), F, SIG_W)
         via(ex, ey, pad.GetNet(), d=0.7, drill=0.3)
         placed_vias.append((ex, ey, 0.35))
 
@@ -404,7 +405,7 @@ def lanes(ref, mid, reach, plan):
         x, y = padxy(ref, num)
         n0, p0 = (x - cx) * nx + (y - cy) * ny, (x - cx) * px_ + (y - cy) * py_
         pts = [(x, y), world(jog, p0), world(jog + abs(pt - p0), pt), world(reach, pt)]
-        track(pts, pad.GetNet(), F, 0.18)
+        track(pts, pad.GetNet(), F, SIG_W)
         ex, ey = pts[-1]
         via(ex, ey, pad.GetNet(), d=0.7, drill=0.3)
         placed_vias.append((ex, ey, 0.35))
@@ -425,37 +426,37 @@ def via_near(netname, x, y):
 
 
 _vx, _vy = via_near("/SPI_SCK", -4.3, -15.2)
-track([(_vx, _vy), (_vx + (_vy + 13.95), -13.95), (1.0, -13.95)], SCK, B, 0.18)
+track([(_vx, _vy), (_vx + (_vy + 13.95), -13.95), (1.0, -13.95)], SCK, B, SIG_W)
 # The S end of the tunnel is as tight as the lanes themselves, and left to itself the autorouter strands one
 # or two of the signals there (they then went 60 mm round the W end of the band, past the switch pins). So the
 # rest of U5's SPI lines are drawn too, on B.Cu. MOSI comes in from the W under SCK. MISO_B drops S past the
 # CS_B via to a via of its own and doubles back on F.Cu to R7; CS_B and MISO (from a via W of R7) go S round
 # that, then E and up between the deeper row's vias. DSHOT 1 drops straight out of its lane on F.Cu, under C21,
 # to R12.
-track([via_near("/SPI_MOSI", -6.46, -15.81), (-5.9, -15.86), (-3.45, -15.86), (-2.44, -14.85), (1.66, -14.85)], board.FindNet("/SPI_MOSI"), B, 0.18)
+track([via_near("/SPI_MOSI", -6.46, -15.81), (-5.9, -15.86), (-3.45, -15.86), (-2.44, -14.85), (1.66, -14.85)], board.FindNet("/SPI_MOSI"), B, SIG_W)
 MISO_B, MISO = board.FindNet("/IMU Array/MISO_B"), board.FindNet("/SPI_MISO")
 _r7_1, _r7_2 = padxy("R7", "1"), padxy("R7", "2")
-track([via_near("/IMU Array/MISO_B", -7.21, -16.75), (-6.18, -17.78), (-6.18, -20.3)], MISO_B, B, 0.18)
+track([via_near("/IMU Array/MISO_B", -7.21, -16.75), (-6.18, -17.78), (-6.18, -20.3)], MISO_B, B, SIG_W)
 via(-6.18, -20.3, MISO_B, d=0.62, drill=0.25)
-track([(-6.18, -20.3), (-6.18 - (_r7_1[1] + 20.3), _r7_1[1]), _r7_1], MISO_B, F, 0.18)
+track([(-6.18, -20.3), (-6.18 - (_r7_1[1] + 20.3), _r7_1[1]), _r7_1], MISO_B, F, SIG_W)
 _cx, _cy = via_near("/IMU Array/CS_B", -6.99, -17.94)
-track([(_cx, _cy), (_cx, -21.2), (_cx + 0.4, -21.6), (0.3, -21.6), (2.32, -19.58), (2.32, -13.95)], board.FindNet("/IMU Array/CS_B"), B, 0.18)
+track([(_cx, _cy), (_cx, -21.2), (_cx + 0.4, -21.6), (0.3, -21.6), (2.32, -19.58), (2.32, -13.95)], board.FindNet("/IMU Array/CS_B"), B, SIG_W)
 _mx = _r7_2[0] - 1.0
 via(_mx, _r7_2[1], MISO, d=0.62, drill=0.25)
-track([_r7_2, (_mx, _r7_2[1])], MISO, F, 0.18)
-track([(_mx, _r7_2[1]), (_mx, -21.6), (_mx + 0.5, -22.1), (1.2, -22.1), (2.98, -20.32), (2.98, -14.85)], MISO, B, 0.18)
+track([_r7_2, (_mx, _r7_2[1])], MISO, F, SIG_W)
+track([(_mx, _r7_2[1]), (_mx, -21.6), (_mx + 0.5, -22.1), (1.2, -22.1), (2.98, -20.32), (2.98, -14.85)], MISO, B, SIG_W)
 for _p in ((-6.18, -20.3, 0.31), (_mx, _r7_2[1], 0.31)):
     placed_vias.append(_p)
 # N end: CS_B's lane via sits in the middle of the row with U11 pin 1 straight above it, and the autorouter boxes
 # it in with its neighbours' fan-outs about one run in three, so it goes straight up on F.Cu between the two
 # upper-row vias
-track([(2.32, -5.85), (2.32, padxy("U11", "1")[1])], board.FindNet("/IMU Array/CS_B"), F, 0.18)
+track([(2.32, -5.85), (2.32, padxy("U11", "1")[1])], board.FindNet("/IMU Array/CS_B"), F, SIG_W)
 # and the other three vias of the lower row get a short F.Cu stub out past the upper row, so a neighbour's
 # fan-out cannot close the 0.7 mm gap they leave through; the autorouter picks each one up at its N end
 for _n, _x in (("/SPI_SCK", 1.0), ("/CRSF_TX", 3.64), ("/DS1_IO", 4.96)):
-    track([(_x, -5.85), (_x, -3.9)], board.FindNet(_n), F, 0.18)
+    track([(_x, -5.85), (_x, -3.9)], board.FindNet(_n), F, SIG_W)
 _r12 = padxy("R12", "1")
-track([(4.96, -13.95), (4.96, -18.6), (4.96 + (-18.6 - _r12[1]), _r12[1]), _r12], board.FindNet("/DS1_IO"), F, 0.18)
+track([(4.96, -13.95), (4.96, -18.6), (4.96 + (-18.6 - _r12[1]), _r12[1]), _r12], board.FindNet("/DS1_IO"), F, SIG_W)
 escape("R22", "1", length=1.1)
 escape("D5", "2", length=1.5)
 
@@ -549,12 +550,12 @@ for name, layers, (x0, x1, y0, y1) in (("VBAT_RAW B", (B,), grow(VBAT_BAND)), ("
     board.Add(ka)
 
 # ESD clamp to connector pin, both connectors: four 2 mm hops the autorouter sometimes leaves open, so they are
-# drawn here: down out of the diode pad, across below the diode, down into the pin (1.25 mm pin pitch, 0.18 mm)
+# drawn here: down out of the diode pad, across below the diode, down into the pin (1.25 mm pin pitch, SIG_W)
 for d, j, n in (("D5", "J5", "3"), ("D6", "J5", "4"), ("D3", "J4", "2"), ("D4", "J4", "3")):
     dp = next(p for p in board.FindFootprintByReference(d).Pads() if p.GetNumber() == "1")
     jp = next(p for p in board.FindFootprintByReference(j).Pads() if p.GetNumber() == n)
     (dx, dy), (jx, jy) = padxy(d, "1"), padxy(j, n)
-    track([(dx, dy), (dx, dy - 1.0), (jx, dy - 1.0), (jx, jy)], dp.GetNet(), F, 0.18)
+    track([(dx, dy), (dx, dy - 0.95), (jx, dy - 0.95), (jx, jy)], dp.GetNet(), F, SIG_W)   # 0.95: keeps the run clear of the neighbouring pin's pad
 
 # battery sense divider: the short F.Cu net is hand routed; the autorouter takes it on to the TP10 test pad
 SNS = board.FindNet("/VBAT_SNS")
