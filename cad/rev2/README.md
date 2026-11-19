@@ -1,6 +1,6 @@
 # Rev-2 carrier: outline, keepouts, placement (chassis v3.4g)
 
-**Source:** the chassis CAD lives outside this repo. The scripts here expect the v33 rev B package at `/tmp/hg33b/holy_guacamole_v33b/` (read-only). It has `README.md` (Z table and plan features), `scripts/concept_v33.py` and `step/*.step`.
+**Source:** the current chassis (v3.4g) is in [`../chassis`](../chassis). The scripts here were written against the older v33 rev B package and still expect the v33 rev B package at `/tmp/hg33b/holy_guacamole_v33b/` (read-only). It has `README.md` (Z table and plan features), `scripts/concept_v33.py` and `step/*.step`.
 I took the constants from the script and README and confirmed them with part bounding boxes and planar sections of the rev B STEPs.
 The STEPs were tessellated to `/tmp/hg33b_work/` and sliced with trimesh.
 The chassis changes since then (v3.4c to v3.4g) are entered as boxes in `scripts/build_rev2.py`. The v3.4g chassis itself is the `holy_guacamole_v34g` package, also outside this repo.

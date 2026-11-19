@@ -1,6 +1,6 @@
 # Holy Guacamole: System and Carrier PCB Specification
 
-**Document status:** Rev B 2.2 (2026-11-11). Covers the robot at chassis v3.4g and the rev 2 carrier as routed for PCBWay. The KiCad schematic `hardware/guac.kicad_sch` and board `hardware/guac.kicad_pcb` are the source of truth for the electronics. The chassis comes from the v3.4g CAD, which lives outside this repo; `cad/rev2/README.md` records what the board takes from it.
+**Document status:** Rev B 2.2 (2026-11-11). Covers the robot at chassis v3.4g and the rev 2 carrier as routed for PCBWay. The KiCad schematic `hardware/guac.kicad_sch` and board `hardware/guac.kicad_pcb` are the source of truth for the electronics. The chassis is the v3.4g CAD in `cad/chassis/` (ordering guide and cut files in `cad/fab/`); `cad/rev2/README.md` records what the board takes from it.
 **Robot:** Holy Guacamole, 1 lb meltybrain antweight, MRCA full combat.
 **Previous revisions:** Rev A (v1.3c: 40 × 50 mm board, fly-lead pads, solder-down receiver) and Rev B 2.0-draft (pre-route). See git history for that text.
 
