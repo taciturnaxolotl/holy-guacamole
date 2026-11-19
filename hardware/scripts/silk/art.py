@@ -36,6 +36,9 @@ def avocado(tilt=-14, pit_r=4.5, cross=True):
     g = unary_union([skin, flesh_line.difference(Point(0, 0).buffer(pit_r+0.7)), pit])
     return affinity.rotate(g, tilt, origin=(0, 0)), affinity.rotate(body, tilt, origin=(0, 0))
 
+FAB_NO = (0.0, -36.6)   # board frame, centre of the order-number line on the back
+
+
 def _common(bd, V):
     """bottom pieces every style shares (view frame): XT30 solder-side names, wordmark + credit, OSHW block"""
     G, labels = [], []
@@ -43,10 +46,12 @@ def _common(bd, V):
         for y, t in ((-10.8, top), (-15.8, bot)):
             g, w = text(t, 0.8, 'xbold', align='r' if vx > 0 else 'l')
             labels.append(affinity.translate(_mid(g), vx - 2.35 if vx > 0 else vx + 2.35, y))
-    h, wh = text('HOLY', 4.8, CHICLE, track=0.02); G.append(affinity.translate(h, 0, -27.0))
-    gm, wg = text('GUACAMOLE', 3.4, CHICLE, track=0.02); gm = affinity.scale(gm, min(1, 32/wg), min(1, 32/wg), origin=(0, 0)); G.append(affinity.translate(gm, 0, -31.4))
-    l1, _ = text('my favorite lil meltybrain  /  rev 2  /  nov 2026', 0.95, 'xbold', track=0.03); G.append(affinity.translate(l1, 0, -33.4))
-    l2, _ = text('Kieran Klukas  /  dunkirk.sh/h/guac', 0.95, 'xbold', track=0.03); G.append(affinity.translate(l2, 0, -35.3))
+    h, wh = text('HOLY', 4.8, CHICLE, track=0.02); G.append(affinity.translate(h, 0, -26.4))
+    gm, wg = text('GUACAMOLE', 3.4, CHICLE, track=0.02); gm = affinity.scale(gm, min(1, 32/wg), min(1, 32/wg), origin=(0, 0)); G.append(affinity.translate(gm, 0, -30.8))
+    l1, _ = text('my favorite lil meltybrain  /  rev 2  /  nov 2026', 0.95, 'xbold', track=0.03); G.append(affinity.translate(l1, 0, -32.8))
+    l2, _ = text('Kieran Klukas  /  dunkirk.sh/h/guac', 0.95, 'xbold', track=0.03); G.append(affinity.translate(l2, 0, -34.7))
+    # line 3 is PCBWay's order number: silk_rev2.py writes it as a real WayWayWay text at FAB_NO, which their CAM
+    # swaps for the number
     from oshw_logo import logo
     G.append(logo(7.2, (5.2, 32.6)))
     for k, t in enumerate(('OPEN', 'SOURCE', 'HARDWARE')):
@@ -295,10 +300,10 @@ def top(bd):
     # wordmark in the free N strip (W of the USB notch), test-pad note in the S strip
     av, body = avocado(tilt=-10); b = affinity.scale(body, 0.235, 0.235, origin=(0, 0))
     mini = unary_union([b.difference(b.buffer(-0.34)), Point(0, 0).buffer(0.95)])
-    P.put(affinity.translate(mini, -12.3, 33.75), force=True)
+    P.put(affinity.translate(mini, -12.7, 33.75), force=True)
     h, wh = text('HOLY', 2.2, CHICLE, track=0.02); g2, wg = text('GUACAMOLE', 1.75, CHICLE, track=0.02)
     sc = min(1, 9.4/wg); h = affinity.scale(h, sc, sc, origin=(0, 0)); g2 = affinity.scale(g2, sc, sc, origin=(0, 0))
-    P.put(affinity.translate(h, -4.9, 34.45), force=True); P.put(affinity.translate(g2, -4.9, 31.9), force=True)
+    P.put(affinity.translate(h, -5.3, 34.45), force=True); P.put(affinity.translate(g2, -5.3, 31.9), force=True)
     # middle of the front: a hazard placard in the free band between the ICs and the XT30s
     hz = hazard(16.0, 6.6)
     if not P.first(affinity.translate(hz, cx, cy) for cx, cy in ((0, -5.6), (-0.5, -5.6), (0.5, -5.6), (0, -5.3), (0, -5.9))):

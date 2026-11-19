@@ -7,6 +7,7 @@ PCB
 - Finish ENIG. Green solder mask, white silkscreen on both sides.
 - Vias tented on both sides, not plugged. Please do not open or plug any via.
 - Keep the solder mask dams between the pads of U4, U5 and U6 (0.5 mm pitch LGA, 0.22 mm gap).
+- Order number: please print it in place of the text "WayWayWay" on the bottom silkscreen (south end, under the credits).
 - No slots, no castellations, no edge plating. Four non-plated 2.2 mm mounting holes.
 - If the boards are panelised, please put the rails and tabs on the short (north and south) ends only; the long edges sit 0.5 mm from the chassis walls and must be smooth.
 

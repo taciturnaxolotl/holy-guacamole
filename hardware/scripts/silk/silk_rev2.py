@@ -45,12 +45,12 @@ FP_SILK = ('(fp_line', '(fp_arc', '(fp_circle', '(fp_rect', '(fp_poly', '(fp_tex
 
 
 def strip(txt):
-    """remove our gr_poly items, every top-side gr_text, and the footprints' own F.SilkS graphics and texts
+    """remove our gr_poly items and order-number marker, every top-side gr_text, and the footprints' own F.SilkS graphics and texts
     (KiCad's outlines; 'update footprints from library' brings them back, so rerun this after one)"""
     cut = []
     for a, b in top_items(txt):
         item = txt[a:b]
-        if item.startswith('(gr_poly') and f'(uuid "{TAG}-' in item: cut.append((a, b))
+        if item.startswith(('(gr_poly', '(gr_text')) and f'(uuid "{TAG}-' in item: cut.append((a, b))
         elif item.startswith('(gr_text') and '(layer "F.SilkS")' in item: cut.append((a, b))
         elif item.startswith('(footprint'):
             for c, d in top_items(txt, 1, a + 1, b - 1):
@@ -92,14 +92,22 @@ def main():
         G[side] = art.dfm(g, 0.12).simplify(0.004)      # drop crumbs the pad clipping leaves behind
     out = os.path.join(os.path.dirname(os.path.abspath(pcb)), '..', 'docs', 'silk')
     os.makedirs(out, exist_ok=True)
+    # the order-number marker is a real KiCad text, written below; stand it in on the preview so it shows
+    from shapely import affinity
+    mark, _ = art.text('WayWayWay', 0.95, 'xbold', track=0.03)
+    preview = {'F': G['F'], 'B': G['B'].union(affinity.translate(affinity.scale(mark, -1, 1, origin=(0, 0)), art.FAB_NO[0], art.FAB_NO[1]))}
     for side, name in (('F', 'top'), ('B', 'bottom')):
-        im = render(bd, side, art=G[side], ppm=40)
+        im = render(bd, side, art=preview[side], ppm=40)
         im.save(os.path.join(out, f'silk_{name}.png'))
     if preview_only: print('previews in', out); return
     items, k = [], 0
     for side, layer in (('F', 'F.SilkS'), ('B', 'B.SilkS')):
         for p in no_holes(G[side]):
             items.append(sexpr(p, layer, k)); k += 1
+    # PCBWay order-number position: the fab replaces the literal text WayWayWay with the number, same size
+    x, y = art.FAB_NO
+    items.append(f'\t(gr_text "WayWayWay"\n\t\t(at {OX + x:.4f} {OY - y:.4f} 0)\n\t\t(layer "B.SilkS")\n\t\t(uuid "{TAG}-0000-4000-8000-ffffffffffff")\n'
+                 f'\t\t(effects\n\t\t\t(font\n\t\t\t\t(size 0.95 0.95)\n\t\t\t\t(thickness 0.15)\n\t\t\t)\n\t\t\t(justify mirror)\n\t\t)\n\t)\n')
     i = txt.rindex('\t(embedded_fonts')
     txt = txt[:i] + ''.join(items) + txt[i:]
     open(pcb, 'w').write(txt)
