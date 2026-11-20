@@ -91,12 +91,12 @@ Runtime IO stays on the XIAO edge pads. Most of the XIAO's underside pads are un
 | `J5` | ELRS receiver harness, JST-GH 4-pin | `JST_GH_SM04B-GHS-TB` |
 | `J6` | Battery, XT30 male, vertical | `AMASS_XT30UPB-M` |
 | `J7` | Switch loop, XT30 female, vertical | `AMASS_XT30UPB-F` |
-| `L1` | 5.6 µH Bourns SRP6060FA | SRP6060FA |
+| `L1` | 5.6 µH Würth 74439346056 (WE-XHMI, 5.2 mm); SRP6060FA-5R6M or Coilcraft XGL6060-562MEC also fit the 6060 land | SRP6060FA |
 | `C21` | 47 µF 35 V polymer tantalum (KEMET T521X476M035ATE030), ≤ 4.3 mm tall | `CP_EIA-7343-43_Kemet-X` |
 | `D2` | SMAJ15CA bidirectional TVS on VBUS | SMA |
 | `D3`, `D4` | ESD clamps on DSHOT1/DSHOT2 at `J4` | SOD-523 |
 | `D5`, `D6` | ESD clamps (ESD5B5.0ST1G) on CRSF_RX/CRSF_TX at `J5` | SOD-523 |
-| `D7` | Schottky (Nexperia PMEG4010CEH, 40 V 1 A) from the buck 5V to the XIAO 5V pad, which is the module's USB VBUS | SOD-123F |
+| `D7` | Schottky (Nexperia PMEG4010EH, 40 V 1 A; PMEG4010CEH or onsemi MBR140SFT1G also fit) from the buck 5V to the XIAO 5V pad, which is the module's USB VBUS | SOD-123F |
 | `TP10`, `TP13`–`TP15` | VBAT_SNS, SWDIO, SWDCK, GND test pads | 1 mm pad |
 
 Free refs from deletions: `R14`, `R15`, `R19`, `R20`, `R21`, `R23`, `R24`, `C14`–`C17`, `U7`–`U10`, `U12`, `J3`, `JP1`. Do not reuse them in this revision, so old BOMs and photos stay unambiguous.
@@ -167,9 +167,9 @@ The Repeat AM32 BEC stays **isolated**; do not tie it to the carrier 5 V rail. T
 | Part | AP63301WU-7, TSOT-23-6 |
 | Input | 3.8–32 V part rating. Design range is VBUS 9.0–13.05 V (3S HV) |
 | Output | 5.0 V, set by `R27` 158 kΩ / `R28` 30.1 kΩ, with `C18` 47 pF feed-forward |
-| Inductor | `L1` 5.6 µH Bourns SRP6060FA |
-| Input caps | `C1`, `C19`, `C20` 22 µF 25 V 0805 + `C2` 100 nF |
-| Output caps | `C4`, `C5` 22 µF |
+| Inductor | `L1` 5.6 µH Würth 74439346056 (6060 land, 15 mΩ, 6.9 A) |
+| Input caps | `C1`, `C19`, `C20` 22 µF 25 V 0805 (Murata GRM21BR61E226ME44L) + `C2` 100 nF |
+| Output caps | `C4`, `C5` 22 µF 10 V soft-termination (TDK C2012X5R1A226M125AE) |
 | Bootstrap | `C3` 100 nF |
 | UVLO | 3S only: `R25` 66.5 kΩ / `R26` 10 kΩ on EN, about 7.96 V off / 8.93 V on (2.65 V/cell). It is a dead-pack backstop set below spin-up sag; the firmware's per-cell warn / halt does the real low-voltage handling |
 | Input-cap margin | At 13.05 V each Samsung `CL21A226MAYNNNE` keeps a little under 4.4 µF, so the three-cap worst case is about 10 µF, right at the reference design value. For more margin, use a 35 V 22 µF 0805 such as Murata GRM21BR6YA226ME43 |
@@ -276,7 +276,7 @@ The 166° window depends on `J2`, `J6`, `J7` and `C21`. Against the v3.4g placem
 ## Impact hardening
 
 1. 1.6 mm board on four mounting points.
-2. No MLCC within 2 mm of a mounting hole or 1 mm of an edge. Orient 0805 caps parallel to the nearest edge. Use soft-termination parts for `C1`, `C19`, `C20`, `C4`, `C5` where available (for example Murata GCJ or KEMET FT-CAP).
+2. No MLCC within 2 mm of a mounting hole or 1 mm of an edge. Orient 0805 caps parallel to the nearest edge. `C4`/`C5` use TDK's soft-termination 22 µF 10 V. No soft-termination 22 µF 0805 exists at 25 V or above (Murata GCJ/GRJ, KEMET FT-CAP and AVX FlexiTerm all stop well below 22 µF in 0805), so `C1`/`C19`/`C20` stay standard termination and rely on placement and the conformal coat.
 3. Stake `L1`, `C21`, and the XIAO corners with epoxy after the electrical test.
 4. Conformal-coat the whole board, masking the GH sockets, XT30 pins, USB-C, and test pads.
 5. No tie slots on the board; there is no room for them. Strain relief is on the chassis: snap channels on the S ledge hold the `J1` leads, and each lap joint gets an epoxy fillet. The GH plugs latch.

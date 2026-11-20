@@ -1,17 +1,18 @@
 Designators,Qty per board,Manufacturer,Manufacturer Part Number,Description,Supplier,Supplier Part Number
-C1 C4 C5 C19 C20,5,TDK,C2012X5R1E226M125AC,22uF 25V X5R 0805 ceramic capacitor,DigiKey,445-9112-1-ND
+C1 C19 C20,3,Murata Electronics,GRM21BR61E226ME44L,22uF 25V X5R 0805 ceramic capacitor (buck input; no soft-term 22uF 0805 exists above 10V),,
+C4 C5,2,TDK,C2012X5R1A226M125AE,22uF 10V X5R 0805 soft-termination ceramic capacitor (buck output),,
 C2 C3 C7 C8 C9 C10 C11 C12,8,KEMET,C0402C104K3RACTU,100nF 25V X7R 0402 ceramic capacitor,DigiKey,399-14148-1-ND
 C6 C13,2,Murata Electronics,GRM185R60J106ME15D,10uF 6.3V X5R 0603 ceramic capacitor,DigiKey,490-10467-1-ND
 C18,1,TDK,C1005C0G1H470G050BA,47pF C0G 50V 2% 0402 AP63301 feed-forward capacitor,DigiKey,445-5364-1-ND
 C21,1,KEMET,T521X476M035ATE030,"47uF 35V polymer tantalum, 30 mOhm ESR, EIA 7343-43 (X case), max 4.3 mm tall",,
 D2,1,Bourns,SMAJ15CA,15V bidirectional 400W TVS DO-214AC SMA,DigiKey,SMAJ15CABCT-ND
 D3 D4 D5 D6,4,onsemi,ESD5B5.0ST1G,Bidirectional 5V ESD diode SOD-523,DigiKey,ESD5B5.0ST1GOSCT-ND
-D7,1,Nexperia,PMEG4010CEH,"40V 1A Schottky, SOD-123F (USB VBUS isolation for the XIAO 5V pad)",,
+D7,1,Nexperia,"PMEG4010EH,115","40V 1A Schottky, SOD-123F (USB VBUS isolation for the XIAO 5V pad); alt onsemi MBR140SFT1G",,
 J2,1,JST,SM02B-GHS-TB(LF)(SN),JST-GH 2-pin SMD right-angle header,,
 J4 J5,2,JST,SM04B-GHS-TB(LF)(SN),JST-GH 4-pin SMD right-angle header,,
 J6,1,AMASS,XT30UPB-M,"XT30 male vertical PCB connector, through-hole",,
 J7,1,AMASS,XT30UPB-F,"XT30 female vertical PCB connector, through-hole",,
-L1,1,Bourns,SRP6060FA-5R6M,5.6uH shielded power inductor 6.4x6.6mm,DigiKey,SRP6060FA-5R6MCT-ND
+L1,1,Wurth Elektronik,74439346056,"5.6uH shielded power inductor WE-XHMI 6.65x6.45x5.2mm, 6060 land; alt Coilcraft XGL6060-562MEC or Bourns SRP6060FA-5R6M",,
 Q1,1,Alpha & Omega Semiconductor,AO3402,30V N-channel MOSFET SOT-23,DigiKey,785-1002-1-ND
 R1 R4 R5 R11 R26,5,Vishay Dale,CRCW040210K0FKEDHP,10k ohm 1% 0402 resistor,DigiKey,541-10.0KYCT-ND
 R6 R7 R8 R12 R13,5,Vishay Dale,CRCW040233R0JNEDC,33 ohm 5% 0402 resistor,DigiKey,541-4009-1-ND
