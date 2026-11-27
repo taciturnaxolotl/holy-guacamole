@@ -12,7 +12,7 @@ Everything here is chassis v3.4h (12 mm wheels), in mm, in the chassis frame (or
 | Bottom plate | 1 | MJF with the halves (default), or laser-cut sheet | PA11 0.8 mm | `../chassis/step/v33m_bot.step` or `dxf/plate_bottom_0.8mm.dxf` |
 | Weapon ring | 1 | laser or waterjet (SendCutSend, OSH Cut and the like) | AR550, 3/16" (4.76 mm) | `dxf/ring_AR550_4.76mm.dxf` |
 | Ear liners | one set of the fit you keep | FDM, at home | TPU | `../chassis/liners/*.stl` (three fits; see the chassis README) |
-| Wheel hubs | 2 (+ spares) | MJF with the halves | PA11 | `../chassis/scripts/wheel_hub.step` (or `wheel_mould/wheel_hub.stl`) |
+| Wheel hubs | 2 (+ spares) | MJF with the halves | PA11 | `../chassis/step/wheel_hub.step` (or `wheel_mould/wheel_hub.stl`) |
 | Wheel treads | 2 (+ spares) | cast at home in the printed mould | VytaFlex 40, 5.0 cc each | `wheel_mould/` (mould STLs + casting steps) |
 
 The carrier board is ordered separately, from `hardware/` (see `hardware/scripts/export_pcbway.sh`).

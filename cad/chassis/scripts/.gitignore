@@ -1,0 +1,8 @@
+# generator / FEA outputs (concept_v33.py writes v33m_* next to itself; the kept parts are copied to ../step)
+v33m_*
+*.inp
+*.frd
+*.dat
+*.sta
+*.cvg
+*.msh
