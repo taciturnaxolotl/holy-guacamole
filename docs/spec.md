@@ -1,6 +1,6 @@
 # Holy Guacamole: System and Carrier PCB Specification
 
-**Document status:** Rev B 2.2 (2026-11-11). Covers the robot at chassis v3.4g and the rev 2 carrier as routed for PCBWay. The KiCad schematic `hardware/guac.kicad_sch` and board `hardware/guac.kicad_pcb` are the source of truth for the electronics. The chassis is the v3.4g CAD in `cad/chassis/` (ordering guide and cut files in `cad/fab/`); `cad/rev2/README.md` records what the board takes from it.
+**Document status:** Rev B 2.2 (2026-11-11). Covers the robot at chassis v3.4h (v3.4g with 12 mm wheels) and the rev 2 carrier as routed for PCBWay. The KiCad schematic `hardware/guac.kicad_sch` and board `hardware/guac.kicad_pcb` are the source of truth for the electronics. The chassis is the v3.4h CAD in `cad/chassis/` (ordering guide and cut files in `cad/fab/`); `cad/rev2/README.md` records what the board takes from it.
 **Robot:** Holy Guacamole, 1 lb meltybrain antweight, MRCA full combat.
 **Previous revisions:** Rev A (v1.3c: 40 × 50 mm board, fly-lead pads, solder-down receiver) and Rev B 2.0-draft (pre-route). See git history for that text.
 
@@ -17,7 +17,7 @@
 | Ring liners | TPU, printed at home, one U-liner per ear. Three fits are provided (ear clearance 0.30 / 0.15 / 0.05 mm). Use the snuggest set that slides on, so the ear bears on the liner before the bolts |
 | Plates | Top and bottom, MJF PA11 0.8 mm, 4 × M2.5 each, in 0.6 mm pockets |
 | Drive | 2 × Palm Beach Bots D2822 1100KV, 1/8" shaft, 70 mm leads to 2 mm bullets |
-| Wheels | Ø42 × 9 mm: PA11 hub with a cast VytaFlex 40 tread (printed moulds), outboard MR128 bearing (seat reamed to 12 mm) |
+| Wheels | Ø42 × 12 mm (v3.4h; was 9): PA11 hub with two dovetails + 12 ribs, cast VytaFlex 40 tread (5.0 g, printed moulds in `cad/fab/wheel_mould`), outboard MR128 bearing (seat reamed to 12 mm). Centres r 57.45 |
 | Battery | GNB 3S 380 mAh HV, 55 × 17 × 20 mm, 32 g, 13.05 V full |
 | ESC | Repeat AM32 dual, 28 × 20 mm, standing on edge against the S bay wall. Current limit 4–5 A per channel |
 | Receiver | BetaFPV ELRS Lite flat-antenna, on a tray in the S pocket, wired to `J5` |
@@ -466,7 +466,7 @@ After the v3.4g power move: KiCad DRC is clean against these rules with all nets
 11. **LED maximum on-time.** This spec asks for a hard cap but gives no number. Firmware caps a single pulse at about 655 ms (and duty at 25%). Set the real limit from the TinySLED's thermal behaviour.
 12. **Through-hole tails.** Only `J6` and `J7` are through-hole (4 pins). Trim their tails flush over the Ø4 bottom-plate reliefs (v3.4g moves `J7`'s to the SW).
 13. **Rev A bodge.** On existing Rev A boards, lift or cut R6/R7/R8 pin 2 from MOSI and jumper them to D9 before IMU bring-up.
-14. **Firmware plant parameters.** Update them for 3S, the Ø42 wheel, and the v3.4g geometry.
+14. **Firmware plant parameters.** Update them for 3S, the Ø42 × 12 wheel at r 57.45, and the v3.4h geometry.
 
 ### Later
 

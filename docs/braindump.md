@@ -118,13 +118,13 @@ Single GNB 3S 380 HV pack (55 × 17 × 20, 32 g) on the spin axis at x ±8.5, y 
 
 ### Motor mounting and wheels
 
-Motors on the E/W axis, perpendicular to the teeth (prevents hockey-puck sliding). PBB D2822 1100KV, 1/8" shaft, ~70 mm leads to 2 mm bullets. Wheels Ø42 × 9 mm at r ≈ 56 mm: PA11 hub with a cast VytaFlex 40 tread (printed moulds), outboard MR128 bearing (seat reamed to 12 mm).
+Motors on the E/W axis, perpendicular to the teeth (prevents hockey-puck sliding). PBB D2822 1100KV, 1/8" shaft, ~70 mm leads to 2 mm bullets. Wheels Ø42 × 12 mm (v3.4h; was 9) at r ≈ 57.5 mm: PA11 hub with a cast VytaFlex 40 tread (printed moulds), outboard MR128 bearing (seat reamed to 12 mm).
  
 ---
 
 ## 5. Operating parameters
  
-Numbers for v3.4f: I ≈ 1.39e-3 kg·m² (CAD), wheel Ø42 at r 56 (chassis rpm = 0.375 × motor rpm without slip), 3S HV.
+Numbers for v3.4f: I ≈ 1.39e-3 kg·m² (CAD), wheel Ø42 at r 57.45 since v3.4h (chassis rpm = 0.366 × motor rpm without slip; 0.375 at the old r 56), 3S HV.
 
 | Parameter | Value |
 |---|---|
@@ -291,8 +291,8 @@ Drift = (Accuracy Coefficient) × (Power) × (Wheel Path / Wheel Diameter)
  
 **Melty Ratio = Wheel Path / Wheel Diameter:**
 ```
-Wheel path = 2π × wheel radius from centre = 2π × 56mm = 352mm per revolution
-Melty ratio, v3.4f Ø42 wheel = 352 / 42 = 8.4
+Wheel path = 2π × wheel radius from centre = 2π × 57.45mm = 361mm per revolution
+Melty ratio, v3.4h Ø42 wheel = 361 / 42 = 8.6
 (old 75 mm / 20 mm concept: 471 / 20 = 23.6)
 ```
  
@@ -419,7 +419,7 @@ Placement geometry and the rev-2 axis map are in Section 8.
 | Shaft | 1/8" |
 | Leads | ~70 mm silicone, 2 mm bullets to the ESC leads |
  
-**Drive:** shaft-driven Ø42 wheel with an outboard MR128 bearing (no hub-on-bell mount). Chassis rpm ≈ 0.375 × motor rpm. No-load motor rpm on 3S: ~12,500 (11.4 V) to ~14,400 (13.05 V).
+**Drive:** shaft-driven Ø42 wheel with an outboard MR128 bearing (no hub-on-bell mount). Chassis rpm ≈ 0.366 × motor rpm (v3.4h). No-load motor rpm on 3S: ~12,500 (11.4 V) to ~14,400 (13.05 V).
  
 **Motor orientation:** E/W, perpendicular to the teeth. Prevents lateral sliding instability per Project Liftoff experience.
  
@@ -453,7 +453,9 @@ UVLO: 3S only, set by `R25` 66.5 kΩ / `R26` 10 kΩ (`JP1` is gone). It cuts at 
  
 ### 9.8 Wheels: cast urethane tread
  
-Ø42 × 9 mm. PA11 hub (MJF) with a VytaFlex 40 tread cast in printed moulds (`wheel_mould` package), MR128 outboard bearing. Earlier options (EVA foam + rubber cement + latex, BaneBots T61) are superseded.
+Ø42 × 12 mm (v3.4h, widened from 9). PA11 hub (MJF) with two dovetails and 12 ribs, and a 5.0 g VytaFlex 40 tread cast in printed moulds (`cad/fab/wheel_mould`), MR128 outboard bearing. Earlier options (EVA foam + rubber cement + latex, BaneBots T61) are superseded.
+
+Why 12 mm, from the Discord (melty.db, 2026-11-15): narrow 50A BaneBots T40s shredded after one fight on an ant melty, while ~25 mm cast 40A treads lasted about 4 fights; 40–50A is the usual range for ant and beetle meltys (60A had no grip at NHRL); glue alone lets a tread rip off above ~600 g, so the tread is held mechanically (dovetails + ribs, no release on the hub). 12 mm was the most the frame allows without touching the motors: the MR128 moved out 3 mm and the bearing end wall went from 7 to 3.6 mm (FEA 13.9 MPa, FoS 2.2). Wider means extending the tread inboard over the motor can. Other failures seen there: motors pulling apart (bell off the shaft, circlips; here the outboard bearing takes the outward pull in compression) and hubs softening from motor or braking heat.
  
 **Centrifugal concern:** at 4,000 RPM the tread sees ~1,000 g at r 56; spin-test before the first event and check floor clearance. Moderate grip is better than maximum grip for drift.
  
@@ -732,7 +734,7 @@ Buckeye Bot Bash 2 (Bellefontaine OH, Aug 29 2026) has passed and is no longer t
 ### Before the PCBWay order
  
 1. **`C21` part number.** Still TBD in the PCBWay BOM (100 µF / 25 V polymer tantalum, 7343-43, ≤ 4.3 mm).
-2. **3S UVLO cutoff.** Keep `R25` 75k (~8.85 V) or change to 66.5k (~8.0 V).
+2. **3S UVLO cutoff.** Decided: `R25` 66.5k (~8.0 V), `JP1` and the 2S divider removed.
 3. **TinySLED at 13.05 V.** Confirm the 2–3S module tolerates it, or use the 3–6S version.
  
 ### Bring-up and bench

@@ -24,7 +24,7 @@ from skimage import measure
 from shapely.geometry import Polygon, Point, box as sbox
 from shapely.ops import unary_union
 from shapely import affinity as _aff
-HERE = os.path.dirname(os.path.abspath(__file__)); REAL = os.path.join(HERE, '..', 'real')
+HERE = os.path.dirname(os.path.abspath(__file__)); REAL = os.environ.get('REAL', os.path.join(HERE, '..', 'real'))   # vendor STEPs (motor.step, switch.step), not in the repo
 sys.path.insert(0, os.path.join(HERE, '..', 'ring')); from ring_fea import ring2d
 
 NPZ = sys.argv[1] if len(sys.argv) > 1 else 'topo_v33_0.16.npz'
@@ -42,9 +42,9 @@ EAR_R = 68.5; EAR_ANG = [30, 90, 150, 210, 270, 330]; EAR_W = 10.0; EAR_RIN = 64
 # motor (vendor STEP, transformed): base 26..31.33 r13.85, can 31.64..51.4 r13.9, shaft back to 24.4
 WALL0, WALL1 = 20.5, 26.0
 CAN_R = 14.0; CAN0 = 26.0; CAN1 = 51.4
-WHEEL_R = 21.0; WHEEL_W = 9.0; HUB_R = 18.0; W0, W1 = CAN1, CAN1+WHEEL_W   # Ø42 x 9 (wheel_v33.py): MJF PA11 spoked hub, 3x M2 to the can face, 3 mm cast VytaFlex 40 tread on a dovetail + ribs tread
+WHEEL_R = 21.0; WHEEL_W = 12.0; HUB_R = 18.0; W0, W1 = CAN1, CAN1+WHEEL_W   # Ø42 x 12 (v3.4h, was 9; wheel_v33.py): MJF PA11 spoked hub, 3x M2 to the can face, 3 mm cast VytaFlex 40 tread on a dovetail + ribs tread
 WELL0, WELL1, WELL_Y = CAN1-1.0, W1+0.6, WHEEL_R+4.0
-XB0 = W0+0.05+9.15; XB1 = XB0+3.5
+XB0 = W0+0.05+WHEEL_W+0.15; XB1 = XB0+3.5   # bearing follows the wheel out (end wall 7 -> 4 mm)
 BRG_SEAT_R = 5.9                                                     # v3.4f: Ø11.8 as printed, ream to 12.0 for the MR128 (MJF can't hold the old Ø12.1 slip)                                  # MR128 outboard support bearing (8x12x3.5) on the hub stub
 M_R = cq.Matrix([[0, 1, 0, CAN0], [1, 0, 0, 0], [0, 0, -1, ZC]])     # model y = axis, model -x (leads) -> bot -y
 M_L = cq.Matrix([[0, -1, 0, -CAN0], [1, 0, 0, 0], [0, 0, 1, ZC]])    # right rotated 180° about bot y: leads still -y
@@ -95,7 +95,7 @@ def U(*ws):
 _motor = cq.importers.importStep(os.path.join(REAL, 'motor.step')).val()
 # rev-2 carrier from Kieran's cad/rev2/board_outline.dxf (40 x 76, USB notch) + the keepout.dxf placement courtyards
 import ezdxf
-REV2 = os.environ.get('REV2', '/home/claude/taciturnaxolotl/holy-guacamole/cad/rev2')
+REV2 = os.environ.get('REV2', os.path.join(HERE, '..', '..', 'rev2'))   # repo: cad/rev2
 def _dxf_loop(path, layer):
     segs = []
     for e in ezdxf.readfile(path).modelspace():
@@ -135,7 +135,7 @@ disk = Point(0, 0).buffer(R_SK, 256); plan = plan.intersection(disk)
 
 # ---------------- passive 2D (same as topopt) ----------------
 pv_void = unary_union([srect(*BAY), srect(*SWCAV), srect(USB_X[0], USB_X[1], *CHIM_Y), srect(*SPK[:4])] +
-                      [srect(s*CAN0, s*50.5, -15.5, 15.5) for s in (1, -1)] + [srect(s*50.4, s*62.9, -WELL_Y, WELL_Y) for s in (1, -1)])
+                      [srect(s*CAN0, s*50.5, -15.5, 15.5) for s in (1, -1)] + [srect(s*50.4, s*(W1+2.5), -WELL_Y, WELL_Y) for s in (1, -1)])
 pv = [pv_void.buffer(2.0, join_style=2).difference(pv_void), disk.difference(Point(0, 0).buffer(R_SK-2.0, 256))]
 pv += [srect(s*WALL0, s*WALL1, -18.5, 18.5) for s in (1, -1)]
 pv += [Point(EAR_R*math.cos(math.radians(a)), EAR_R*math.sin(math.radians(a))).buffer(5.6, 64) for a in EAR_ANG]   # ear pads r5.6: 0.5 mm clear of the lined notch flank (6.1) — r7.5 made sliver tets at the flank
@@ -433,7 +433,7 @@ parts = {'lower': (lower, '#d97a2b'), 'upper': (upper, '#e8a15c'), 'ring': (ring
 for s in 'RL':
     sg = 1 if s == 'R' else -1
     parts['motor'+s] = (motor(sg), '#222222'); parts['wheel'+s] = (wheel(sg), '#222222'); parts['hub'+s] = (hub(sg), '#9be36a'); parts['brg'+s] = (brg(sg), '#bbbbbb')
-MASS = {'usbf': 1.5, 'hubR': 3.1, 'hubL': 3.1, 'brgR': 1.3, 'brgL': 1.3, 'battery': 32.0, 'switch': 2.15, 'xt30': 3.0, 'esc': 6.0, 'rx': 0.5, 'pcb': 12.0, 'pcbcomp': 0.0, 'ledT': 0.4, 'ledB': 0.4, 'motorR': 44.0, 'motorL': 44.0, 'wheelR': 3.6, 'wheelL': 3.6}   # battery = 3S 300 mAh (pocket kept at the 450 envelope)
+MASS = {'usbf': 1.5, 'hubR': 3.5, 'hubL': 3.5, 'brgR': 1.3, 'brgL': 1.3, 'battery': 32.0, 'switch': 2.15, 'xt30': 3.0, 'esc': 6.0, 'rx': 0.5, 'pcb': 12.0, 'pcbcomp': 0.0, 'ledT': 0.4, 'ledB': 0.4, 'motorR': 44.0, 'motorL': 44.0, 'wheelR': 5.0, 'wheelL': 5.0}   # battery = 3S 300 mAh (pocket kept at the 450 envelope)
 DENS = {'lower': RHO, 'upper': RHO, 'ring': 7.85, 'top': 0.84, 'bot': 0.84, 'rindT': 1.21, 'rindB': 1.21, 'liner': 1.21}
 
 if __name__ == '__main__':
