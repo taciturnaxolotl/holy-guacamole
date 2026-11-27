@@ -1,9 +1,7 @@
 # Rev-2 carrier: outline, keepouts, placement (chassis v3.4g)
 
-**Source:** the current chassis (v3.4g) is in [`../chassis`](../chassis). The scripts here were written against the older v33 rev B package and still expect the v33 rev B package at `/tmp/hg33b/holy_guacamole_v33b/` (read-only). It has `README.md` (Z table and plan features), `scripts/concept_v33.py` and `step/*.step`.
-I took the constants from the script and README and confirmed them with part bounding boxes and planar sections of the rev B STEPs.
-The STEPs were tessellated to `/tmp/hg33b_work/` and sliced with trimesh.
-The chassis changes since then (v3.4c to v3.4g) are entered as boxes in `scripts/build_rev2.py`. The v3.4g chassis itself is the `holy_guacamole_v34g` package, also outside this repo.
+**Source:** the chassis is in [`../chassis`](../chassis) (v3.4h; the board side has not changed since v3.4g). `scripts/build_rev2.py` writes `keepout.dxf`, which `../chassis/scripts/concept_v33.py` reads.
+The scripts were first written against the v33 rev B package and still read its tessellated meshes from `/tmp/hg33b*/` (not in this repo), with the changes since (v3.4c to v3.4g) entered as boxes in `build_rev2.py`. To re-run them, point `WORK`/`MPFX` at the STLs the chassis generator writes in `../chassis/scripts/`.
 
 **Frame:** the generator's own. Origin on the spin axis, +Y = N (switch/USB), −Y = S (ESC/rx), +X = E, +Z up, viewed from +Z. **Board coordinates = chassis XY**, in mm.
 
@@ -33,6 +31,7 @@ Placement, all parts (`PL` in `scripts/build_rev2.py`, courtyard rectangles, top
 | J5 rear pads | −5.88…3.68 | −25.55…−23.2 | 0.2 | flat pads under the S beam |
 | J2 TinySLEDs GH-2 | −17.48…−10.52 | 23.0…29.4 | 4.25 | v3.4g. Centre (−14.0, 26.2), opens S onto the plug zone (y 18.5…23.0) and Y-splice zone (y 15.4…18.5, ≤ 1.0) |
 | Q1 / R16 / R17 | −10.44…−6.56 | 23.9…29.85 | ≤ 1.2 | v3.4g. E of J2, N of the buck input caps |
+| D7 PMEG4010CEH (SOD-123F) | ≈ 16.8…19.0 | ≈ 24.8…29.0 | ≈ 1.1 | added on the board after v3.4g, centre (17.9, 26.9), 90°. Not in `keepout.dxf`; checked against the v3.4h STEPs: 0.9 mm to the lower half, 1.2 mm to the other board parts, 13 mm to the harness |
 | U4 LSM6DSV320X (r 12) | box ±2 | | ≈ 1 | (−11.64, 2.90), 166° |
 | U5 H3LIS331 (r 18) | box ±2 | | ≈ 1 | (−4.35, −17.47), 256° |
 | U6 H3LIS331 (r 18) | box ±2 | | ≈ 1 | (17.30, 4.96), 16° |
