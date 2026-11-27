@@ -24,8 +24,8 @@ from skimage import measure
 from shapely.geometry import Polygon, Point, box as sbox
 from shapely.ops import unary_union
 from shapely import affinity as _aff
-HERE = os.path.dirname(os.path.abspath(__file__)); REAL = os.environ.get('REAL', os.path.join(HERE, '..', 'real'))   # vendor STEPs (motor.step, switch.step), not in the repo
-sys.path.insert(0, os.path.join(HERE, '..', 'ring')); from ring_fea import ring2d
+HERE = os.path.dirname(os.path.abspath(__file__)); REAL = os.environ.get('REAL', os.path.join(HERE, '..', 'vendor'))   # vendor STEPs (motor.step, switch.step)
+from ring_fea import ring2d
 
 NPZ = sys.argv[1] if len(sys.argv) > 1 else 'topo_v33_0.16.npz'
 VARIANT = sys.argv[2] if len(sys.argv) > 2 else 'mjf'
@@ -405,7 +405,7 @@ def rind(top, C=3.5, PROUD=0.3):
 liner = prism(LINER2D, Z_RB, Z_RT)
 # ---------------- components ----------------
 def motor(s): return cq.Workplane('XY').newObject([_motor.transformGeometry(M_R if s == 1 else M_L)])
-_WH = {n: cq.importers.importStep(os.path.join(HERE, f'wheel_{n}.step')).val() for n in ('hub', 'tread', 'bearing')}
+_WH = {n: cq.importers.importStep(os.path.join(HERE, '..', 'step', f'wheel_{n}.step')).val() for n in ('hub', 'tread', 'bearing')}
 def _place(shape, s):
     m = cq.Matrix([[0, 0, s, s*(W0+0.05)], [0, 1, 0, 0], [-s, 0, 0, ZC]])          # wheel local z (can face) -> bot +-x
     return cq.Workplane('XY').newObject([shape.transformGeometry(m)])

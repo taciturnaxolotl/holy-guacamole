@@ -5,7 +5,7 @@ import os, sys, math, cadquery as cq
 from shapely.geometry import Point, Polygon
 from shapely.ops import unary_union
 from shapely import affinity as _aff
-HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, os.path.join(HERE, '..', 'ring'))
+HERE = os.path.dirname(os.path.abspath(__file__))
 from ring_fea import ring2d
 RI, RO, RING_T = 73.0, 78.0, float(os.environ.get('RING_T_MEAS', 4.763))
 EAR_R, EAR_ANG, EAR_W, EAR_RIN, CLR, LINER_T = 68.5, [30, 90, 150, 210, 270, 330], 10.0, 64.5, 0.3, 0.8

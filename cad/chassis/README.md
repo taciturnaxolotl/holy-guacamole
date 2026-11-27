@@ -14,13 +14,12 @@ Units are mm. The spin axis is z, and the origin is the centre of the frame's bo
 ## Files
 | path | what |
 |---|---|
-| `step/` | the parts one per file. **Print these in MJF PA11: `v33m_lower.step`, `v33m_upper.step`, `v33m_top.step`, `v33m_bot.step`** (plates 0.8 mm). The rest are reference bodies (motors, wheels, hubs, bearings, ring, TPU liners, battery, ESC envelope, PCB + parts, receiver, switch, LEDs, USB-C, XT30 courtyards) |
-| `stl/` | viewer-only items: fasteners (Ti M3×20 ring bolts, M2.5×6 plate screws, M2×4 PCB screws, M3×6 motor screws, M2×5 wheel screws, brass inserts), detailed ESC, hex key, harness (one STL per circuit), plugs + 2 mm bullets + mated XT30s, foam/tape pads |
+| `step/` | the parts one per file. **Print these in MJF PA11: `v33m_lower.step`, `v33m_upper.step`, `v33m_top.step`, `v33m_bot.step`** (plates 0.8 mm). The rest are reference bodies (motors, wheels, hubs, bearings, ring, TPU liners, battery, ESC envelope, PCB + parts, receiver, switch, LEDs, USB-C, XT30 courtyards). `wheel_hub/tread/bearing.step` are the wheel parts alone in their own coordinates (axis +z, can face at z 0), for ordering the hub |
 | `harness/` | `harness.js` (route source of truth), the sampler and the collision checker, sampled points |
 | `viewer/holy-guacamole.html` | the offline 3D viewer: wiring view, section, explode, build animation (v3.4h). Rebuild it from `viewer/src/` |
 | `renders/` | v3.4h stills: hero, exploded (labelled), drawing, section A-A, guts, wiring (+ SVG) |
-| `ring/ring_fea.py` | the weapon ring's 2D geometry (`ring2d`, imported by `concept_v33.py`) and its tooth-hit FEA sweep |
-| `scripts/` | generator + checks: cadquery → gmsh → CalculiX (`concept_v33.py topo_v33_0.12.npz mjf`, then `check`, `hw`, `printcheck`, `tools`, `fea`). `wheel_v33.py` builds the wheel (the hub, tread and bearing STEPs here, which the generator imports) and the tread mould STLs; the copies to order are in `../fab/wheel_mould`. The generator also needs the vendor STEPs `motor.step` (PBB D2822) and `switch.step` (Fingertech mini switch) in `../real/` (or `REAL=<dir>`); they are not in the repo |
+| `scripts/` | generator + checks: cadquery → gmsh → CalculiX. Run `concept_v33.py topo_v33_0.12.npz mjf` from here, then `check_v33`, `hw_v33`, `printcheck_v33`, `tools_v33`, `fea_v33`; it writes `v33m_*` next to itself (ignored by git), and the kept parts are copied into `step/`. `ring_fea.py` is the ring's 2D shape (`ring2d`, imported by the generator) and its tooth-hit FEA sweep. `wheel_v33.py` writes the wheel STEPs into `step/` and the hub + mould STLs into `../fab/wheel_mould/` |
+| `vendor/` | bought-part models the generator imports: PBB D2822 `motor.step`, Fingertech `switch.step` |
 
 ## Z table
 | z | what |

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Ø42 x 12 hub-motor wheel (v3.4h: was 9): MJF PA11 spoked hub + cast urethane tread (VytaFlex 40), plus a 3-part printable mould.
 local coords: wheel axis = +z, z=0 is the face that bolts to the motor can (3x M2 on Ø12).
-exports wheel_hub.step/.stl, wheel_tread.step/.stl, mould_base.stl, mould_ring.stl, mould_lid.stl
+exports ../step/wheel_{hub,tread,bearing}.step and ../../fab/wheel_mould/{wheel_hub,mould_base,mould_ring,mould_lid}.stl
 """
 import math, cadquery as cq
 W = 12.0; R_T = 21.0; R_H = 18.0; R_RIM_IN = 16.2          # tread OD, hub OD (= tread ID), hub rim ID
@@ -45,10 +45,13 @@ lid = cyl(MO_R, W, W+3.0).cut(cyl(COL_R+0.3, W-1, W+4))                         
 lid = lid.cut(cq.Workplane('XY').center(0, (R_H+R_T)/2).circle(2.0).extrude(5).translate((0, 0, W-1)))      # pour
 lid = lid.cut(cq.Workplane('XY').center(0, -(R_H+R_T)/2).circle(1.0).extrude(5).translate((0, 0, W-1)))     # vent
 if __name__ == '__main__':
+    import os; HERE = os.path.dirname(os.path.abspath(__file__))
+    STEP, FAB = os.path.join(HERE, '..', 'step'), os.path.join(HERE, '..', '..', 'fab', 'wheel_mould')
     vh, vt = hub.val().Volume()/1000, tread.val().Volume()/1000
     print(f"hub {vh:.2f} cc -> {vh*1.05:.2f} g PA11 | tread {vt:.2f} cc -> {vt*1.0:.2f} g VytaFlex 40 | wheel {vh*1.05+vt:.2f} g + 3x M2 screws")
     print('valid', hub.val().isValid(), tread.val().isValid())
     for n, v in (('wheel_hub', hub), ('wheel_tread', tread), ('wheel_bearing', bearing)):
-        cq.exporters.export(v, n+'.step'); cq.exporters.export(v, n+'.stl', tolerance=0.02, angularTolerance=0.1)
+        cq.exporters.export(v, os.path.join(STEP, n+'.step'))
+        if n == 'wheel_hub': cq.exporters.export(v, os.path.join(FAB, n+'.stl'), tolerance=0.02, angularTolerance=0.1)
     for n, v in (('mould_base', base), ('mould_ring', ring), ('mould_lid', lid)):
-        cq.exporters.export(v, n+'.stl', tolerance=0.02, angularTolerance=0.1)
+        cq.exporters.export(v, os.path.join(FAB, n+'.stl'), tolerance=0.02, angularTolerance=0.1)
