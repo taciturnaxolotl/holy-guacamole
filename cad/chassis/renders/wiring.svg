@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1810" height="1090" viewBox="0 0 1810 1090">
+<style>.t{font:600 24px Inter,system-ui,sans-serif;fill:#22252a} .s{font:400 18px Inter,system-ui,sans-serif;fill:#646a74}
+.c{font:600 18px Inter,system-ui,sans-serif;fill:#22252a} .p{font:500 16px Inter,system-ui,sans-serif} .h{font:700 30px Inter,system-ui,sans-serif;fill:#22252a}</style>
+<rect x="2" y="2" width="1806" height="1086" rx="28" fill="#ffffff" stroke="#d0d5dc" stroke-width="3"/>
+<text x="60" y="64" class="h">Wiring</text><text x="60" y="94" class="s">v3.4h chassis · rev-2 carrier (3S only), J7 beside J6 · power runs clockwise</text>
+<rect x="600" y="330" width="600" height="460" rx="22" fill="#e9f4ec" stroke="#2f8f50" stroke-width="3"/>
+<text x="790" y="318" class="c" fill="#22252a" text-anchor="start">Rev-2 carrier · 40 × 76 · 4-layer · also the power board</text>
+<rect x="885" y="420" width="235" height="56" rx="10" fill="#ffffff" stroke="#d0d5dc" stroke-width="2"/>
+<text x="1002.5" y="444.0" class="c" text-anchor="middle">XIAO RP2350</text>
+<text x="1002.5" y="466.0" class="p" fill="#646a74" text-anchor="middle">runtime IO on D0–D10</text>
+<rect x="885" y="488" width="235" height="56" rx="10" fill="#ffffff" stroke="#d0d5dc" stroke-width="2"/>
+<text x="1002.5" y="512.0" class="c" text-anchor="middle">LSM6 + 2× H3LIS</text>
+<text x="1002.5" y="534.0" class="p" fill="#646a74" text-anchor="middle">SPI Mode 0, '595 CS latch</text>
+<rect x="885" y="556" width="235" height="56" rx="10" fill="#ffffff" stroke="#d0d5dc" stroke-width="2"/>
+<text x="1002.5" y="580.0" class="c" text-anchor="middle">AP63301 buck</text>
+<text x="1002.5" y="602.0" class="p" fill="#646a74" text-anchor="middle">VBUS → 5 V → D7 → XIAO</text>
+<rect x="885" y="624" width="235" height="56" rx="10" fill="#ffffff" stroke="#d0d5dc" stroke-width="2"/>
+<text x="1002.5" y="648.0" class="c" text-anchor="middle">VBAT sense</text>
+<text x="1002.5" y="670.0" class="p" fill="#646a74" text-anchor="middle">120k / 33.2k → A0</text>
+<rect x="885" y="692" width="235" height="56" rx="10" fill="#ffffff" stroke="#d0d5dc" stroke-width="2"/>
+<text x="1002.5" y="716.0" class="c" text-anchor="middle">Q1 AO3402</text>
+<text x="1002.5" y="738.0" class="p" fill="#646a74" text-anchor="middle">LED low side, gate D1</text>
+<rect x="760" y="650" width="115" height="64" rx="10" fill="#ffffff" stroke="#d0d5dc" stroke-width="2"/>
+<text x="817.5" y="678.0" class="c" text-anchor="middle">SMAJ15CA</text>
+<text x="817.5" y="700.0" class="p" fill="#646a74" text-anchor="middle">+ 47 µF bulk</text>
+<rect x="560" y="570" width="120" height="50" rx="6" fill="#fff3c4" stroke="#b8901a" stroke-width="2"/>
+<text x="620.0" y="602.0" class="c" text-anchor="middle">J6  XT30-M</text>
+<rect x="560" y="470" width="120" height="50" rx="6" fill="#fff3c4" stroke="#b8901a" stroke-width="2"/>
+<text x="620.0" y="502.0" class="c" text-anchor="middle">J7  XT30-F</text>
+<rect x="1140" y="715" width="120" height="50" rx="6" fill="#ffe3dc" stroke="#d23b2f" stroke-width="2"/>
+<text x="1200.0" y="747.0" class="c" text-anchor="middle">J1  pads</text>
+<rect x="1140" y="505" width="120" height="50" rx="6" fill="#e6ecf7" stroke="#3a6fd0" stroke-width="2"/>
+<text x="1200.0" y="537.0" class="c" text-anchor="middle">J4  GH-4</text>
+<rect x="960" y="765" width="120" height="50" rx="6" fill="#e6ecf7" stroke="#3a6fd0" stroke-width="2"/>
+<text x="1020.0" y="797.0" class="c" text-anchor="middle">J5  GH-4</text>
+<rect x="640" y="765" width="120" height="50" rx="6" fill="#ffeedd" stroke="#ff8c1a" stroke-width="2"/>
+<text x="700.0" y="797.0" class="c" text-anchor="middle">J2  GH-2</text>
+<path d="M680,585 L705,585 L705,508 L680,508" fill="none" stroke="#ffffff" stroke-width="11" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M680,585 L705,585 L705,508 L680,508" fill="none" stroke="#d23b2f" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="700" y="552" class="p" fill="#d23b2f" text-anchor="end">VBAT_RAW</text>
+<path d="M680,482 L745,482 L745,757 L1140,757" fill="none" stroke="#ffffff" stroke-width="11" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M680,482 L745,482 L745,757 L1140,757" fill="none" stroke="#e0742a" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="756" y="520" class="p" fill="#e0742a" text-anchor="start">VBUS</text>
+<path d="M745,584 L885,584" fill="none" stroke="#ffffff" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M745,584 L885,584" fill="none" stroke="#e0742a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M745,682 L760,682" fill="none" stroke="#ffffff" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M745,682 L760,682" fill="none" stroke="#e0742a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="60" y="520" width="300" height="150" rx="14" fill="#e8eefb" stroke="#3a6fd0" stroke-width="2.5"/>
+<text x="78" y="554" class="t" fill="#22252a">GNB 3S 380 HV</text>
+<text x="78" y="580" class="s">11.4 V nom · 13.05 V full</text>
+<text x="78" y="608" class="s">XT30-F lead · XH balance plug</text>
+<path d="M360,585 L560,585" fill="none" stroke="#ffffff" stroke-width="12" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M360,585 L560,585" fill="none" stroke="#d23b2f" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M360,610 L560,610" fill="none" stroke="#ffffff" stroke-width="12" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M360,610 L560,610" fill="none" stroke="#2a2c30" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="460" y="572" class="p" fill="#646a74" text-anchor="middle">pack leads</text>
+<rect x="520" y="130" width="360" height="120" rx="14" fill="#fbf5e2" stroke="#b8901a" stroke-width="2.5"/>
+<text x="538" y="164" class="t" fill="#22252a">Fingertech mini switch</text>
+<text x="538" y="190" class="s">in its frame socket, 3/32" hex key</text>
+<text x="538" y="218" class="s">~85 mm XT30-M pigtail, 20 AWG</text>
+<path d="M610,250 L610,265 L520,265 L520,508 L560,508" fill="none" stroke="#ffffff" stroke-width="11" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M610,250 L610,265 L520,265 L520,508 L560,508" fill="none" stroke="#d23b2f" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M650,250 L650,282 L540,282 L540,482 L560,482" fill="none" stroke="#ffffff" stroke-width="11" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M650,250 L650,282 L540,282 L540,482 L560,482" fill="none" stroke="#e0742a" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="512" y="400" class="p" fill="#646a74" text-anchor="end">pigtail up the W side, twisted</text>
+<rect x="1330" y="300" width="420" height="175" rx="14" fill="#e6ecf7" stroke="#3a6fd0" stroke-width="2.5"/>
+<text x="1348" y="334" class="t" fill="#22252a">Repeat AM32 dual ESC</text>
+<text x="1348" y="360" class="s">28 × 20 · AM32_RR_ROBOT_DUAL_ESC_F421</text>
+<text x="1348" y="388" class="s">DSHOT600 bidir + EDT · 4–5 A/ch limit</text>
+<text x="1348" y="412" class="s">BEC isolated, not tied to the 5 V rail</text>
+<path d="M1260,730 L1410,730 L1410,475" fill="none" stroke="#ffffff" stroke-width="12" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1260,730 L1410,730 L1410,475" fill="none" stroke="#e0742a" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1260,750 L1430,750 L1430,475" fill="none" stroke="#ffffff" stroke-width="12" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1260,750 L1430,750 L1430,475" fill="none" stroke="#2a2c30" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1335" y="790" class="p" fill="#646a74" text-anchor="middle">20 AWG</text>
+<path d="M1260,522 L1370,522 L1370,475" fill="none" stroke="#ffffff" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1260,522 L1370,522 L1370,475" fill="none" stroke="#b8bec7" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1260,540 L1395,540 L1395,475" fill="none" stroke="#ffffff" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1260,540 L1395,540 L1395,475" fill="none" stroke="#e2b714" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1272" y="572" class="p" fill="#646a74" text-anchor="start">GND · D1 white</text>
+<text x="1272" y="594" class="p" fill="#646a74" text-anchor="start">D2 yellow · GND</text>
+<rect x="1440" y="640" width="150" height="130" rx="12" fill="#eeeeee" stroke="#2a2c30" stroke-width="2.5"/>
+<text x="1458" y="674" class="t" fill="#22252a">Motor R</text>
+<text x="1458" y="700" class="s">D2822 1100KV</text>
+<text x="1458" y="728" class="s">2 mm bullets</text>
+<path d="M1485,475 L1485,640" fill="none" stroke="#ffffff" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1485,475 L1485,640" fill="none" stroke="#3a3a3a" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1515,475 L1515,640" fill="none" stroke="#ffffff" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1515,475 L1515,640" fill="none" stroke="#666" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1545,475 L1545,640" fill="none" stroke="#ffffff" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1545,475 L1545,640" fill="none" stroke="#909090" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="1610" y="640" width="150" height="130" rx="12" fill="#eeeeee" stroke="#2a2c30" stroke-width="2.5"/>
+<text x="1628" y="674" class="t" fill="#22252a">Motor L</text>
+<text x="1628" y="700" class="s">D2822 1100KV</text>
+<text x="1628" y="728" class="s">2 mm bullets</text>
+<path d="M1655,475 L1655,640" fill="none" stroke="#ffffff" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1655,475 L1655,640" fill="none" stroke="#3a3a3a" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1685,475 L1685,640" fill="none" stroke="#ffffff" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1685,475 L1685,640" fill="none" stroke="#666" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1715,475 L1715,640" fill="none" stroke="#ffffff" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1715,475 L1715,640" fill="none" stroke="#909090" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1600" y="800" class="p" fill="#646a74" text-anchor="middle">3 phases each, 70 mm leads</text>
+<rect x="880" y="900" width="320" height="140" rx="14" fill="#f1e8fa" stroke="#7b42b2" stroke-width="2.5"/>
+<text x="898" y="934" class="t" fill="#22252a">BetaFPV ELRS Lite</text>
+<text x="898" y="960" class="s">flat antenna · S-pocket tray</text>
+<text x="898" y="988" class="s">CRSF 420 kbaud, non-inverted</text>
+<path d="M983,815 L983,900" fill="none" stroke="#ffffff" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M983,815 L983,900" fill="none" stroke="#2a2c30" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1008,815 L1008,900" fill="none" stroke="#ffffff" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1008,815 L1008,900" fill="none" stroke="#c93a3a" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1033,815 L1033,900" fill="none" stroke="#ffffff" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1033,815 L1033,900" fill="none" stroke="#b8bec7" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1058,815 L1058,900" fill="none" stroke="#ffffff" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1058,815 L1058,900" fill="none" stroke="#e2b714" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1100" y="852" class="p" fill="#646a74" text-anchor="start">GND · 5V · RX ← · TX →, twisted, &lt; 60 mm</text>
+<rect x="300" y="900" width="470" height="140" rx="14" fill="#fff1e3" stroke="#ff8c1a" stroke-width="2.5"/>
+<text x="318" y="934" class="t" fill="#22252a">Heading LEDs · 2 × TinySLED</text>
+<text x="318" y="960" class="s">top + bottom in parallel, orange</text>
+<text x="318" y="988" class="s">check the 2–3S part at 13.05 V</text>
+<path d="M680,815 L680,900" fill="none" stroke="#ffffff" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M680,815 L680,900" fill="none" stroke="#e0742a" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M720,815 L720,900" fill="none" stroke="#ffffff" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M720,815 L720,900" fill="none" stroke="#ff8c1a" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="668" y="868" class="p" fill="#646a74" text-anchor="end">Y-spliced to both LEDs by the plug</text>
+<text x="60" y="730" class="c" fill="#22252a" text-anchor="start">Wires</text>
+<path d="M60,752 L100,752" fill="none" stroke="#ffffff" stroke-width="11" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M60,752 L100,752" fill="none" stroke="#d23b2f" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="114" y="758" class="p" fill="#646a74" text-anchor="start">VBAT_RAW, battery side</text>
+<path d="M60,778 L100,778" fill="none" stroke="#ffffff" stroke-width="11" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M60,778 L100,778" fill="none" stroke="#e0742a" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="114" y="784" class="p" fill="#646a74" text-anchor="start">VBUS, switched</text>
+<path d="M60,804 L100,804" fill="none" stroke="#ffffff" stroke-width="11" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M60,804 L100,804" fill="none" stroke="#2a2c30" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="114" y="810" class="p" fill="#646a74" text-anchor="start">GND</text>
+<path d="M60,830 L100,830" fill="none" stroke="#ffffff" stroke-width="11" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M60,830 L100,830" fill="none" stroke="#b8bec7" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="114" y="836" class="p" fill="#646a74" text-anchor="start">DSHOT1 / CRSF</text>
+<path d="M60,856 L100,856" fill="none" stroke="#ffffff" stroke-width="11" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M60,856 L100,856" fill="none" stroke="#e2b714" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="114" y="862" class="p" fill="#646a74" text-anchor="start">DSHOT2 / CRSF</text>
+<path d="M60,882 L100,882" fill="none" stroke="#ffffff" stroke-width="11" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M60,882 L100,882" fill="none" stroke="#ff8c1a" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="114" y="888" class="p" fill="#646a74" text-anchor="start">HEAD_SW</text>
+<text x="1240" y="1000" class="p" fill="#646a74" text-anchor="start"></text>
+<text x="1240" y="1028" class="p" fill="#646a74" text-anchor="start"></text>
+<text x="1240" y="1056" class="p" fill="#646a74" text-anchor="start"></text>
+<text x="940" y="180" class="p" fill="#646a74" text-anchor="start">J7 (switch loop) sits beside J6 at the S end; only the pigtail runs N.</text>
+<text x="940" y="208" class="p" fill="#646a74" text-anchor="start">J7 carries no ground: VBAT_RAW out, VBUS back.</text>
+<text x="940" y="236" class="p" fill="#646a74" text-anchor="start">Outer-layer VBUS ↔ VBAT_RAW kept 1 mm apart.</text>
+</svg>

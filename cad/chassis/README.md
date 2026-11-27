@@ -1,25 +1,26 @@
-# holy guacamole v3.4g (2026-11-10): chassis + rev-2 carrier + harness
+# holy guacamole v3.4h (2026-11-16): chassis + rev-2 carrier + harness
 
 Units are mm. The spin axis is z, and the origin is the centre of the frame's bottom face. +y = N (switch / USB end), −y = S (ESC / receiver end), +x = E motor. Every file is in bot coordinates, so they all drop into one assembly without moving anything.
 
 **Status:**
-- **Mass:** 446 g (limit 454). Needs 2.7 g of balance trim at r44.
+- **Mass:** 447 g (limit 454). Needs 2.9 g of balance trim at r44.
 - **Fit:** every assembly, service and tool sweep passes, with no overlaps.
 - **Printing:** 0 trapped-powder cavities, and both halves are one solid each.
-- **FEA:** worst case is 45.9 MPa at 500 g impact, at the motor-wall corner (FoS 1.14 vs 52 MPa PA11).
+- **FEA (`fea_v33.py`, 4000 rpm + impacts, allow 30 MPa):** ring-supported worst case FoS 1.03, same as v3.4g (1.00). The bearing end walls peak at 13.9 MPa (FoS 2.2). The bolts-only bound shows one 31.7–36.9 MPa node on the ring lip at the 150° ear; the next node down is 27.7 MPa, matching v3.4g, so it reads as a re-mesh spike, not a change from the wheels.
 - **Harness:** collision-checked against the frame, the parts, the plug bodies and each other. The only contacts are deliberate: the ESC power leads have a 0.05 mm snap in the ledge channels, and the motor-lead strands touch where the twist starts.
 
-**Board:** rev 2 placement with J7 beside J6 (v3.4g). The PCB STEP is a placement reference: the board on `main` has since gained its silkscreen and ground fill, which change no outline or part position. The LED keepout layers get re-added board-side from `harness/harness.js`.
+**Board:** rev 2 placement with J7 beside J6 (since v3.4g). The PCB STEP is a placement reference: the board on `main` has since gained its silkscreen and ground fill, which change no outline or part position. The LED keepout layers get re-added board-side from `harness/harness.js`.
 
 ## Files
 | path | what |
 |---|---|
-| `holy_guacamole_v34g_assembly.step` | every STEP part in one coloured assembly (Onshape / Fusion import) |
 | `step/` | the parts one per file. **Print these in MJF PA11: `v33m_lower.step`, `v33m_upper.step`, `v33m_top.step`, `v33m_bot.step`** (plates 0.8 mm). The rest are reference bodies (motors, wheels, hubs, bearings, ring, TPU liners, battery, ESC envelope, PCB + parts, receiver, switch, LEDs, USB-C, XT30 courtyards) |
 | `stl/` | viewer-only items: fasteners (Ti M3×20 ring bolts, M2.5×6 plate screws, M2×4 PCB screws, M3×6 motor screws, M2×5 wheel screws, brass inserts), detailed ESC, hex key, harness (one STL per circuit), plugs + 2 mm bullets + mated XT30s, foam/tape pads |
 | `harness/` | `harness.js` (route source of truth), the sampler and the collision checker, sampled points |
-| `viewer/holy-guacamole.html` | the offline 3D viewer: wiring view, section, explode, build animation |
-| `scripts/` | generator + checks: cadquery → gmsh → CalculiX (`concept_v33.py topo_v33_0.12.npz mjf`, then `check`, `hw`, `printcheck`, `tools`, `fea`) |
+| `viewer/holy-guacamole.html` | the offline 3D viewer: wiring view, section, explode, build animation (v3.4h). Rebuild it from `viewer/src/` |
+| `renders/` | v3.4h stills: hero, exploded (labelled), drawing, section A-A, guts, wiring (+ SVG) |
+| `ring/ring_fea.py` | the weapon ring's 2D geometry (`ring2d`, imported by `concept_v33.py`) and its tooth-hit FEA sweep |
+| `scripts/` | generator + checks: cadquery → gmsh → CalculiX (`concept_v33.py topo_v33_0.12.npz mjf`, then `check`, `hw`, `printcheck`, `tools`, `fea`). `wheel_v33.py` builds the wheel (the hub, tread and bearing STEPs here, which the generator imports) and the tread mould STLs; the copies to order are in `../fab/wheel_mould`. The generator also needs the vendor STEPs `motor.step` (PBB D2822) and `switch.step` (Fingertech mini switch) in `../real/` (or `REAL=<dir>`); they are not in the repo |
 
 ## Z table
 | z | what |
@@ -33,6 +34,22 @@ Units are mm. The spin axis is z, and the origin is the centre of the frame's bo
 | 16.9…29.0 | upper half. Battery ribs x ±8.75…10.75 (SE rib stops at y −19.2); L-shelves at z 25.5 with windows over J6 / J7 |
 | 23.2…24.6 | receiver tray across the S pocket |
 | 28.4…29.33 | top plate |
+
+## What changed in v3.4h
+
+The wheels go from 9 to **12 mm wide** (+33% tread), because narrow cast treads wear out fast on ant and beetle meltys (Discord: 9–10 mm T40s shredded in a fight; ~25 mm cast 40A lasted about 4).
+
+| | v3.4g | v3.4h |
+|---|---|---|
+| wheel | Ø42 × 9, one dovetail + 12 ribs | **Ø42 × 12, two dovetails (at ⅓ and ⅔ width) + 12 ribs** |
+| tread / hub | 3.6 g / 3.1 g | **5.0 g / 3.5 g** (pour 5.0 cc, ~6.5 cc with sprue) |
+| wheel span | x 51.45…60.45 | **x 51.45…63.45** |
+| MR128 bearing seat | x 60.6…64.1 | **x 63.6…67.1** (still Ø11.8 printed, ream to 12.0) |
+| bearing end wall to the ring | 7 mm | **3.6 mm** (x 69.0…72.6); carries the ~250 N outward pull at 4000 rpm in compression, 13.9 MPa peak |
+| wheel wells, plate notches, strut | follow the wheel (`WHEEL_W`), strut is 3 mm shorter |
+| wheel centres | 111.9 apart | **114.9 apart** |
+
+Unchanged: Ø42, the 6.5 mm the wheels stand proud of each face, motors, ring, board, harness. The viewer and renders are rebuilt for v3.4h.
 
 ## What changed in v3.4g
 

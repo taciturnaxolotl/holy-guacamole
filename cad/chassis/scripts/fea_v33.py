@@ -92,7 +92,7 @@ for s in (1, -1):
     loads.append((sel(sel_m), Fc*np.array([s, 0.]), np.array([0., s]), Fi))
 SHOCK = 500*9.81
 # outboard bearing: rotor (~22 g) + wheel/hub/bearing (~8 g) pull outward along the motor axis, into the lip of each end-wall housing
-XB1 = 51.4+0.05+9.15+3.5
+XB1 = 51.4+0.05+12.0+0.15+3.5   # v3.4h: 12 mm wheel
 for s in (1, -1):
     ra = np.hypot(X[:, 1], X[:, 2]-ZC)
     m = (np.abs(X[:, 0]-s*(XB1+0.02)) < 0.1) & (ra > 5.25) & (ra < 6.05)

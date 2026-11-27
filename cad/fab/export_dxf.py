@@ -3,8 +3,10 @@
 usage (from cad/fab/):  uv run --with cadquery-ocp --with ezdxf python export_dxf.py
 then:                   uv run --with ezdxf --with shapely --with matplotlib python check_dxf.py dxf/*.dxf
 
-Lines, arcs and circles are written as such. A contour made only of short straight segments (the ring, which the
-chassis generator builds as a finely filleted polygon) goes out as one closed polyline, so every contour is closed.
+Lines, arcs and circles are written as such. A contour made only of straight segments (the ring, which the chassis
+generator builds as a polygon) is rebuilt: runs of vertices that lie on one circle (to 2 um) become true ARCs, a loop
+that is all one circle becomes a CIRCLE, and what is left stays as lines. The ring's OD otherwise goes out as ~10 mm
+chords (0.16 mm flats) and its bolt holes as 32-gons.
 Coordinates are the chassis frame (origin on the spin axis, +Y = N), so the files line up with each other.
 """
 import sys, math
@@ -26,6 +28,46 @@ PARTS = {   # STEP in ../chassis/step -> DXF in dxf/
     "v33m_top.step": "plate_top_0.8mm.dxf",
     "v33m_bot.step": "plate_bottom_0.8mm.dxf",
 }
+
+
+def _circle3(a, b, c):
+    (x1, y1), (x2, y2), (x3, y3) = a, b, c
+    d = 2*(x1*(y2-y3) + x2*(y3-y1) + x3*(y1-y2))
+    if abs(d) < 1e-12: return None
+    ux = ((x1*x1+y1*y1)*(y2-y3) + (x2*x2+y2*y2)*(y3-y1) + (x3*x3+y3*y3)*(y1-y2))/d
+    uy = ((x1*x1+y1*y1)*(x3-x2) + (x2*x2+y2*y2)*(x1-x3) + (x3*x3+y3*y3)*(x2-x1))/d
+    return (ux, uy, math.hypot(x1-ux, y1-uy))
+
+
+def emit_polygon(msp, pts, n, tol=0.002, rmax=500.0):
+    """closed polygon -> ARC / CIRCLE / LINE entities. Runs of >= 4 vertices on one circle become an arc."""
+    m = len(pts)
+    c = _circle3(pts[0], pts[m//3], pts[2*m//3])
+    if c and c[2] < rmax and all(abs(math.hypot(x-c[0], y-c[1]) - c[2]) < tol for x, y in pts):
+        msp.add_circle((c[0], c[1]), c[2]); n['circle'] += 1; return
+    on = lambda c, q: abs(math.hypot(q[0]-c[0], q[1]-c[1]) - c[2]) < tol
+    # start at a vertex where the curvature changes, so no run wraps past index 0
+    def fits(i):
+        c = _circle3(pts[i-1], pts[i], pts[(i+1) % m]); return c if (c and c[2] < rmax) else None
+    start = 0
+    for i in range(m):
+        a, b = fits(i), fits((i+1) % m)
+        if not (a and b and on(a, pts[(i+2) % m])): start = (i+1) % m; break
+    P = pts[start:] + pts[:start]; k = 0
+    while k < m:
+        j = k + 2
+        c = _circle3(P[k], P[(k+1) % m], P[j % m]) if j < m + 1 else None
+        if c and c[2] < rmax:
+            while j + 1 <= m and on(c, P[(j+1) % m]): j += 1
+        if c and c[2] < rmax and j - k >= 3:
+            p0, pm, p1 = P[k], P[(k+j)//2 % m], P[j % m]
+            c = _circle3(p0, pm, p1) or c                         # exact through both ends, so the lines meet the arc
+            a0 = math.degrees(math.atan2(p0[1]-c[1], p0[0]-c[0])); a1 = math.degrees(math.atan2(p1[1]-c[1], p1[0]-c[0]))
+            am = math.degrees(math.atan2(pm[1]-c[1], pm[0]-c[0]))
+            ccw = (am - a0) % 360 < (a1 - a0) % 360            # the CCW sweep a0 -> a1 passes through the middle vertex
+            msp.add_arc((c[0], c[1]), c[2], a0 if ccw else a1, a1 if ccw else a0); n['arc'] += 1; k = j
+        else:
+            msp.add_line(P[k], P[(k+1) % m]); n['line'] += 1; k += 1
 
 
 def export(src, dst):
@@ -55,7 +97,7 @@ def export(src, dst):
             pts.append(c.Value(c.FirstParameter()) if probe.Orientation() == 0 else c.Value(c.LastParameter()))
             probe.Next()
         if all_lines and len(pts) > 8:
-            msp.add_lwpolyline([(p.X(), p.Y()) for p in pts], close=True); n['polyline'] = n.get('polyline', 0) + 1
+            emit_polygon(msp, [(p.X(), p.Y()) for p in pts], n)
             w.Next(); continue
         while ex.More():
             edge = ex.Current(); c = BRepAdaptor_Curve(edge); t0, t1 = c.FirstParameter(), c.LastParameter()

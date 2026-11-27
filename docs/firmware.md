@@ -232,8 +232,8 @@ this table; change here and in the struct together.
 | Disc body radius `R_body` | 0.085 m (sim) / **0.078 m** (v3.4f ring Ro; frame is Ø145) | mass + body contact |
 | Weapon-tip radius `R_tip` | 0.115 m (sim) / **0.090 m** (v3.4f, Ø180 over the two teeth) | **collision radius** |
 | Moment of inertia `I` | `k·m·R_body²`, k≈0.55 → ~1.8e-3 kg·m² (sim) / **~1.39e-3 kg·m²** (v3.4f CAD; the 126 g ring at r 75.5 dominates; k≈0.51 on R 0.078) | k tunable (mass distribution) |
-| Thrust lever `r_w` | ~0.055–0.06 m / **0.056 m** (v3.4f wheel centre) | effective drive-wheel lever from centre |
-| Wheel | **Ø42 × 9 mm**, cast VytaFlex 40 tread | chassis rpm = motor rpm × 21/56 = **0.375 ×** (no slip) |
+| Thrust lever `r_w` | ~0.055–0.06 m / **0.0575 m** (v3.4h wheel centre; 0.056 before) | effective drive-wheel lever from centre |
+| Wheel | **Ø42 × 12 mm** (v3.4h), cast VytaFlex 40 tread | chassis rpm = motor rpm × 21/57.45 = **0.366 ×** (no slip) |
 | Normal RPM | 2600–2750 rpm (272–288 rad/s) | tracking mode, ~0.44 throttle |
 | Strike/burst RPM | 3750–4000 rpm (393–419 rad/s) | pre-attack punch, ~0.65 throttle |
 | Full-throttle terminal ω | ~644 rad/s (~6150 rpm) | headroom above combat RPM so drift modulation doesn't clip |
